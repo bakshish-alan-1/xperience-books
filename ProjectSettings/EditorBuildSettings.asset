@@ -6,13 +6,48 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/AR Books/00_Scenes/00_Splash.unity
+    path: Assets/_XperienceBooks/00_Scenes/00_Splash.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 1
-    path: Assets/AR Books/00_Scenes/01_Home.unity
+    path: Assets/_XperienceBooks/00_Scenes/01_Home.unity
     guid: 08dc6fa6b475f404d8b541a8ae18edcc
+  - enabled: 1
+    path: Assets/_XperienceBooks/00_Scenes/Modules/01_3D_Face_Prop.unity
+    guid: 83b3b8daa90754ee3b9ab064b19e71b0
+  - enabled: 1
+    path: Assets/_XperienceBooks/00_Scenes/Modules/02_AR_with_Image_Tracking.unity
+    guid: 3d1c9cd6439394c889f62043726b1a70
+  - enabled: 1
+    path: Assets/_XperienceBooks/00_Scenes/Modules/03_AR_with_Plane_Tracking.unity
+    guid: ef4ceb0143a8f4143bcdee5c943aa60a
+  - enabled: 1
+    path: Assets/_XperienceBooks/00_Scenes/Modules/04_E-commerce.unity
+    guid: 07e097ef965204630b4187dfd7aa88eb
+  - enabled: 1
+    path: Assets/_XperienceBooks/00_Scenes/Modules/05_Face_Neck-Hole.unity
+    guid: 05478f021412a46b99f014762436bc13
+  - enabled: 1
+    path: Assets/_XperienceBooks/00_Scenes/Modules/06_Face_Paint.unity
+    guid: 985646707254b4fc89d3a5db8ef317bc
+  - enabled: 1
+    path: Assets/_XperienceBooks/00_Scenes/Modules/07_Fan_Art.unity
+    guid: df3228138af93454887ad24d33219f69
+  - enabled: 1
+    path: Assets/_XperienceBooks/00_Scenes/Modules/08_ImageGallery.unity
+    guid: a87a5b525704e4c0c9742b872fb37ca3
+  - enabled: 1
+    path: Assets/_XperienceBooks/00_Scenes/Modules/09_AR-Portal.unity
+    guid: ac4189c525329451489af9080fea78ba
+  - enabled: 1
+    path: Assets/_XperienceBooks/00_Scenes/Modules/10_WebsitePage.unity
+    guid: 58fbedf7adf414b86baad39eb8e82cef
+  - enabled: 1
+    path: Assets/_XperienceBooks/00_Scenes/Modules/11_2D_Object_Me.unity
+    guid: e7ccdd6c44db840fbae2e1dd1bd9a1f3
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 9530466dbf6794a13b31f3b737cc64a5,
       type: 2}
     UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 04d086070555149b38f929aa8f52ecac,
+      type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 10ce567d4bd5744bdb2697b3daa68b99,
       type: 2}

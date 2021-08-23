@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a99d7a77d0214e80ab4de49344c1498, type: 3}
+  m_Name: Properties
+  m_EditorClassIdentifier: 
+  m_CurrentEnvirnment: 0
+  TestingBaseURL: https://arbooks.theintellify.net/api/
+  ProductionBaseURL: https://admin.continuummultimedia.com/api/
+  LoginAPI: login
+  Register: register
+  GetOTPforForgotPassword: forget-password/get-otp
+  ForgotPassword: forget-password
+  UpdateParentEmail: user/parent-email/update
+  GetMappModuleList: chapter/getarmoduleschapters?book_id={0}&chapter_id={1}&qr_code_id={2}&latitude={3}&longitude={4}
+  GetModuleContent: chapter/getchapterqrcodealldata?chapter_id={0}&ar_module_id={1}
+  GetMarkerImages: chapter/getchapterccodealldata?chapter_id={0}&ar_module_id={1}
+  UpdateUserProfile: profile/update
+  UpdateUserPassword: change-password
+  seriesList: series
+  seriesDetails: series
+  GetFeatureProductList: product/getfeaturedproducts?book_id={0}&chapter_id={1}
+  GetAllCategory: category/show
+  GetProductByCategory: product/getproductsbycategory?category_id={0}
+  GetAddressList: address/v1
+  DeleteAddress: address/delete/v1
+  StoreAddress: address/store/v1
+  UpdateAddress: address/update/v1
+  Order: order
+  OrderUpdate: order/update
