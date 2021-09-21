@@ -1,21 +1,43 @@
-﻿using UnityEditor;
+﻿using System;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
+using Debug = UnityEngine.Debug;
 
 namespace TriLibCore.Editor
 {
     public class BuildProcessor : IPreprocessBuildWithReport
     {
-        public int callbackOrder => 0;
+        public int callbackOrder => -1000;
 
         public void OnPreprocessBuild(BuildReport report)
         {
-            if ((
-                    report.summary.platform == BuildTarget.StandaloneWindows || report.summary.platform == BuildTarget.StandaloneWindows64 ||
-                    report.summary.platform == BuildTarget.StandaloneLinux64 || report.summary.platform == BuildTarget.StandaloneOSX
-                ) && PlayerSettings.GetApiCompatibilityLevel(report.summary.platformGroup) != ApiCompatibilityLevel.NET_4_6)
+            var waitingMappers = false;
+            string materialMapper = null;
+            var arguments = Environment.GetCommandLineArgs();
+            foreach (var argument in arguments)
             {
-                UnityEngine.Debug.LogWarning("Please change the API Compatibility Level to .NET 4.x under Player Settings. Otherwise, some TriLib features like GLTF loading won't work.");
+                if (waitingMappers)
+                {
+                    materialMapper = argument;
+                    continue;
+                }
+                switch (argument)
+                {
+                    case "-trilib_mappers":
+                        {
+                            waitingMappers = true;
+                            break;
+                        }
+                }
+            }
+            if (materialMapper != null)
+            {
+                Debug.Log($"Using the given material mapper:{materialMapper}.");
+                CheckMappers.SelectMapper(materialMapper);
+            }
+            else
+            {
+                CheckMappers.Initialize();
             }
         }
     }

@@ -58,6 +58,7 @@ public class LoadModelFromURL : MonoBehaviour
 
         Debug.Log("StartLoadObject path/url: " + _url);
         var assetLoaderOptions = AssetLoader.CreateDefaultLoaderOptions();
+        //assetLoaderOptions.PivotPosition = PivotPosition.Center;
         var webRequest = AssetDownloader.CreateWebRequest(_url);
         if (isLocal)
             AssetDownloader.LoadModelFromZip(_url, OnLoad, OnMaterialsLoad, OnProgress, OnError, _RootObject, assetLoaderOptions);

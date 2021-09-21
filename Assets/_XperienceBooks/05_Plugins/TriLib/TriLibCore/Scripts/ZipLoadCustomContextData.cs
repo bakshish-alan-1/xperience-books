@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
+using TriLibCore.General;
 
 namespace TriLibCore
 {
@@ -20,5 +22,15 @@ namespace TriLibCore
         /// The optional custom data.
         /// </summary>
         public object CustomData;
+
+        /// <summary>
+        /// The original error event passed to the Zip loading method.
+        /// </summary>
+        public Action<IContextualizedError> OnError;
+
+        /// <summary>
+        /// The original materials load event passed to the Zip loading method.
+        /// </summary>
+        public Action<AssetLoaderContext> OnMaterialsLoad;
     }
 }

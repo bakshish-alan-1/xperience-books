@@ -1,6 +1,7 @@
-﻿using System;
+﻿#pragma warning disable 672
+
+using System;
 using ICSharpCode.SharpZipLib.Zip;
-using StbImageSharp;
 using TriLibCore.Interfaces;
 using TriLibCore.Utils;
 
@@ -21,6 +22,14 @@ namespace TriLibCore.Mappers
             if (zipFile == null)
             {
                 throw new Exception("Zip file instance is null.");
+            }
+            if (string.IsNullOrWhiteSpace(texture.Filename))
+            {
+                if (assetLoaderContext.Options.ShowLoadingWarnings)
+                {
+                    UnityEngine.Debug.LogWarning("Texture name is null.");
+                }
+                return null;
             }
             var shortFileName = FileUtils.GetShortFilename(texture.Filename).ToLowerInvariant();
             foreach (ZipEntry zipEntry in zipFile)

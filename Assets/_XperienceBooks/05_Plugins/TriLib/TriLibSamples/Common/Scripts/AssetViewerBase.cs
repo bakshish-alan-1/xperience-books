@@ -1,4 +1,6 @@
-﻿using System;
+﻿#pragma warning disable 649
+using System;
+using System.IO;
 using TriLibCore.General;
 using TriLibCore.Utils;
 using UnityEngine;
@@ -157,7 +159,8 @@ namespace TriLibCore.Samples
             HideModelUrlDialog();
             SetLoading(true);
             OnBeginLoadModel(true);
-            var isZipFile = fileExtension == "zip";
+            fileExtension = fileExtension.ToLowerInvariant();
+            var isZipFile = fileExtension == "zip" || fileExtension == ".zip";
             AssetDownloader.LoadModelFromUri(request, OnLoad, onMaterialsLoad ?? OnMaterialsLoad, OnProgress, OnError, wrapperGameObject, AssetLoaderOptions, customData, isZipFile ? null : fileExtension, isZipFile);
         }
 
@@ -196,11 +199,12 @@ namespace TriLibCore.Samples
         protected void SetLoading(bool value)
         {
             var selectables = FindObjectsOfType<Selectable>();
-            foreach (var button in selectables)
+            for (var i = 0; i < selectables.Length; i++)
             {
+                var button = selectables[i];
                 button.interactable = !value;
             }
-#if UNITY_WSA || UNITY_WEBGL
+#if UNITY_WSA || UNITY_WEBGL || TRILIB_FORCE_SYNC
             _loadingWrapper.gameObject.SetActive(value);
 #else
             _loadingBar.gameObject.SetActive(value);
@@ -215,15 +219,15 @@ namespace TriLibCore.Samples
             Instance = this;
         }
 
-        /// <summary>Event is triggered when the Model loading progress changes.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <summary>Event that is triggered when the Model loading progress changes.</summary>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         /// <param name="value">The loading progress, ranging from 0 to 1.</param>
         protected virtual void OnProgress(AssetLoaderContext assetLoaderContext, float value)
         {
             _loadingBar.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width * value);
         }
 
-        /// <summary>Event is triggered when any error occurs.</summary>
+        /// <summary>Event that is triggered when any error occurs.</summary>
         /// <param name="contextualizedError">The Contextualized Error that has occurred.</param>
         protected virtual void OnError(IContextualizedError contextualizedError)
         {
@@ -232,15 +236,15 @@ namespace TriLibCore.Samples
             SetLoading(false);
         }
 
-        /// <summary>Event is triggered when the Model Meshes and hierarchy are loaded.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <summary>Event that is triggered when the Model Meshes and hierarchy are loaded.</summary>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         protected virtual void OnLoad(AssetLoaderContext assetLoaderContext)
         {
 
         }
 
         /// <summary>Event is triggered when the Model (including Textures and Materials) has been fully loaded.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         protected virtual void OnMaterialsLoad(AssetLoaderContext assetLoaderContext)
         {
             SetLoading(false);

@@ -14,19 +14,23 @@ public class StaticKeywords
     // Theme images name
     public static string DialogBox = "dialog_box.png";
     public static string DialogBoxBtn = "dialog_box_btn.png";
-    public static string Fan_art_Img_Bg = "fan_art_img_glry.png";
+    public static string Fan_art_Img_Bg = "fan_art_img_glry.png";// fan art header bg
     public static string SeriesImage = "seriesImage.png";
     public static string LogoTheme = "logo.png";
-    public static string Scan_BGTheme = "scan_qr_bg.png";
+    public static string Scan_BGTheme = "scan_qr_bg.png";// scan screen main BG
     public static string BGTheme="background_image.png";
-    public static string ScanTheme = "scan_button.png";
+    public static string ScanTheme = "scan_button.png";// scan btn image used at home screen
     public static string FacebookTheme = "facebook_icon.png";
     public static string TwitterTheme = "twitter_icon.png";
     public static string InstaTheme = "instagram_icon.png";
+    public static string YoutubeTheme = "youtube_icon.png";
     public static string WebsiteTheme = "website_icon.png";
     public static string BackBtnTheme = "back_button.png";
     public static string ProfileTheme = "profile_icon.png";
-    public static string NotificationTheme = "notif_icon.png";
+    public static string NotificationTheme = "notify_icon.png";// notification icon used in home screen
+    public static string NotificationNextBtn = "notify_cell_next.png";// next btn for notification cell
+    public static string NotificationCellIcon = "notify_cell_icon.png";// icon for notification cell
+    public static string NotificationCellBG = "notify_cell_bg.png";// bg for notification cell
     public static string Module1Theme = "module_1.png";
     public static string Module2Theme = "module_2.png";
     public static string Module3Theme = "module_3.png";

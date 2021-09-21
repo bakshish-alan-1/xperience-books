@@ -145,6 +145,7 @@ public class Profile : MonoBehaviour
                 user.parent_email = m_parentEmail.text;
                 user.age = m_Age.text;
                 user.password = m_password.text;
+                user.old_password = PlayerPrefs.GetString("Password");
                 user.new_password = m_confirmPassword.text;
 
                 if (m_Gender_Male.isOn == true)

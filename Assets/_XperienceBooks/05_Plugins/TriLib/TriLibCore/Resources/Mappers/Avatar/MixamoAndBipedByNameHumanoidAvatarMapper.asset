@@ -120,6 +120,7 @@ MonoBehaviour:
     - LeftHand
     - L Hand
     - L_Hand
+    - LeftWrist
   - HumanBone: 12
     HumanLimit:
       useDefaultValues: 1
@@ -164,6 +165,7 @@ MonoBehaviour:
     - RightHand
     - R Hand
     - R_Hand
+    - RightWrist
   - HumanBone: 1
     HumanLimit:
       useDefaultValues: 1

@@ -14,7 +14,7 @@ namespace TriLibCore.Samples
         /// <summary>
         /// Tries to find the given external data source using the original resource filename and the context parameters.
         /// </summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         /// <param name="originalFilename">The source data original filename.</param>
         /// <param name="finalPath">The found data final Path.</param>
         /// <returns>The external data source Stream, if found. Otherwise <c>null</c>.</returns>

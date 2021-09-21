@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace SFB
+namespace TriLibCore.SFB
 {
     /// <summary>Represents a platform-specific file with a Stream.</summary>
     public class ItemWithStream
@@ -14,7 +14,7 @@ namespace SFB
         /// <summary>
         /// Indicates if this item has valid data.
         /// </summary>
-        public bool HasData => Name != null || Stream != null;
+        public bool HasData => !string.IsNullOrWhiteSpace(Name) || Stream != null;
 
         /// <summary>
         /// Opens the Stream to read data from this item.

@@ -1,4 +1,6 @@
-﻿using TriLibCore.Extensions;
+﻿using System.Collections.Generic;
+using TriLibCore.Extensions;
+using TriLibCore.Interfaces;
 using UnityEngine;
 
 namespace TriLibCore.Mappers
@@ -8,12 +10,13 @@ namespace TriLibCore.Mappers
     public class ByBonesRootBoneMapper : RootBoneMapper
     {
         /// <inheritdoc />
-        public override Transform Map(AssetLoaderContext assetLoaderContext)
+        public override Transform Map(AssetLoaderContext assetLoaderContext, IList<Transform> bones)
         {
             Transform bestBone = null;
             var bestChildrenCount = 0;
-            foreach (var bone in assetLoaderContext.BoneTransforms)
+            for (var i = 0; i < bones.Count; i++)
             {
+                var bone = bones[i];
                 var childrenCount = bone.CountChild();
                 if (childrenCount >= bestChildrenCount)
                 {

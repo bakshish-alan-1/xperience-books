@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-namespace SFB
-{
 
+namespace TriLibCore.SFB
+{
     public class StandaloneFileBrowserLinux : IStandaloneFileBrowser<ItemWithStream>
     {
         private static Action<IList<ItemWithStream>> _openFileCb;

@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class VirtualButton : MonoBehaviour
 {
-
-
     Ray ray;
     RaycastHit hit;
 
@@ -45,9 +43,7 @@ public class VirtualButton : MonoBehaviour
         if (isObjectPlced) {
             isObjectPlced = false;
             Debug.Log("Click");
-            doorRoot.transform.GetChild(0).GetComponent<Animation>().Play("Door");
-            //anim.SetTrigger("DoorOpen");
-            //GetComponent<BoxCollider>().isTrigger = true;
+            iTween.RotateTo(doorRoot.transform.GetChild(0).transform.GetChild(1).gameObject, iTween.Hash("y", -100f, "time", 2f, "easeType", iTween.EaseType.linear, "loopType", iTween.LoopType.none));
         }
     }
 }

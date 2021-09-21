@@ -1,4 +1,5 @@
-﻿using TriLibCore.General;
+﻿#pragma warning disable 649
+using TriLibCore.General;
 using UnityEngine;
 using TriLibCore.Extensions;
 using UnityEngine.UI;
@@ -16,10 +17,16 @@ namespace TriLibCore.Samples
         private GameObject _loadedGameObject;
 
         /// <summary>
-        /// The load model Button.
+        /// The load Model Button.
         /// </summary>
         [SerializeField]
         private Button _loadModelButton;
+
+        /// <summary>
+        /// The progress indicator Text;
+        /// </summary>
+        [SerializeField]
+        private Text _progressText;
 
         /// <summary>
         /// Creates the AssetLoaderOptions instance and displays the Model file-picker.
@@ -40,7 +47,8 @@ namespace TriLibCore.Samples
         /// <param name="filesSelected">Indicates if any file has been selected.</param>
         private void OnBeginLoad(bool filesSelected)
         {
-            _loadModelButton.interactable = false;
+            _loadModelButton.interactable = !filesSelected;
+            _progressText.enabled = filesSelected;
         }
 
         /// <summary>
@@ -49,7 +57,7 @@ namespace TriLibCore.Samples
         /// <param name="obj">The contextualized error, containing the original exception and the context passed to the method where the error was thrown.</param>
         private void OnError(IContextualizedError obj)
         {
-            Debug.LogError($"An error ocurred while loading your Model: {obj.GetInnerException()}");
+            Debug.LogError($"An error occurred while loading your Model: {obj.GetInnerException()}");
         }
 
         /// <summary>
@@ -59,11 +67,11 @@ namespace TriLibCore.Samples
         /// <param name="progress">The loading progress.</param>
         private void OnProgress(AssetLoaderContext assetLoaderContext, float progress)
         {
-            Debug.Log($"Loading Model. Progress: {progress:P}");
+            _progressText.text = $"Progress: {progress:P}";
         }
 
         /// <summary>
-        /// Called when the Model (including Textures and Materials) has been fully loaded, or after any error occurs.
+        /// Called when the Model (including Textures and Materials) has been fully loaded.
         /// </summary>
         /// <remarks>The loaded GameObject is available on the assetLoaderContext.RootGameObject field.</remarks>
         /// <param name="assetLoaderContext">The context used to load the Model.</param>
@@ -71,12 +79,14 @@ namespace TriLibCore.Samples
         {
             if (assetLoaderContext.RootGameObject != null)
             {
-                Debug.Log("Materials loaded. Model fully loaded.");
+                Debug.Log("Model fully loaded.");
             }
             else
             {
                 Debug.Log("Model could not be loaded.");
             }
+            _loadModelButton.interactable = true;
+            _progressText.enabled = false;
         }
 
         /// <summary>
@@ -94,13 +104,7 @@ namespace TriLibCore.Samples
             if (_loadedGameObject != null)
             {
                 Camera.main.FitToBounds(assetLoaderContext.RootGameObject, 2f);
-                Debug.Log("Model loaded. Loading materials.");
             }
-            else
-            {
-                Debug.Log("Model materials could not be loaded.");
-            }
-            _loadModelButton.interactable = true;
         }
     }
 }

@@ -30,29 +30,45 @@ namespace TriLibCore.Mappers
         public override Dictionary<BoneMapping, Transform> Map(AssetLoaderContext assetLoaderContext)
         {
             var mapping = new Dictionary<BoneMapping, Transform>();
-            foreach (var boneMapping in BonesMapping)
+            for (var i = 0; i < BonesMapping.Count; i++)
             {
+                var boneMapping = BonesMapping[i];
                 if (boneMapping.BoneNames != null)
                 {
                     var found = false;
-                    foreach (var boneName in boneMapping.BoneNames)
+                    for (var j = 0; j < boneMapping.BoneNames.Length; j++)
                     {
+                        var boneName = boneMapping.BoneNames[j];
                         var transform = assetLoaderContext.RootGameObject.transform.FindDeepChild(boneName, stringComparisonMode, CaseInsensitive);
                         if (transform == null)
                         {
                             continue;
                         }
+
+                        var model = assetLoaderContext.Models[transform.gameObject];
+                        if (!model.IsBone)
+                        {
+                            continue;
+                        }
+
                         mapping.Add(boneMapping, transform);
                         found = true;
                         break;
                     }
+
                     if (!found && !IsBoneOptional(boneMapping.HumanBone))
                     {
+                        if (assetLoaderContext.Options.ShowLoadingWarnings)
+                        {
+                            Debug.LogWarning($"Could not find bone '{boneMapping.HumanBone}'");
+                        }
+
                         mapping.Clear();
                         return mapping;
                     }
                 }
             }
+
             return mapping;
         }
 

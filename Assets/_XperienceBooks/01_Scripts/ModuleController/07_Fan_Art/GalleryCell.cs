@@ -12,6 +12,7 @@ public class GalleryCell : MonoBehaviour
     Texture2D webTexture;
     public GalleryViewData m_CellData;
 
+    public Button button;
 
 
     public void SetGalleryTexture(bool isLocalFile, string URL, string localPath, string fileName, GalleryViewData data) {
@@ -24,6 +25,7 @@ public class GalleryCell : MonoBehaviour
 
         using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(URL))
         {
+            button.interactable = false;
             // www.downloadHandler = new DownloadHandlerBuffer();
             yield return uwr.SendWebRequest();
 
@@ -43,6 +45,9 @@ public class GalleryCell : MonoBehaviour
                 {
                     FileHandler.SaveFile(localPath, fileName, uwr.downloadHandler.data);
                 }
+
+                if (button)
+                    button.interactable = true;
             }
         }
 }

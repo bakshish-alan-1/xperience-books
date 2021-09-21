@@ -80,6 +80,12 @@ public class PlacementController : MonoBehaviour
 							}
 							else
 							{
+								if (m_Preloader.activeSelf)
+								{
+									audioSource.Stop();
+									audioSource.Play();
+								}
+
 								m_Preloader.SetActive(false);
 								if (m_SpawnObject != null)
 									m_SpawnObject.SetActive(true);

@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
 
 public class BookController : MonoBehaviour
 {
+    [SerializeField] TMPro.TMP_Text seriesName;
     [SerializeField] GameObject bookObj;
     [SerializeField] GameObject parent;
     [SerializeField] GameObject nodataFound;
@@ -28,6 +27,7 @@ public class BookController : MonoBehaviour
         else
             nodataFound.SetActive(false);
 
+        seriesName.text = GameManager.Instance.selectedSeries.name;
         for (int i = 0; i < GameManager.Instance.m_SeriesDetails.Count; i++)
         {
             GameObject obj = Instantiate(bookObj, parent.transform);

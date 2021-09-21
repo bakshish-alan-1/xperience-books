@@ -17,6 +17,7 @@ public class User
     public string updated_at;
     public object deleted_at;
     public string password, new_password;
+    public string old_password;
     public bool is_agreed;
     public bool first_login;
 

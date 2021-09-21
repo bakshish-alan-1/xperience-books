@@ -13,6 +13,8 @@ public class ErrorWindow : MonoBehaviour
 
     }
 
+    public static ErrorWindow Instance = null;
+
     [SerializeField] Image BG, ButtonImg;
     [SerializeField]
     TextMeshProUGUI TitleText, Message, ButtonText;
@@ -25,10 +27,17 @@ public class ErrorWindow : MonoBehaviour
 
     public ResponseData response;
 
+    private void Start()
+    {
+        if (Instance == null)
+            Instance = this;
+    }
+
     void setBGTheme(bool isDefault)
     {
         if (isDefault)
         {
+            Debug.Log("set them for error msg default");
             BG.sprite = Resources.Load<Sprite>("DialogBox");
             ButtonImg.sprite = Resources.Load<Sprite>("StoneBack");
 
@@ -36,9 +45,9 @@ public class ErrorWindow : MonoBehaviour
             TitleText.font = GameManager.Instance.DefaultFont;
             ButtonText.font = GameManager.Instance.DefaultFont;
 
-            Message.color = new Color(76f, 76f, 136f);
-            TitleText.color = new Color(76f, 76f, 136f);
-            ButtonText.color = new Color(76f, 76f, 136f);
+            Message.color = Color.white;
+            TitleText.color = Color.white;
+            ButtonText.color = new Color32(95, 93, 170, 255);
         }
         else
         {

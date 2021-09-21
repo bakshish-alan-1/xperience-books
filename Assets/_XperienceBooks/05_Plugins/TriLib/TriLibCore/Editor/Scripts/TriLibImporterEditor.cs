@@ -1,8 +1,13 @@
-﻿using System;
+﻿#pragma warning disable CS0105
+using System;
 using UnityEditor;
 using UnityEditor.Experimental.AssetImporters;
 using Object = UnityEngine.Object;
-
+#if UNITY_2020_2_OR_NEWER
+using UnityEditor.AssetImporters;
+#else
+using UnityEditor.Experimental.AssetImporters;
+#endif
 namespace TriLibCore.Editor
 {
     [CustomEditor(typeof(TriLibScriptedImporter))]

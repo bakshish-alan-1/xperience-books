@@ -69,8 +69,8 @@ public class ModuleList : MonoBehaviour
         int i = 0;
         foreach (Transform child in m_CurrentActiveModule.transform)
         {
-            child.GetComponent<ContentButton>().SetData(i, m_ButtonSprite[m_ActiveModules[i] - 1], m_ActiveModules[i]);
-              i++;
+            child.GetComponent<ContentButton>().SetData(m_ActiveModules[i]-1, m_ButtonSprite[m_ActiveModules[i] - 1], m_ActiveModules[i]);
+             i++;
         }
     }
 }

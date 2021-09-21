@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 
-namespace SFB
+namespace TriLibCore.SFB
 {
     public class StandaloneFileBrowserEditor : IStandaloneFileBrowser<ItemWithStream>
     {
@@ -21,8 +21,7 @@ namespace SFB
             }
             var itemWithStream = new ItemWithStream
             {
-                Name = path//,
-                //Stream = File.OpenRead(path)
+                Name = path
             };
             return new [] {itemWithStream};
         }
@@ -37,8 +36,7 @@ namespace SFB
             var path = EditorUtility.OpenFolderPanel(title, directory, "");
             var itemWithStream = new ItemWithStream
             {
-                Name = path//,
-                //Stream = File.OpenRead(path)
+                Name = path
             };
             return new [] { itemWithStream };
         }
@@ -55,8 +53,7 @@ namespace SFB
             var path = EditorUtility.SaveFilePanel(title, directory, name, ext);
             var itemWithStream = new ItemWithStream
             {
-                Name = path//,
-                //Stream = File.OpenRead(path)
+                Name = path
             };
             return itemWithStream;
         }

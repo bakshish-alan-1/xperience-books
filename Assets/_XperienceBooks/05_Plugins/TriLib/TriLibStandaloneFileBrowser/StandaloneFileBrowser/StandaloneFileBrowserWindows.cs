@@ -1,10 +1,9 @@
 ﻿#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-namespace SFB
+
+namespace TriLibCore.SFB
 {
     public class StandaloneFileBrowserWindows : IStandaloneFileBrowser<ItemWithStream>
     {
@@ -129,8 +128,7 @@ namespace SFB
                         var filename = multiselect && results.Count > 0 ? $"{results[0].Name}\\{currentString}" : currentString;
                         results.Add(new ItemWithStream
                         {
-                            Name = filename//,
-                            //Stream = File.OpenRead(filename)
+                            Name = filename
                         });
                     }
                     currentStringBytes.Clear();

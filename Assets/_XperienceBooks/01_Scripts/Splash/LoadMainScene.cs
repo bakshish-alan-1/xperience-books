@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using KetosGames.SceneTransition;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class LoadMainScene : MonoBehaviour
@@ -23,7 +24,9 @@ public class LoadMainScene : MonoBehaviour
         PlayerPrefs.SetInt("ENV", 1);// 1 = testing , 2 = production
         PlayerPrefs.SetInt("IsFreshInstall", 1);
         Debug.Log("Load home scene");
-        UnityEngine.SceneManagement.SceneManager.LoadScene(1);
+        SceneLoader.LoadScene(1);
+        //UnityEngine.SceneManagement.SceneManager.LoadScene(1);
+        //UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(1);
     }
 
 

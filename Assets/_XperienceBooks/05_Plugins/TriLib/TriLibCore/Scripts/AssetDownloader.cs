@@ -58,26 +58,30 @@ namespace TriLibCore
 
         /// <summary>Loads a Model from the given URI Asynchronously (Accepts zip files).</summary>
         /// <param name="unityWebRequest">The Unity Web Request used to load the Model. You can use the CreateWebRequest method to create a new Unity Web Request or pass your instance.</param>
-        /// <param name="onLoad">The Method to call on the Main Thread when the Model Meshes and hierarchy are loaded.</param>
-        /// <param name="onMaterialsLoad">The Method to call on the Main Thread when the Model (including Textures and Materials) has been fully loaded.</param>
+        /// <param name="onLoad">The Method to call on the Main Thread when the Model is loaded but resources may still pending.</param>
+        /// <param name="onMaterialsLoad">The Method to call on the Main Thread when the Model and resources are loaded.</param>
         /// <param name="onProgress">The Method to call when the Model loading progress changes.</param>
         /// <param name="onError">The Method to call on the Main Thread when any error occurs.</param>
         /// <param name="wrapperGameObject">The Game Object that will be the parent of the loaded Game Object. Can be null.</param>
-        /// <param name="assetLoaderOptions">The Asset Loader Options reference. Asset Loader Options contains various options used during the Model loading process.</param>
-        /// <param name="customContextData">The Custom Data that will be passed along the AssetLoaderContext.</param>
+        /// <param name="assetLoaderOptions">The options to use when loading the Model.</param>
+        /// <param name="customContextData">The Custom Data that will be passed along the Context.</param>
         /// <param name="fileExtension">The extension of the URI Model or the Model inside the Zip file.</param>
         /// <param name="isZipFile">Pass <c>true</c> if your file is a Zip file.</param>
+        /// <param name="haltTask">Turn on this field to avoid loading the model immediately and chain the Tasks.</param>
         /// <returns>The AssetLoaderContext used to load the model.</returns>
-        public static Coroutine LoadModelFromUri(UnityWebRequest unityWebRequest, Action<AssetLoaderContext> onLoad, Action<AssetLoaderContext> onMaterialsLoad, Action<AssetLoaderContext, float> onProgress, Action<IContextualizedError> onError = null, GameObject wrapperGameObject = null, AssetLoaderOptions assetLoaderOptions = null, object customContextData = null, string fileExtension = null, bool? isZipFile = null)
+        public static Coroutine LoadModelFromUri(UnityWebRequest unityWebRequest, Action<AssetLoaderContext> onLoad, Action<AssetLoaderContext> onMaterialsLoad, Action<AssetLoaderContext, float> onProgress, Action<IContextualizedError> onError = null, GameObject wrapperGameObject = null, AssetLoaderOptions assetLoaderOptions = null, object customContextData = null, string fileExtension = null, bool? isZipFile = null, bool haltTask = false)
         {
+            Debug.Log("Load from Live");
             var assetDownloader = new GameObject("Asset Downloader").AddComponent<AssetDownloaderBehaviour>();
-            return assetDownloader.StartCoroutine(assetDownloader.DownloadAsset(unityWebRequest, onLoad, onMaterialsLoad, onProgress, wrapperGameObject, onError, assetLoaderOptions, customContextData, fileExtension, isZipFile));
+            return assetDownloader.StartCoroutine(assetDownloader.DownloadAsset(unityWebRequest, onLoad, onMaterialsLoad, onProgress, wrapperGameObject, onError, assetLoaderOptions, customContextData, fileExtension, true));
         }
 
+        //Akash
         public static Coroutine LoadModelFromZip(string path, Action<AssetLoaderContext> onLoad, Action<AssetLoaderContext> onMaterialsLoad, Action<AssetLoaderContext, float> onProgress, Action<IContextualizedError> onError = null, GameObject wrapperGameObject = null, AssetLoaderOptions assetLoaderOptions = null, object customContextData = null, string fileExtension = null, bool? isZipFile = null)
         {
+            Debug.Log("Load from Local");
             var assetDownloader = new GameObject("Asset Downloader from zip").AddComponent<AssetDownloaderBehaviour>();
-            return assetDownloader.StartCoroutine(assetDownloader.DownloadAssetFromZip(path, onLoad, onMaterialsLoad, onProgress, wrapperGameObject, onError, assetLoaderOptions, customContextData, fileExtension, isZipFile));
+            return assetDownloader.StartCoroutine(assetDownloader.DownloadAssetFromZip(path, onLoad, onMaterialsLoad, onProgress, wrapperGameObject, onError, assetLoaderOptions, customContextData, fileExtension, true));
         }
     }
 }

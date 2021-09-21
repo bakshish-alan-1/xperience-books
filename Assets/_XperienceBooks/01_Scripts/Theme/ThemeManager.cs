@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.Networking;
 using TMPro;
+using System.Threading.Tasks;
 
 public class ThemeManager : MonoBehaviour
 {
@@ -53,6 +54,8 @@ public class ThemeManager : MonoBehaviour
         { urls.Add(GameManager.Instance.selectedSeries.theme.scan_button); name.Add(theme + "/" + StaticKeywords.ScanTheme); }
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.facebook_icon))
         { urls.Add(GameManager.Instance.selectedSeries.theme.facebook_icon); name.Add(theme + "/" + StaticKeywords.FacebookTheme); }
+        if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.youtube_icon))
+        { urls.Add(GameManager.Instance.selectedSeries.theme.youtube_icon); name.Add(theme + "/" + StaticKeywords.YoutubeTheme); }
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.twitter_icon))
         { urls.Add(GameManager.Instance.selectedSeries.theme.twitter_icon); name.Add(theme + "/" + StaticKeywords.TwitterTheme); }
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.instagram_icon))
@@ -102,13 +105,52 @@ public class ThemeManager : MonoBehaviour
 
             if (Directory.Exists(theme))
             {
-                StartCoroutine(saveTheame(urls[no], name[no]));
+                //StartCoroutine(saveTheame(urls[no], name[no]));
+                for (int i = 0; i < urls.Count; i++)
+                {
+                    OnDownloadTheme(urls[i], name[i]);// async call for download data
+                }
             }
             //else
             //    setTheameOfSeries();
         }
     }
 
+    public async void OnDownloadTheme(string url, string imageName)
+    {
+        Debug.Log("url: " + url + ", name: " + imageName);
+
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+        var operation = request.SendWebRequest();
+        while (!operation.isDone)
+            await Task.Yield();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log(request.error);
+            GameManager.Instance.OpenPrepareThemWindow(false);
+            ErrorWindow.Instance.SetErrorMessage("Something Went Wrong", request.error, "TRY AGAIN", ErrorWindow.ResponseData.InternetIssue, true);
+        }
+        else
+        {
+            File.WriteAllBytes(imageName, request.downloadHandler.data);
+
+            if ((no + 1) >= urls.Count)
+            {
+                if (imageName.Equals(StaticKeywords.Font1Theme))
+                    onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font1Theme, GameManager.Instance.TitleFont);
+
+                if (imageName.Equals(StaticKeywords.Font2Theme))
+                    onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font2Theme, GameManager.Instance.DetailFont);
+
+                PlayerPrefs.SetString("IsThemeSaved", "true");
+                HomeScreen.Instance.OnSetHomePanelData();
+            }
+            else
+                no += 1;
+        }
+    }
+    /*
     IEnumerator saveTheame(string url, string imageName)
     {
         Debug.Log("url: " + url + ", name: " + imageName);
@@ -117,7 +159,11 @@ public class ThemeManager : MonoBehaviour
         yield return request.SendWebRequest();
 
         if (request.isNetworkError || request.isHttpError)
+        {
             Debug.Log(request.error);
+            GameManager.Instance.OpenPrepareThemWindow(false);
+            ErrorWindow.Instance.SetErrorMessage("Something Went Wrong",request.error, "TRY AGAIN", ErrorWindow.ResponseData.InternetIssue, true);
+        }
         else
         {
             File.WriteAllBytes(imageName, request.downloadHandler.data);
@@ -136,29 +182,37 @@ public class ThemeManager : MonoBehaviour
                 if (imageName.Equals(StaticKeywords.Font2Theme))
                     GameManager.Instance.DetailFont = onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font2Theme);
 
+                PlayerPrefs.SetString("IsThemeSaved", "true");
                 HomeScreen.Instance.OnSetHomePanelData();
             }
         }
     }
+    */
 
     // return TMP_FontAsset object for TextMesh pro text
-    public TMP_FontAsset onCreateFontAsset(string myFontPath)
+    public async void onCreateFontAsset(string myFontPath, TMP_FontAsset textFont)
     {
-        string fontPaths = myFontPath;
-        //Font font = new Font(fontPaths);
+        var data = TMP_FontAsset.CreateFontAsset(new Font(myFontPath));
+        while (!data)
+            await Task.Yield();
 
-        //TMP_FontAsset fontAsset = TMP_FontAsset.CreateFontAsset(font);
-        return TMP_FontAsset.CreateFontAsset(new Font(myFontPath));
+        textFont = TMP_FontAsset.CreateFontAsset(new Font(myFontPath));
     }
 
-    public void OnLoadImage(string path, string name, Image image)
+    public async void OnLoadImage(string path, string name, Image image)
     {
         if (!File.Exists(path + "/" + name))
             return;
 
         Texture2D thisTexture = new Texture2D(100, 100);
         byte[] bytes = File.ReadAllBytes(path +"/" + name);
-        thisTexture.LoadImage(bytes);
-        image.sprite = GameManager.Instance.Texture2DToSprite(thisTexture);
+        //thisTexture.LoadImage(bytes);
+        while (!thisTexture.LoadImage(bytes))
+            await Task.Yield();
+
+        if (image != null)
+        {
+            image.sprite = GameManager.Instance.Texture2DToSprite(thisTexture);
+        }
     }
 }

@@ -1,12 +1,14 @@
-﻿using UnityEngine;
-using TriLibCore.General;
+﻿#pragma warning disable CS0105
+using UnityEngine;
 using TriLibCore.Interfaces;
 using UnityEditor;
+#if UNITY_2020_2_OR_NEWER
+using UnityEditor.AssetImporters;
+#else
 using UnityEditor.Experimental.AssetImporters;
-
+#endif
 namespace TriLibCore.Editor
 {
-    [ScriptedImporter(1, new[] { "gltf", "glb", "ply", "stl", "3mf" })]
     public class TriLibScriptedImporter : ScriptedImporter
     {
         public AssetLoaderOptions AssetLoaderOptions

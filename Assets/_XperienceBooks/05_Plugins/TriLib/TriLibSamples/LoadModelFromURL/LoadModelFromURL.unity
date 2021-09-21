@@ -341,7 +341,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: This sample downloads a model compressed in a Zip file
+  m_Text: This sample downloads a Model compressed in a Zip file
 --- !u!222 &1118294654
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace SFB
+namespace TriLibCore.SFB
 {
     public class StandaloneFileBrowserAndroidListener : AndroidJavaProxy
     {

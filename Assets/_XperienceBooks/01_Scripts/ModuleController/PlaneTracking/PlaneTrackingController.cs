@@ -70,7 +70,7 @@ public class PlaneTrackingController : MonoBehaviour
         m_LocalURL = FileHandler.FinalPath(filePath, fileName); // For Example :- "file://" + Application.persistentDataPath + "/" + filePath + fileName;
         m_WebURL = PlaneTrackingData[currentIndex].ar_content;
         audioPath = GameManager.Instance.LocalStoragePath + filePath;
-
+        Debug.Log("audioPath: " + audioPath);
         Debug.Log("Audio Loop: " + PlaneTrackingData[currentIndex].audio_play_in_loop);
     }
 
@@ -113,7 +113,7 @@ public class PlaneTrackingController : MonoBehaviour
         {
             Debug.Log("Save File at : " + localModelFilePath);
             File.WriteAllBytes(localModelFilePath, data);
-            FileHandler.ExtractFiles(localModelFilePath, audioPath);
+            FileHandler.ExtractFiles(localModelFilePath, audioPath, true);
         }
     }
 
@@ -176,7 +176,8 @@ public class PlaneTrackingController : MonoBehaviour
                 Debug.Log("audio_play_in_loop: " + PlaneTrackingData[currentIndex].audio_play_in_loop);
                 audioSource.loop = PlaneTrackingData[currentIndex].audio_play_in_loop;
                 audioSource.clip = temp;
-                
+                Debug.Log("temp.length: " + temp.length);
+                Debug.Log("m_SpawnObject: " + m_SpawnObject.activeSelf);
                 if (temp.length <= 0)
                 {
                     string msg = "Unsupported file or audio format.";

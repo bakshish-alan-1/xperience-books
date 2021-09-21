@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.IO;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -16,7 +17,7 @@ public class BookData : MonoBehaviour
         index = no;
         seriesName.text = name;
         if (imgURL != "")
-            StartCoroutine(setImage(imgURL));
+            setImage(imgURL);// StartCoroutine(setImage(imgURL));
     }
 
     public void OnBookSelected()
@@ -30,7 +31,24 @@ public class BookData : MonoBehaviour
             HomeScreen.Instance.OnSetHomePanelData();// already theme available then direct set to the home panel
     }
 
-    IEnumerator setImage(string url)
+    public async void setImage(string url)
+    {
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+        var operation = request.SendWebRequest();
+        while (!operation.isDone)
+            await Task.Yield();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log(request.error);
+        }
+        else
+        {
+            seriesImg.sprite = GameManager.Instance.Texture2DToSprite(((DownloadHandlerTexture)request.downloadHandler).texture);
+        }
+    }
+
+    /*IEnumerator setImage(string url)
     {
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
         yield return request.SendWebRequest();
@@ -39,5 +57,5 @@ public class BookData : MonoBehaviour
             Debug.Log(request.error);
         else
             seriesImg.sprite = GameManager.Instance.Texture2DToSprite(((DownloadHandlerTexture)request.downloadHandler).texture);
-    }
+    }*/
 }

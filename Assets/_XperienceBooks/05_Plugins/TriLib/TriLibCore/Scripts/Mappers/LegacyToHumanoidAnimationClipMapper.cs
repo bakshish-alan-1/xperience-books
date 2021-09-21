@@ -19,7 +19,7 @@ namespace TriLibCore.Mappers
         public override AnimationClip[] MapArray(AssetLoaderContext assetLoaderContext, AnimationClip[] sourceAnimationClips)
         {
             var animator = assetLoaderContext.RootGameObject.GetComponent<Animator>();
-            if (animator != null)
+            if (animator != null && animator.avatar != null && animator.avatar.isHuman)
             {
                 animator.enabled = false;
                 if (MecanimAnimationClipTemplate == null)
@@ -29,12 +29,15 @@ namespace TriLibCore.Mappers
                         Debug.LogWarning("No MecanimAnimationClipTemplate specified when using the LegacyToHumanoidAnimationClipMapper.");
                     }
                     MecanimAnimationClipTemplate = new AnimationClip();
+                    assetLoaderContext.Allocations.Add(MecanimAnimationClipTemplate);
                 }
                 for (var i = 0; i < sourceAnimationClips.Length; i++)
                 {
-                    var oldAnimationClip = sourceAnimationClips[i];
-                    sourceAnimationClips[i] = HumanoidRetargeter.ConvertLegacyIntoHumanoidAnimationClip(assetLoaderContext.RootGameObject, animator.avatar, sourceAnimationClips[i], MecanimAnimationClipTemplate);
-                    Destroy(oldAnimationClip);
+                    var animationClip = HumanoidRetargeter.ConvertLegacyIntoHumanoidAnimationClip(assetLoaderContext.RootGameObject, animator.avatar, sourceAnimationClips[i], MecanimAnimationClipTemplate);
+                    if (animationClip != null)
+                    {
+                        sourceAnimationClips[i] = animationClip;
+                    }
                 }
                 animator.enabled = true;
             }

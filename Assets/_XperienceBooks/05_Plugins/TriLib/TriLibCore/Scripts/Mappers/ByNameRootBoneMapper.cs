@@ -1,4 +1,6 @@
-﻿using TriLibCore.General;
+﻿using System.Collections.Generic;
+using TriLibCore.General;
+using TriLibCore.Interfaces;
 using TriLibCore.Utils;
 using UnityEngine;
 
@@ -25,34 +27,30 @@ namespace TriLibCore.Mappers
         public string[] RootBoneNames = { "Hips", "Bip01", "Pelvis" };
 
         /// <inheritdoc />        
-        public override Transform Map(AssetLoaderContext assetLoaderContext)
+        public override Transform Map(AssetLoaderContext assetLoaderContext, IList<Transform> bones)
         {
             if (RootBoneNames != null)
             {
-                foreach (var rootBoneName in RootBoneNames)
+                for (var i = 0; i < RootBoneNames.Length; i++)
                 {
-                    var found = FindDeepChild(assetLoaderContext.RootGameObject.transform, rootBoneName);
+                    var rootBoneName = RootBoneNames[i];
+                    var found = FindDeepChild(bones, rootBoneName);
                     if (found != null)
                     {
                         return found;
                     }
                 }
             }
-            return base.Map(assetLoaderContext);
+            return base.Map(assetLoaderContext, bones);
         }
 
-        private Transform FindDeepChild(Transform transform, string right)
+        private Transform FindDeepChild(IList<Transform> transforms, string right)
         {
-            if (StringComparer.Matches(StringComparisonMode, CaseInsensitive, transform.name, right))
+            foreach (var transform in transforms)
             {
-                return transform;
-            }
-            foreach (Transform child in transform)
-            {
-                var found = FindDeepChild(child, right);
-                if (found != null)
+                if (StringComparer.Matches(StringComparisonMode, CaseInsensitive, transform.name, right))
                 {
-                    return found;
+                    return transform;
                 }
             }
             return null;

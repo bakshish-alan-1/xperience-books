@@ -4,7 +4,7 @@ using Ecommerce;
 using UnityEngine;
 using TMPro;
 using System.Linq;
-
+using UnityEngine.UI;
 
 public class CartController : MonoBehaviour
 {
@@ -12,11 +12,9 @@ public class CartController : MonoBehaviour
 
 
     public GameObject cartPrefab;
-
     public GameObject container;
-
+    public Button placeBtnOrader;
     public List<CartProduct> m_FinalCart = new List<CartProduct>();
-
     public TextMeshProUGUI t_continueToCheckout;
 
     public float t_TotalCheckoutPrice = 0;
@@ -24,8 +22,8 @@ public class CartController : MonoBehaviour
 
     private void Awake()
     {
-
         if (Instance == null) { Instance = this; }
+        placeBtnOrader.interactable = false;
     }
 
 
@@ -48,14 +46,15 @@ public class CartController : MonoBehaviour
         }
     }
  
-
     public void UpdateFinalPrice() {
 
         t_TotalCheckoutPrice = m_FinalCart.Where(X => X.isActive == true).Select(Y => Y.m_FinalPrice).Sum();
 
         t_continueToCheckout.text = "Place this order: $ " + t_TotalCheckoutPrice;
 
+        if (t_TotalCheckoutPrice > 0)
+            placeBtnOrader.interactable = true;
+        else
+            placeBtnOrader.interactable = false;
     }
-
-   
 }

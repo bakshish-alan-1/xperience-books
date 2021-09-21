@@ -13,7 +13,7 @@ namespace TriLibCore.Editor
         [MenuItem("Assets/Create/TriLib/MecanimAnimationClipTemplate")]
         public static void CreateMecanimAnimationClipTemplate()
         {
-            var editorWindow = (EditorWindow)EditorWindow.GetWindow<MecanimAnimationClipEditor>();
+            var editorWindow = (EditorWindow)GetWindow<MecanimAnimationClipEditor>();
             editorWindow.Show();
         }
 
@@ -55,7 +55,7 @@ namespace TriLibCore.Editor
 
             if (GUILayout.Button("Create Template with given Settings"))
             {
-                AssetDatabase.CreateAsset(_animationClip, $"{AssetDatabase.GetAssetPath(Selection.activeObject)}/{FileUtils.SanitizePath(_animationClip.name)}.asset");
+                AssetDatabase.CreateAsset(_animationClip, $"{FileUtils.GetFileDirectory(AssetDatabase.GetAssetPath(Selection.activeObject))}/{FileUtils.SanitizePath(_animationClip.name)}.asset");
             }
         }
     }

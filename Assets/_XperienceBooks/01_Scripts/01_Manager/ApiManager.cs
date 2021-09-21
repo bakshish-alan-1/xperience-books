@@ -177,7 +177,7 @@ public class Skin
     public string name, dialog_box, dialog_box_btn, scan_qr_bg, fan_art_img_glry;
     public string color_code, notif_icon;
     public string background_image, scan_button, back_button;
-    public string logo, facebook_icon, twitter_icon, instagram_icon, website_icon, profile_icon;
+    public string logo, facebook_icon, twitter_icon, youtube_icon, instagram_icon, website_icon, profile_icon;
     public string module_1, module_2, module_3, module_4, module_5, module_6, module_7, module_8, module_9, module_10, module_11, module_12;
     public string font_h1, font_h2, font_h3, font_h4;
     public int created_at_timestamp, updated_at_timestamp;
@@ -295,19 +295,25 @@ public class ApiManager : MonoBehaviour
     #region Login Apis
 
     public void NewLogin(User user) {
+
+        Debug.Log("User data: " + user.email + " " + user.password);
         StartCoroutine(CheckInternetConnection(isConnected =>
         {
             if (isConnected)
             {
+
+                Debug.Log(properties.LoginAPI);
                 APIClient.CallWebAPI(Method.POST.ToString(),properties.LoginAPI,JsonUtility.ToJson(user),string.Empty,LoginUser);
             }
         }));
     }
 
     private void LoginUser(bool success, object data,long statusCode) {
-      
+
+        RaycastUnblock();
         if (success)
         {
+            GameManager.Instance.isMarkerDetailInfoOpen = false;
             LoginResponse response = JsonUtility.FromJson<LoginResponse>(data.ToString());
             response.data.user.password = PlayerPrefs.GetString("Password", "");
             FileHandler.SaveUserData(response.data);
@@ -322,8 +328,8 @@ public class ApiManager : MonoBehaviour
             }
             else
             {
-                WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel); // Redirect to Home Panel
                 GameManager.Instance.OpenMarkerDetailsWindow();
+                WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel); // Redirect to Home Panel
             }
         }
         else {
@@ -351,7 +357,6 @@ public class ApiManager : MonoBehaviour
                 errorWindow.SetErrorMessage("Something Went Wrong", Validator.GetValidateErrorMessage(ErrorMessage), "CLOSE", ErrorWindow.ResponseData.JustClose, false);
             }
         }
-        RaycastUnblock();
     }
     #endregion
 
@@ -401,9 +406,11 @@ public class ApiManager : MonoBehaviour
             UserData userData = new UserData();
             userData.token = GameManager.Instance.m_UserData.token;
             userData.user = response.data;
-
+            userData.user.password = PlayerPrefs.GetString("Password", "");
+            
             FileHandler.SaveUserData(userData);    // save updated user details on local file
             Profile.Instance.SetProfileData(GameManager.Instance.m_UserData);
+            errorWindow.SetErrorMessage("Congratulations", response.message, "OKAY", ErrorWindow.ResponseData.JustClose, true);
             WindowManager.Instance.BackToPreviousWindow();
         }
         else
@@ -620,7 +627,6 @@ public class ApiManager : MonoBehaviour
 
     private void PasswordUpdated(bool success, object data, long statusCode)
     {
-
         if (success)
         {
             LoginResponse response = JsonUtility.FromJson<LoginResponse>(data.ToString());
@@ -661,7 +667,6 @@ public class ApiManager : MonoBehaviour
 
     private void ForgotOTPSuccess(bool success, object data, long statusCode)
     {
-
         if (success)
         {
             LoginResponse response = JsonUtility.FromJson<LoginResponse>(data.ToString());
@@ -691,7 +696,8 @@ public class ApiManager : MonoBehaviour
         {
             LoginResponse response = JsonUtility.FromJson<LoginResponse>(data.ToString());
             ForgotPassword.Instance.ResetField();
-            WindowManager.Instance.OpenPanel("LoginForm");
+            errorWindow.SetErrorMessage("Congratulations", response.message, "OKAY", ErrorWindow.ResponseData.JustClose, true);
+            WindowManager.Instance.OpenPanel("Login");
         }
         else
         {

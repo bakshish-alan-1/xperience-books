@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
-namespace SFB
+namespace TriLibCore.SFB
 {
     public class StandloneFileBrowserWebGLHelper : MonoBehaviour
     {

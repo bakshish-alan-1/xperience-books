@@ -1,4 +1,6 @@
-﻿using System;
+﻿#pragma warning disable 672
+
+using System;
 using System.IO;
 using TriLibCore.Interfaces;
 using TriLibCore.Mappers;
@@ -13,7 +15,7 @@ namespace TriLibCore.Samples
     public class TextureMapperSample : TextureMapper
     {
         /// <summary>Tries to retrieve a Stream to the Texture native data based on the given context.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         /// <param name="texture">The source Texture to load the Stream from.</param>
         /// <returns>Return the context containing the texture data.</returns>
         public override TextureLoadingContext Map(AssetLoaderContext assetLoaderContext, ITexture texture)

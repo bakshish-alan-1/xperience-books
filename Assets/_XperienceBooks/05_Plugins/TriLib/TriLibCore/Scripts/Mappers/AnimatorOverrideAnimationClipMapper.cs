@@ -18,7 +18,7 @@ namespace TriLibCore.Mappers
             {
                 if (assetLoaderContext.Options.ShowLoadingWarnings)
                 {
-                    Debug.LogWarning("Tried to execute an AnimatorOverrideController mapper on a GameObject without an Animator or without setting an AnimatorOverrideController.");
+                    Debug.LogWarning("Tried to execute an AnimatorOverrideController Mapper on a GameObject without an Animator or without setting an AnimatorOverrideController.");
                 }
                 return sourceAnimationClips;
             }

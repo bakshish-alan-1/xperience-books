@@ -139,6 +139,7 @@ MonoBehaviour:
   m_CellData:
     m_ArtistName: 
     m_ArtDiscription: 
+  button: {fileID: 8267953401111173448}
 --- !u!114 &8267953401111173448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,7 +178,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 8267953401111173460}
   m_OnClick:
     m_PersistentCalls:

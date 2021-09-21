@@ -29,7 +29,7 @@ public class FileHandler
 
             FinalPath = extractDir;
         }
-
+        Debug.Log("Extract Zip at: " + FinalPath);
         //Extract zip file on path 
         ZipFile.ExtractToDirectory(m_ZipFileInfo.FullName, FinalPath);
     }

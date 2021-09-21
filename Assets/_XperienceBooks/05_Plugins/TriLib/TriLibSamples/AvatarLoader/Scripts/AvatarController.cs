@@ -68,7 +68,7 @@ namespace TriLibCore.Samples
         private void Awake()
         {
             Instance = this;
-            _cameraHeightOffset = new Vector3(0f, CharacterController.height * 0.9f, 0f);
+            _cameraHeightOffset = new Vector3(0f, CharacterController.height * 0.8f, 0f);
             _cameraOffset = Camera.main.transform.position - transform.position;
         }
 

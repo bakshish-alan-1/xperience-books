@@ -1,6 +1,8 @@
-﻿using System;
+﻿#pragma warning disable 672
+
+using System;
 using System.Collections.Generic;
-using SFB;
+using TriLibCore.SFB;
 using TriLibCore.Interfaces;
 using TriLibCore.Utils;
 

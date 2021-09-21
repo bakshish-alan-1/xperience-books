@@ -25,8 +25,9 @@ namespace TriLibCore.Mappers
         {
             if (AnimatorOverrideController != null)
             {
-                foreach (var animationClip in sourceAnimationClips)
+                for (var i = 0; i < sourceAnimationClips.Length; i++)
                 {
+                    var animationClip = sourceAnimationClips[i];
                     var overrides = new List<KeyValuePair<AnimationClip, AnimationClip>>(AnimatorOverrideController.overridesCount);
                     AnimatorOverrideController.GetOverrides(overrides);
                     for (var j = 0; j < overrides.Count; j++)
@@ -39,6 +40,7 @@ namespace TriLibCore.Mappers
                             overrides[j] = new KeyValuePair<AnimationClip, AnimationClip>(kvp.Key, animationClip);
                         }
                     }
+
                     AnimatorOverrideController.ApplyOverrides(overrides);
                 }
             }

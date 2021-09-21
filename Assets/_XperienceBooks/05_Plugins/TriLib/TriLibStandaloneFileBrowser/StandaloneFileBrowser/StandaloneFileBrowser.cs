@@ -1,38 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-namespace SFB
+namespace TriLibCore.SFB
 {
     /// <summary>Represents a platform-specific file browser.</summary>
     public class StandaloneFileBrowser
     {
 #if UNITY_EDITOR
-    #if UNITY_EDITOR_OSX
-            private static readonly IStandaloneFileBrowser<ItemWithStream> _platformWrapper = new StandaloneFileBrowserMac();
-    #elif UNITY_EDITOR_LINUX
-            private static readonly IStandaloneFileBrowser<ItemWithStream> _platformWrapper = new StandaloneFileBrowserLinux();
-    #elif UNITY_EDITOR_WIN
-            private static readonly IStandaloneFileBrowser<ItemWithStream> _platformWrapper = new StandaloneFileBrowserWindows();
-#else
             private static IStandaloneFileBrowser<ItemWithStream> _platformWrapper = new StandaloneFileBrowserEditor();
-#endif
 #else
-    #if UNITY_WSA
+#if UNITY_WSA
             private static readonly IStandaloneFileBrowser<ItemWithStream> _platformWrapper = new StandaloneFileBrowserWinRT();
-    #elif UNITY_ANDROID
+#elif UNITY_ANDROID
             private static readonly IStandaloneFileBrowser<ItemWithStream> _platformWrapper = new StandaloneFileBrowserAndroid();
-    #elif UNITY_WEBGL
+#elif UNITY_WEBGL
             private static readonly IStandaloneFileBrowser<ItemWithStream> _platformWrapper = new StandaloneFileBrowserWebGL();
-    #elif UNITY_STANDALONE_OSX
+#elif UNITY_STANDALONE_OSX
             private static readonly IStandaloneFileBrowser<ItemWithStream> _platformWrapper = new StandaloneFileBrowserMac();
-    #elif UNITY_IOS
+#elif UNITY_IOS
             private static readonly IStandaloneFileBrowser<ItemWithStream> _platformWrapper = new StandaloneFileBrowserIOS();
-    #elif UNITY_STANDALONE_WIN
+#elif UNITY_STANDALONE_WIN
             private static readonly IStandaloneFileBrowser<ItemWithStream> _platformWrapper = new StandaloneFileBrowserWindows();
-    #elif UNITY_STANDALONE_LINUX
+#elif UNITY_STANDALONE_LINUX
             private static readonly IStandaloneFileBrowser<ItemWithStream> _platformWrapper = new StandaloneFileBrowserLinux();
-    #else
+#else
             private static readonly IStandaloneFileBrowser<ItemWithStream> _platformWrapper = null;
-    #endif
+#endif
 #endif
         /// <summary>
         /// Native open file dialog

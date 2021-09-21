@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.Networking;
 using System.IO;
+using System.Threading.Tasks;
 
 public class SeriesData : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class SeriesData : MonoBehaviour
         seriesName.text = name;
         url = imgURL;
         if (url != "")
-            StartCoroutine(setImage(url));
+            setImage(url);//StartCoroutine(setImage(url));
     }
 
     public void OnSeriesSelected()
@@ -41,7 +42,25 @@ public class SeriesData : MonoBehaviour
         ApiManager.Instance.GetSeriesDetails(GameManager.Instance.m_Series[index].id);
     }
 
-    IEnumerator setImage(string url)
+    public async void setImage(string url)
+    {
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+        var operation = request.SendWebRequest();
+        while (!operation.isDone)
+            await Task.Yield();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log(request.error);
+        }
+        else
+        {
+            texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+            seriesImg.sprite = GameManager.Instance.Texture2DToSprite(texture);
+        }
+    }
+
+    /*IEnumerator setImage(string url)
     {
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
         yield return request.SendWebRequest();
@@ -53,5 +72,5 @@ public class SeriesData : MonoBehaviour
             texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
             seriesImg.sprite = GameManager.Instance.Texture2DToSprite(texture);
         }
-    }
+    }*/
 }

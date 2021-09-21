@@ -1,19 +1,23 @@
-﻿using TriLibCore.Mappers;
+﻿using TriLibCore.General;
+using TriLibCore.Mappers;
+using TriLibCore.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using HumanLimit = TriLibCore.General.HumanLimit;
 
 namespace TriLibCore.Editor
 {
     public class PreBuiltResources : UnityEditor.Editor
     {
+
         [MenuItem("Assets/Create/TriLib/Asset Loader Options/Pre-built Asset Loader Options")]
         public static void CreatePreBuiltAssetLoaderOptions()
         {
             var assetLoaderOptions = AssetLoader.CreateDefaultLoaderOptions();
-            AssetDatabase.CreateAsset(assetLoaderOptions, $"{AssetDatabase.GetAssetPath(Selection.activeObject)}/AssetLoaderOptions.asset");
+            AssetDatabase.CreateAsset(assetLoaderOptions, $"{FileUtils.GetFileDirectory(AssetDatabase.GetAssetPath(Selection.activeObject))}/AssetLoaderOptions.asset");
         }
-
+        
         [MenuItem("Assets/Create/TriLib/Mappers/Humanoid/Mixamo and Biped By Name Humanoid Avatar Mapper")]
         public static void CreateMixamoAndBipedMapper()
         {
@@ -28,11 +32,11 @@ namespace TriLibCore.Editor
             mapper.AddMapping(HumanBodyBones.LeftShoulder, humanLimit, "LeftShoulder", "L Clavicle", "L_Clavicle");
             mapper.AddMapping(HumanBodyBones.LeftUpperArm, humanLimit, "LeftArm", "L UpperArm", "L_UpperArm");
             mapper.AddMapping(HumanBodyBones.LeftLowerArm, humanLimit, "LeftForeArm", "L Forearm", "L_Forearm");
-            mapper.AddMapping(HumanBodyBones.LeftHand, humanLimit, "LeftHand", "L Hand", "L_Hand");
+            mapper.AddMapping(HumanBodyBones.LeftHand, humanLimit, "LeftHand", "L Hand", "L_Hand", "LeftWrist");
             mapper.AddMapping(HumanBodyBones.RightShoulder, humanLimit, "RightShoulder", "R Clavicle", "R_Clavicle");
             mapper.AddMapping(HumanBodyBones.RightUpperArm, humanLimit, "RightArm", "R UpperArm", "R_UpperArm");
             mapper.AddMapping(HumanBodyBones.RightLowerArm, humanLimit, "RightForeArm", "R Forearm", "R_Forearm");
-            mapper.AddMapping(HumanBodyBones.RightHand, humanLimit, "RightHand", "R Hand", "R_Hand");
+            mapper.AddMapping(HumanBodyBones.RightHand, humanLimit, "RightHand", "R Hand", "R_Hand", "RightWrist");
             mapper.AddMapping(HumanBodyBones.LeftUpperLeg, humanLimit, "LeftUpLeg", "L Thigh", "L_Thigh");
             mapper.AddMapping(HumanBodyBones.LeftLowerLeg, humanLimit, "LeftLeg", "L Calf", "L_Calf");
             mapper.AddMapping(HumanBodyBones.LeftFoot, humanLimit, "LeftFoot", "L Foot", "L_Foot");
@@ -71,7 +75,9 @@ namespace TriLibCore.Editor
             mapper.AddMapping(HumanBodyBones.RightLittleProximal, humanLimit, "RightHandPinky1", "R Finger4", "R_Finger4");
             mapper.AddMapping(HumanBodyBones.RightLittleIntermediate, humanLimit, "RightHandPinky2", "R Finger41", "R_Finger41");
             mapper.AddMapping(HumanBodyBones.RightLittleDistal, humanLimit, "RightHandPinky3", "R Finger42", "R_Finger42");
-            AssetDatabase.CreateAsset(mapper, $"{AssetDatabase.GetAssetPath(Selection.activeObject)}/MixamoAndBipedByNameHumanoidAvatarMapper.asset");
+            mapper.CaseInsensitive = true;
+            mapper.stringComparisonMode = StringComparisonMode.LeftEndsWithRight;
+            AssetDatabase.CreateAsset(mapper, $"{FileUtils.GetFileDirectory(AssetDatabase.GetAssetPath(Selection.activeObject))}/MixamoAndBipedByNameHumanoidAvatarMapper.asset");
         }
     }
 }

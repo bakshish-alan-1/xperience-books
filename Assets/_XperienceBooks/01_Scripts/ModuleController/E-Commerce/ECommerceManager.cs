@@ -385,12 +385,15 @@ namespace Ecommerce
         #endregion
 
         public void AddressView() {
-            //Get List of address here and set in Address script
-            if (isAddressApiCall == false)
-                GetAddresses();
 
             if (CartController.Instance.t_TotalCheckoutPrice > 0)
+            {
+                //Get List of address here and set in Address script
+                if (isAddressApiCall == false)
+                    GetAddresses();
+
                 OpenPanel("CustomerDetails");
+            }
         }
 
         public void OpenCheckOutPage() {

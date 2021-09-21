@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SFB
+namespace TriLibCore.SFB
 {
     /// <summary>Represents a series of methods to operate platform-specific file pickers.</summary>
     /// <typeparam name="T">File picker return type.</typeparam>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using SFB;
+using TriLibCore.SFB;
 using TriLibCore.Utils;
 
 namespace TriLibCore.Mappers

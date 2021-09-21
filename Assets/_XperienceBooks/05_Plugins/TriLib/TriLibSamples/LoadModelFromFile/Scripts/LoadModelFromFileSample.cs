@@ -1,4 +1,5 @@
-﻿using TriLibCore.General;
+﻿#pragma warning disable 649
+using TriLibCore.General;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -52,7 +53,7 @@ namespace TriLibCore.Samples
         /// <param name="obj">The contextualized error, containing the original exception and the context passed to the method where the error was thrown.</param>
         private void OnError(IContextualizedError obj)
         {
-            Debug.LogError($"An error ocurred while loading your Model: {obj.GetInnerException()}");
+            Debug.LogError($"An error occurred while loading your Model: {obj.GetInnerException()}");
         }
 
         /// <summary>
@@ -66,7 +67,7 @@ namespace TriLibCore.Samples
         }
 
         /// <summary>
-        /// Called when the Model (including Textures and Materials) has been fully loaded, or after any error occurs.
+        /// Called when the Model (including Textures and Materials) has been fully loaded.
         /// </summary>
         /// <remarks>The loaded GameObject is available on the assetLoaderContext.RootGameObject field.</remarks>
         /// <param name="assetLoaderContext">The context used to load the Model.</param>

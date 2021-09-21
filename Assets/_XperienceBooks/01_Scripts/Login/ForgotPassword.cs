@@ -47,23 +47,6 @@ public class ForgotPassword : MonoBehaviour
         }
     }
 
-    public void OnBackBtn()
-    {
-        if (GetOTPData.activeSelf == true)
-        {
-            ResetField();
-            WindowManager.Instance.OpenPanel("LoginForm");
-        }
-        else
-        {
-            GetOTPData.SetActive(true);
-            ForgotPasswardData.SetActive(false);
-            ResetError(newPassword);
-            ResetError(confirmPassword);
-            ResetError(otp);
-        }
-    }
-
     public void GetOTPSuccess(string msg)
     {
         callTostMessage(msg);
@@ -73,10 +56,12 @@ public class ForgotPassword : MonoBehaviour
 
     public void ResetField()
     {
-        forgotEmail.text = "";
         GetOTPData.SetActive(true);
         ForgotPasswardData.SetActive(false);
-        ResetError(forgotEmail);
+        ResetError(forgotEmail, "Enter Email");
+        ResetError(newPassword, "New Password");
+        ResetError(confirmPassword, "Confirm Password");
+        ResetError(otp, "Enter OTP");
     }
 
     void callTostMessage(string msg)
@@ -90,7 +75,13 @@ public class ForgotPassword : MonoBehaviour
     {
         if (newPassword.text == "" || confirmPassword.text == "" || otp.text == "")
         {
-            callTostMessage("Password not empty");
+            if (string.IsNullOrEmpty(otp.text))
+                SetError(otp);
+            else if (string.IsNullOrEmpty(newPassword.text))
+                SetError(newPassword);
+            else if (string.IsNullOrEmpty(confirmPassword.text))
+                SetError(confirmPassword);
+            //callTostMessage("Password not empty");
         }
         else if (confirmPassword.text != newPassword.text)
         {
@@ -104,9 +95,9 @@ public class ForgotPassword : MonoBehaviour
             password.password = confirmPassword.text;
 
             PlayerPrefs.SetString("Password", password.password);
-            ResetError(otp);
-            ResetError(confirmPassword);
-            ResetError(newPassword);
+            ResetError(otp, "Enter OTP");
+            ResetError(confirmPassword, "Confirm Password");
+            ResetError(newPassword, "New Password");
             ApiManager.Instance.ForgotUserPassword(password);
         }
     }
@@ -152,19 +143,15 @@ public class ForgotPassword : MonoBehaviour
 
     public void SetError(TMP_InputField field)
     {
-
         field.text = "";
         field.placeholder.GetComponent<TMP_Text>().color = Color.red;
         field.placeholder.GetComponent<TMP_Text>().text = "Cannot be empty.";
-
     }
 
-    public void ResetError(TMP_InputField field)
+    public void ResetError(TMP_InputField field, string placeHolder)
     {
-
         field.text = "";
         field.placeholder.GetComponent<TMP_Text>().color = Color.grey;
-        field.placeholder.GetComponent<TMP_Text>().text = "Enter text...";
-
+        field.placeholder.GetComponent<TMP_Text>().text = placeHolder;
     }
 }

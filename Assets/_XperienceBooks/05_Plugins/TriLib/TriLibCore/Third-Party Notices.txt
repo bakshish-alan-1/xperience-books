@@ -17,29 +17,29 @@ D. ANTLR 4
 BSD License
 Copyright (c) 2012 Terence Parr and Sam Harwell
 
-E. GltfLoader
-3-Clause BSD License
-Copyright (c) 2015, Matthew and Xueru McMullan All rights reserved
-
-F. Newtonsoft.Json for Unity
+E. Newtonsoft.Json for Unity
 MIT License (MIT)
 Copyright (c) 2019 Kalle Jillheden (jilleJr)
 Original NewtownSoft.Json
 MIT License (MIT)
 Copyright (c) 2007 James Newton-King
 
-G. StandaloneFileBrowser
+F. StandaloneFileBrowser
 MIT License (MIT)
 Copyright (c) Gökhan Gökçe
 
-H. Open Sans Font
+G. Open Sans Font
 Apache License
 Copyright (c) Steve Matteson
 
-I. Android Native File Picker
+H. Android Native File Picker
 MIT License
 Süleyman Yasir KULA
 
-J. IxMilia.ThreeMf
+I. IxMilia.ThreeMf
 MIT License
 Copyright (c) IxMilia
+
+J. GTLF Draco Decoder
+Apache License
+Copyright (c) Google

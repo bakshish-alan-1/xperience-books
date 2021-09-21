@@ -46,6 +46,7 @@ public class Login : MonoBehaviour
                 user.password = password.text;
                 PlayerPrefs.SetString("Password", password.text);
                 //Call Login API
+
                 ApiManager.Instance.NewLogin(user);
                 ResetField();
             }
@@ -106,9 +107,12 @@ public class Login : MonoBehaviour
         else
         {
 
-            emailID.text = "";
-            emailID.placeholder.GetComponent<Text>().color = Color.red;
-            emailID.placeholder.GetComponent<Text>().text = "Email-id not valid !";
+            if (emailID) {
+                emailID.text = "";
+                emailID.placeholder.GetComponent<Text>().color = Color.red;
+                emailID.placeholder.GetComponent<Text>().text = "Email-id not valid !";
+            }
+           
         }
         
     }
@@ -160,7 +164,7 @@ public class Login : MonoBehaviour
     public void ResetField()
     {
         ResetError(email,"abc@xyz.com");
-        ResetError(password);
+        ResetError(password, "Password");
     }
 
 

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 [System.Serializable]
@@ -59,19 +60,24 @@ public class GalleryView : MonoBehaviour
     {
         // fan art theme
         ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.Fan_art_Img_Bg, HeaderBg);
-        ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.ScanTheme, emailBtnIcon);
+        if (isFanART)
+        {
+            //Todo : Manage Email theme for Fan ART from here only
 
-        EmailBtnTxt.font = GameManager.Instance.TitleFont;
-        Color newCol;
-        if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
-            EmailBtnTxt.color = newCol;
+            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBoxBtn, emailBtnIcon);//ScanTheme
 
-        // email box theme
-        ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBox, BoxBg);
-        ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBoxBtn, boxBtnIcon);
+            EmailBtnTxt.font = GameManager.Instance.TitleFont;
+            Color newCol;
+            if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
+                EmailBtnTxt.color = newCol;
 
-        boxBtnTxt.font = GameManager.Instance.TitleFont;
-        boxBtnTxt.color = newCol;
+            // email box theme
+            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBox, BoxBg);
+            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBoxBtn, boxBtnIcon);
+
+            boxBtnTxt.font = GameManager.Instance.TitleFont;
+            boxBtnTxt.color = newCol;
+        }
     }
 
     public void AgreeToggleChange()
@@ -85,9 +91,22 @@ public class GalleryView : MonoBehaviour
     public void OnSendEmailClick()
     {
         string msg = "Add body message here.";
-        string emailTo = "mailto:submitfanart@" + GameManager.Instance.selectedSeries.domain;
+        string emailTo = "submitfanart@" + GameManager.Instance.selectedSeries.domain;
         
-        Application.OpenURL(emailTo + "?subject=" + GameManager.Instance.FanArtEmailSubject + "&body=" + msg);
+        string email = emailTo;
+        string subject = MyEscapeURL(GameManager.Instance.FanArtEmailSubject);
+        string body = MyEscapeURL(msg);
+        Debug.Log("MSG: " + body);
+        Debug.Log("EmailTo: " + email);
+        Debug.Log("Subject: " + subject);
+        Application.OpenURL("mailto:" + email + "?subject=" + subject + "&body=" + body);
+
+        //Application.OpenURL("mailto:" + emailTo + "?subject=" + GameManager.Instance.FanArtEmailSubject + "&body=" + msg);
+    }
+
+    string MyEscapeURL(string url)
+    {
+        return UnityWebRequest.EscapeURL(url).Replace("+", "%20");
     }
 
     public void LoadData() {

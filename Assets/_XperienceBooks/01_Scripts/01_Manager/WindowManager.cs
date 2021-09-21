@@ -41,17 +41,18 @@ public class WindowManager : MonoBehaviour
             Instance = this;
         }
 
-        if (PlayerPrefs.GetInt(StaticKeywords.Login, 0) == 1) {
-
-            // Redirect to home
-            currentWindowIndex = 7;
+        if (PlayerPrefs.GetInt(StaticKeywords.Login, 0) == 1)// 1 = login, 0 = logout
+        {
+            if (PlayerPrefs.GetString("IsThemeSaved").Equals("false") || GameManager.Instance.selectedSeries.id == -1 || GameManager.Instance.selectedBooks.id == -1)
+                currentWindowIndex = 5;// redirect to series screen
+            else
+                currentWindowIndex = 7;// redirect to home screen
         }
     }
 
     // Start is called before the first frame update
     void Start()
     {
-
         // Back to Content screen if Already scan once 
         if (GlobalControl.Instance.scanComplete)
         {
@@ -62,24 +63,23 @@ public class WindowManager : MonoBehaviour
             SocialMediaList(StaticKeywords.ContentList);
         }
 
-
         currentWindow = windows[currentWindowIndex].windowObject;
         currentWindowAnimator = currentWindow.GetComponent<Animator>();
         currentWindowAnimator.Play(windowFadeIn);
+
         if (currentWindowIndex != 0)
             title.text = windows[currentWindowIndex].windowName;
 
         if (PlayerPrefs.GetInt(StaticKeywords.Login, 0) == 1 && !GlobalControl.Instance.scanComplete)
         {
-            if (GameManager.Instance.selectedSeries.id == -1 || GameManager.Instance.selectedBooks.id == -1)
+            if (PlayerPrefs.GetString("IsThemeSaved").Equals("false") || GameManager.Instance.selectedSeries.id == -1 || GameManager.Instance.selectedBooks.id == -1)
             {
-                if (GameManager.Instance.selectedSeries.id == -1)
-                    ApiManager.Instance.GetSeriesList();
-                else
-                    ApiManager.Instance.GetSeriesDetails(GameManager.Instance.selectedSeries.id);
+                ApiManager.Instance.GetSeriesList();
             }
             else
+            {
                 HomeScreen.Instance.OnSetHomePanelData();// if user already login then direct set home panel theme as series selected
+            }
         }
     }
 
@@ -216,11 +216,17 @@ public class WindowManager : MonoBehaviour
 
     public void LogOut()
     {
-        //PlayerPrefs.DeleteAll();
+
+        //ToDo : Clear all playerPref
+        PlayerPrefs.DeleteAll();
+
+        //Clear all user Data
+
+
+
         PlayerPrefs.SetInt(StaticKeywords.Login, 0);
         OpenPanel("Login");
     }
-
 }
 
 

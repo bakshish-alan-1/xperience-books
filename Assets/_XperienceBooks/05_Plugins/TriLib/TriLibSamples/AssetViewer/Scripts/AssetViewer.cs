@@ -1,13 +1,16 @@
-﻿using System.Collections;
+﻿#pragma warning disable 649
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using SFB;
+using TriLibCore.SFB;
 using TriLibCore.General;
 using TriLibCore.Extensions;
-using TriLibCore.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
+
 namespace TriLibCore.Samples
 {
     /// <summary>Represents a TriLib sample which allows the user to load models and HDR skyboxes from the local file-system.</summary>
@@ -70,6 +73,12 @@ namespace TriLibCore.Samples
         private Slider _skyboxExposureSlider;
 
         /// <summary>
+        /// Loading time indicator.
+        /// </summary>
+        [SerializeField]
+        private Text _loadingTimeText;
+
+        /// <summary>
         /// Current camera distance.
         /// </summary>
         protected float CameraDistance = 1f;
@@ -108,6 +117,8 @@ namespace TriLibCore.Samples
         /// Created animation component for the loaded model.
         /// </summary>
         private Animation _animation;
+
+        private Stopwatch _stopwatch;
 
         /// <summary>Gets the playing Animation State.</summary>
         private AnimationState CurrentAnimationState
@@ -228,22 +239,14 @@ namespace TriLibCore.Samples
         /// </summary>
         /// <param name="files">Selected files.</param>
         private void OnSkyboxStreamSelected(IList<ItemWithStream> files)
-        {			
+        {
             if (files != null && files.Count > 0 && files[0].HasData)
             {
-#if (UNITY_WSA || UNITY_ANDROID) && !UNITY_EDITOR
-                Dispatcher.InvokeAsync(new ContextualizedAction<Stream>(LoadSkybox, files[0].OpenStream()));
-#else
-                LoadSkybox(files[0].OpenStream());
-#endif
-            } else
+                Utils.Dispatcher.InvokeAsyncUnchecked(LoadSkybox, files[0].OpenStream());
+            }
+            else
             {
-
-#if (UNITY_WSA || UNITY_ANDROID) && !UNITY_EDITOR
-                Dispatcher.InvokeAsync(new ContextualizedAction(ClearSkybox));
-#else
-                ClearSkybox();
-#endif
+                Utils.Dispatcher.InvokeAsync(ClearSkybox);
             }
         }
 
@@ -292,6 +295,8 @@ namespace TriLibCore.Samples
         {
             base.Start();
             AssetLoaderOptions = AssetLoader.CreateDefaultLoaderOptions();
+            AssetLoaderOptions.Timeout = 180;
+            AssetLoaderOptions.ShowLoadingWarnings = true;
             ClearSkybox();
         }
 
@@ -365,6 +370,12 @@ namespace TriLibCore.Samples
                 Play.gameObject.SetActive(!animationIsPlaying);
                 Stop.gameObject.SetActive(animationIsPlaying);
             }
+            else
+            {
+                Play.gameObject.SetActive(true);
+                Stop.gameObject.SetActive(false); 
+                PlaybackSlider.value = 0f;
+            }
         }
 
         /// <summary>Event triggered when the user selects a file or cancels the Model selection dialog.</summary>
@@ -375,11 +386,14 @@ namespace TriLibCore.Samples
             if (hasFiles)
             {
                 _animations = null;
+                _loadingTimeText.text = null;
+                _stopwatch = new Stopwatch();
+                _stopwatch.Start();
             }
         }
 
         /// <summary>Event triggered when the Model Meshes and hierarchy are loaded.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         protected override void OnLoad(AssetLoaderContext assetLoaderContext)
         {
             base.OnLoad(assetLoaderContext);
@@ -395,8 +409,9 @@ namespace TriLibCore.Samples
                         _animations = _animation.GetAllAnimationClips();
                         if (_animations.Count > 0)
                         {
-                            foreach (var animationClip in _animations)
+                            for (var i = 0; i < _animations.Count; i++)
                             {
+                                var animationClip = _animations[i];
                                 PlaybackAnimation.options.Add(new Dropdown.OptionData(animationClip.name));
                             }
                             PlaybackAnimation.captionText.text = _animations[0].name;
@@ -427,6 +442,13 @@ namespace TriLibCore.Samples
             {
                 var bounds = RootGameObject.CalculateBounds();
                 Camera.main.FitToBounds(bounds, CameraDistanceRatio);
+                // Uncomment this code to scale up small objects
+                //if (bounds.size.magnitude < 1f)
+                //{
+                //    var increase = 1f / bounds.size.magnitude;
+                //    RootGameObject.transform.localScale *= increase;
+                //    bounds = RootGameObject.CalculateBounds();
+                //}
                 CameraDistance = Camera.main.transform.position.magnitude;
                 CameraPivot = bounds.center;
                 Skybox.transform.localScale = bounds.size.magnitude * SkyboxScale * Vector3.one;
@@ -443,6 +465,18 @@ namespace TriLibCore.Samples
         {
             base.OnError(contextualizedError);
             StopAnimation();
+            _stopwatch?.Stop();
+        }
+
+        /// <summary>Event is triggered when the Model (including Textures and Materials) has been fully loaded.</summary>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
+        protected override void OnMaterialsLoad(AssetLoaderContext assetLoaderContext)
+        {
+            base.OnMaterialsLoad(assetLoaderContext);
+            _stopwatch.Stop();
+            var loadedText = $"Loaded in: {_stopwatch.Elapsed.Minutes:00}:{_stopwatch.Elapsed.Seconds:00}";
+            _loadingTimeText.text = loadedText;
+            Debug.Log(loadedText);
         }
     }
 }

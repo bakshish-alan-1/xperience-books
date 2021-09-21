@@ -2,7 +2,10 @@
 {
     Properties
     {
-
+        _MetallicTex("_MetallicTex", 2D) = "black" {}
+        _OcclusionTex("_OcclusionTex", 2D) = "white" {}
+        _DetailMaskTex("_DetailMaskTex", 2D) = "black" {}
+        _SmoothnessTex("_SmoothnessTex", 2D) = "gray" {}
     }
     SubShader
     {
@@ -40,14 +43,13 @@
 			sampler2D _MetallicTex;
 			sampler2D _OcclusionTex;
 			sampler2D _DetailMaskTex;
-			sampler2D _SmoothnessTex;
 
             fixed4 frag (v2f i) : SV_Target
             {
 				fixed metallic = tex2D(_MetallicTex, i.uv).x;
 				fixed occlusion = tex2D(_OcclusionTex, i.uv).x;
 				fixed detail = tex2D(_DetailMaskTex, i.uv).x;
-				fixed smoothness = tex2D(_SmoothnessTex, i.uv).x;
+				fixed smoothness = tex2D(_MetallicTex, i.uv).w;
 				return fixed4(metallic, occlusion, detail, smoothness);
             }
             ENDCG

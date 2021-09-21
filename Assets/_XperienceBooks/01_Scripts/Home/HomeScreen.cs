@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -31,6 +32,8 @@ public class HomeScreen : MonoBehaviour
     [SerializeField] Image facebookIcon, youtubeIcon, twitterIcon, websiteIcon, instaIcon;
     [SerializeField] TMPro.TMP_Text ScanBtnTxt;
 
+    bool isThemeSet = false;
+
     private void Awake()
     {
         if (Instance == null)
@@ -39,14 +42,20 @@ public class HomeScreen : MonoBehaviour
 
     public void OnBackBtnClick()
     {
+        if (WindowManager.Instance.windows[WindowManager.Instance.currentWindowIndex].windowName == "ForgotPassword")
+        {
+            ForgotPassword.Instance.ResetField();
+        }
+
         if (WindowManager.Instance.windows[WindowManager.Instance.currentWindowIndex].windowName == StaticKeywords.HomePanel)
-            ApiManager.Instance.GetSeriesDetails(GameManager.Instance.selectedSeries.id);//ApiManager.Instance.GetSeriesList();
+        { isThemeSet = false; ApiManager.Instance.GetSeriesDetails(GameManager.Instance.selectedSeries.id); }
         else if (WindowManager.Instance.windows[WindowManager.Instance.currentWindowIndex].windowName == "Series")
             WindowManager.Instance.LogOut();
         else if (WindowManager.Instance.windows[WindowManager.Instance.currentWindowIndex].windowName == "Register")
-            WindowManager.Instance.OpenPanel("Login");
+        { PlayerPrefs.SetInt("IsAgreed", 0); WindowManager.Instance.OpenPanel("Login"); }
         else
             WindowManager.Instance.BackToPreviousWindow();
+
     }
 
     public void OnSetSeriesData()
@@ -94,15 +103,21 @@ public class HomeScreen : MonoBehaviour
         }
     }
 
-    // set selected series logo and title in home panel
+    // call from themeManager script after download theme
     public void OnSetHomePanelData()
     {
         Debug.Log("inside OnSetHomePanelData");
+        if (isThemeSet)
+        {
+            WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel);
+            return;
+        }
+
         if (GameManager.Instance.TitleFont == null)
-            GameManager.Instance.TitleFont = ThemeManager.Instance.onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font1Theme);
+            ThemeManager.Instance.onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font1Theme, GameManager.Instance.TitleFont);
 
         if (GameManager.Instance.DetailFont == null)
-            GameManager.Instance.DetailFont = ThemeManager.Instance.onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font2Theme);
+            ThemeManager.Instance.onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font2Theme, GameManager.Instance.DetailFont);
 
         if (GameManager.Instance.SeriesImageTexture != null)
             seriesImage.sprite = GameManager.Instance.Texture2DToSprite(GameManager.Instance.SeriesImageTexture);
@@ -117,6 +132,9 @@ public class HomeScreen : MonoBehaviour
         Title.text = "";
         OnSetHomeScreenSocialMediaObject();
         setHomeTheameOfSeries();
+        GameManager.Instance.OpenMarkerDetailsWindow();
+
+        NotificationPanel.Instance.OnSetThem();// set downloaded theme for notification panel
     }
 
     public void setHomeTheameOfSeries()
@@ -136,6 +154,7 @@ public class HomeScreen : MonoBehaviour
             ScanBtnTxt.color = newCol;
 
         GameManager.Instance.OpenPrepareThemWindow(false);
+        isThemeSet = true;
         WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel);
     }
 
@@ -150,6 +169,7 @@ public class HomeScreen : MonoBehaviour
         ThemeManager.Instance.OnLoadImage(themePath, StaticKeywords.TwitterTheme, twitterIcon);
         ThemeManager.Instance.OnLoadImage(themePath, StaticKeywords.WebsiteTheme, websiteIcon);
         ThemeManager.Instance.OnLoadImage(themePath, StaticKeywords.InstaTheme, instaIcon);
+        ThemeManager.Instance.OnLoadImage(themePath, StaticKeywords.YoutubeTheme, youtubeIcon);
 
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.instagram_link))
         { nooflinks += 1; socialMedia.Add(insta); insta.SetActive(false); }

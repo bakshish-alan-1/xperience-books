@@ -8,6 +8,8 @@ using System.Collections;
 
 public class QRScanController : MonoBehaviour
 {
+    public static QRScanController Instance = null;
+
     public QRCodeDecodeController e_qrController;
 
     //  public GameObject resetBtn;
@@ -36,6 +38,9 @@ public class QRScanController : MonoBehaviour
 
     private void Start()
     {
+        if (Instance == null)
+            Instance = this;
+
         StartCoroutine(GetLocation());
         if (this.e_qrController != null)
         {
@@ -235,4 +240,9 @@ public class QRScanController : MonoBehaviour
 #endif
     }
 
+    void OnApplicationFocus(bool focus)
+    {
+        if (focus)
+            toggleTorch();
+    }
 }

@@ -128,7 +128,7 @@ public class ImageTrackingController : MonoBehaviour
         string m_TargetLocalPath = GameManager.Instance.GetLocalPath(StaticKeywords.ImageTracking) + data.id + "/"+ data.c_code_image_id + "/";
         string m_TargetImageName = data.id+"_"+data.c_code_image_name;
         string prefix = GameManager.Instance.LocalStoragePath;
-        audioPath = m_TargetLocalPath;
+        audioPath = GameManager.Instance.LocalStoragePath + m_TargetLocalPath;
         Debug.Log("audio_play_in_loop: " + data.audio_play_in_loop);
         audioSource.loop = data.audio_play_in_loop;
 
@@ -344,6 +344,8 @@ public class ImageTrackingController : MonoBehaviour
             {
                 rootObject.gameObject.SetActive(false);
                 isPreloaderPositionSet = false;
+                if (audioSource.isPlaying)
+                    audioSource.Stop();
             }
         }
 
@@ -365,7 +367,7 @@ public class ImageTrackingController : MonoBehaviour
             if (data != null)
             {
                 File.WriteAllBytes(localModelFilePath, data);
-                FileHandler.ExtractFiles(localModelFilePath, audioPath);// extract zip at path
+                FileHandler.ExtractFiles(localModelFilePath, audioPath, true);// extract zip at path
             }
         }
     }
@@ -407,6 +409,7 @@ public class ImageTrackingController : MonoBehaviour
         isModelAvailable = true;
 
         string mp3Path = GetAudioPath();
+        Debug.Log("Mp3Path: " + mp3Path);
         if (!string.IsNullOrEmpty(mp3Path))
         {
             DirectoryInfo dirInfo = new DirectoryInfo(mp3Path);

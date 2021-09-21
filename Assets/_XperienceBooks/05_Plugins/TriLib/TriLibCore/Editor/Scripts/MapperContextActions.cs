@@ -35,6 +35,7 @@ namespace TriLibCore.Editor
                     typeof(HumanoidAvatarMapper).IsAssignableFrom(@class) ||
                     typeof(RootBoneMapper).IsAssignableFrom(@class) ||
                     typeof(LipSyncMapper).IsAssignableFrom(@class) ||
+                    typeof(UserPropertiesMapper).IsAssignableFrom(@class) ||
                     typeof(ExternalDataMapper).IsAssignableFrom(@class);
             }
             return false;

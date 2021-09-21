@@ -15,6 +15,7 @@ public class Register : MonoBehaviour
     private TMP_InputField lastname;
     [SerializeField]
     private TMP_InputField email, parentEmail;
+    [SerializeField] Image parentEmailRoot;
     [SerializeField]
     private TMP_InputField age;
     [SerializeField]
@@ -184,24 +185,29 @@ public class Register : MonoBehaviour
         {
             parentEmail.text = "";
             parentEmail.interactable = false;
+            Color32 color = new Color32(200, 200, 200, 255);
+            parentEmailRoot.color = color;
         }
         else
         {
             parentEmail.text = "";
             parentEmail.interactable = true;
+            parentEmailRoot.color = Color.white;
         }
-        ResetError(parentEmail);
+        ResetError(parentEmail, "Parent Email");
     }
 
     public void ResetField() {
 
-        ResetError(firstname);
-        ResetError(lastname);
-        ResetError(email);
-        ResetError(parentEmail);
-        ResetError(age);
+        ResetError(firstname, "First Name");
+        ResetError(lastname, "Last Name");
+        ResetError(email, "Email");
+        ResetError(parentEmail, "Parent Email");
+        ResetError(age, "Age");
         errorText.SetActive(false);
         gender.SetAllTogglesOff();
+        male.isOn = true;
+        parentEmailRoot.color = Color.white;
     }
 
 
@@ -223,12 +229,11 @@ public class Register : MonoBehaviour
     }
 
 
-    public void ResetError(TMP_InputField field) {
+    public void ResetError(TMP_InputField field, string placeHolder) {
 
         field.text = "";
         field.placeholder.GetComponent<TMP_Text>().color = defaultColor;
-        field.placeholder.GetComponent<TMP_Text>().text = "Enter text...";
+        field.placeholder.GetComponent<TMP_Text>().text = placeHolder;
 
     }
-
 }

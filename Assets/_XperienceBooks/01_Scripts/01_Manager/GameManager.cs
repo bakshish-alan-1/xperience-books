@@ -83,10 +83,6 @@ public class GameManager : MonoBehaviour
     public bool isSafetyWindowOpen = false;
     public SafetyWindow safetyWindow;
 
-    [Header("ARMarker Info")]
-    public bool isMarkerDetailInfoOpen = false;
-    [SerializeField] Animator markerWindowAnimator;
-
     [Header("Logout Confirm")]
     [SerializeField] Animator confrimWindowAnimator;
 
@@ -99,6 +95,17 @@ public class GameManager : MonoBehaviour
     public TMPro.TMP_FontAsset TitleFont;
     public TMPro.TMP_FontAsset DetailFont;
 
+    [Header("ARMarker Info")]
+    public bool isMarkerDetailInfoOpen = false;
+    [SerializeField] Animator markerWindowAnimator;
+    [SerializeField] UnityEngine.UI.Image DialogBox;
+    [SerializeField] UnityEngine.UI.Image CloseBoxBtn;
+    [SerializeField] UnityEngine.UI.Image WebsiteBoxBtn;
+    [SerializeField] TMPro.TMP_Text TitleText;
+    [SerializeField] TMPro.TMP_Text message;
+    [SerializeField] TMPro.TMP_Text closeBtnText;
+    [SerializeField] TMPro.TMP_Text websiteBtnText;
+
     public string LocalStoragePath
     {
         get => m_LocalPath;
@@ -107,10 +114,12 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        PlayerPrefs.SetString("IsThemeSaved", PlayerPrefs.GetString("IsThemeSaved", "false"));
         LocalStoragePath = Application.persistentDataPath + "/LocalStorage/";
         Debug.Log("GameManager: " + LocalStoragePath);
         if (PlayerPrefs.GetInt("IsFreshInstall", 0) == 0)
         {
+            Debug.Log("GameManager localstorage folder delete or created ");
             if (Directory.Exists(LocalStoragePath)) {
                 Debug.Log("Deleting Old Data");
                 Directory.Delete(LocalStoragePath, true);
@@ -121,7 +130,6 @@ public class GameManager : MonoBehaviour
                 Directory.CreateDirectory(LocalStoragePath + "Theme");
 
         }
-        Debug.Log("GameManager localstorage folder delete or created ");
         if (Instance == null) {
             Instance = this;
         }
@@ -155,7 +163,6 @@ public class GameManager : MonoBehaviour
         ModuleList.Instance.ActivateModules(currentBook.b_MapModules);
     }
 
-
     public void RestartScene() {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name); 
     }
@@ -169,8 +176,8 @@ public class GameManager : MonoBehaviour
             LoadModule(moduleID + 1);
         }
         else {
-            //ApiManager.Instance.GetModuleData(currentBook.chapter_id, moduleID);
-            ApiManager.Instance.GetModuleData(selectedBooks.id, moduleID);
+            ApiManager.Instance.GetModuleData(currentBook.chapter_id, moduleID);
+            //ApiManager.Instance.GetModuleData(selectedBooks.id, moduleID);
         }
 
     }
@@ -207,7 +214,6 @@ public class GameManager : MonoBehaviour
         SceneLoader.LoadScene(SceneIndex);
     }
 
-
     public string GetLocalPath(string ModuleName) {
         return currentBook.BasePath() + "/" + ModuleName + "/";
     }
@@ -218,12 +224,37 @@ public class GameManager : MonoBehaviour
         //WindowManager.Instance.OpenPanel("AddressDetails");Akash
     }
 
-    // ARMarker Details Infor Started
+    #region markerDetailInfo
+    private void setMarkerInfoTheme()
+    {
+        ThemeManager.Instance.OnLoadImage(GetThemePath(), StaticKeywords.DialogBox, DialogBox);
+        ThemeManager.Instance.OnLoadImage(GetThemePath(), StaticKeywords.DialogBoxBtn, CloseBoxBtn);
+        ThemeManager.Instance.OnLoadImage(GetThemePath(), StaticKeywords.DialogBoxBtn, WebsiteBoxBtn);
+
+        Color newCol;
+        if (!string.IsNullOrEmpty(selectedSeries.theme.color_code) && ColorUtility.TryParseHtmlString(selectedSeries.theme.color_code, out newCol))
+        {
+            TitleText.color = newCol;
+            message.color = newCol;
+            closeBtnText.color = newCol;
+            websiteBtnText.color = newCol;
+        }
+
+        if (TitleFont != null)
+        {
+            TitleText.font = TitleFont;
+        }
+
+        if (DetailFont != null)
+            message.font = DetailFont;
+    }
+
     public void OpenMarkerDetailsWindow()
     {
         if (!isMarkerDetailInfoOpen)
         {
             isMarkerDetailInfoOpen = true;
+            setMarkerInfoTheme();
             markerWindowAnimator.Play("Window In");
         }
     }
@@ -237,7 +268,7 @@ public class GameManager : MonoBehaviour
     {
         markerWindowAnimator.Play("Window Out");
     }
-    // ARMarker Details Infor End
+    #endregion
 
     public Sprite Texture2DToSprite(Texture2D texture)
     {
@@ -255,10 +286,24 @@ public class GameManager : MonoBehaviour
     {
         if (value)
         {
+            Debug.Log("<color=red>I am ready to delete all</color>");
             WindowManager.Instance.LogOut();
             SeriesController.Instance.OnRemoveChield();
+
+            Debug.Log(LocalStoragePath);
+
+            if (File.Exists(LocalStoragePath + "Theme/SeriesData.json"))
+                File.Delete(LocalStoragePath + "Theme/SeriesData.json");
+
+            if (File.Exists(LocalStoragePath + "Theme/BooksData.json"))
+                File.Delete(LocalStoragePath + "Theme/BooksData.json");
+
+            //Todo : HD
+            ClearAllData();
+            SceneManager.LoadSceneAsync(0);
         }
         confrimWindowAnimator.Play("Window Out");
+
     }
 
     // Open Prepare theme box
@@ -275,5 +320,17 @@ public class GameManager : MonoBehaviour
     public bool isPrepareThemeOpen()
     {
         return isPrepared;
+    }
+
+
+
+    //Todo : create by hardik shah
+    // Clear all data before logout so can load new data on login 
+    public void ClearAllData() {
+
+        if (GameManager.Instance) {
+            Destroy(this.gameObject);
+        }
+
     }
 }

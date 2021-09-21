@@ -7,7 +7,7 @@ using Windows.Storage;
 using TriLibCore;
 using UnityEngine;
 
-namespace SFB
+namespace TriLibCore.SFB
 {
     public class StandaloneFileBrowserWinRT : IStandaloneFileBrowser<ItemWithStream>
     {

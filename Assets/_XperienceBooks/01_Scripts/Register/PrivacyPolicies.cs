@@ -29,4 +29,10 @@ public class PrivacyPolicies : MonoBehaviour
         else
             goBtn.interactable = false;
     }
+
+    void OnApplicationQuit()
+    {
+        Debug.Log("Application ending after " + Time.time + " seconds");
+        PlayerPrefs.DeleteKey("IsAgreed");
+    }
 }

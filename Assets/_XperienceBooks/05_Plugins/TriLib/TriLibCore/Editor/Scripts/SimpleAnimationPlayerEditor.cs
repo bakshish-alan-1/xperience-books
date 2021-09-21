@@ -13,7 +13,7 @@ namespace TriLibCore.Editor
             var simpleAnimationPlayer = (SimpleAnimationPlayer) target;
             if (simpleAnimationPlayer.AnimationClips != null)
             {
-                for (var i = 0; i < simpleAnimationPlayer.AnimationClips.Length; i++)
+                for (var i = 0; i < simpleAnimationPlayer.AnimationClips.Count; i++)
                 {
                     var animationClip = simpleAnimationPlayer.AnimationClips[i];
                     if (animationClip != null && GUILayout.Button(animationClip.name))

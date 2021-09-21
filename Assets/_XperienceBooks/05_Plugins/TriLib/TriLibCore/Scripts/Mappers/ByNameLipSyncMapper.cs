@@ -29,23 +29,25 @@ namespace TriLibCore.Mappers
         /// <inheritdoc />
         protected override int MapViseme(AssetLoaderContext assetLoaderContext, LipSyncViseme viseme, IGeometryGroup geometryGroup)
         {
-            foreach (var visemeCandidate in VisemeCandidates)
+            for (var i = 0; i < VisemeCandidates.Count; i++)
             {
+                var visemeCandidate = VisemeCandidates[i];
                 if (visemeCandidate.Viseme == viseme)
                 {
                     foreach (var candidateName in visemeCandidate.CandidateNames)
                     {
-                        for (var i = 0; i < geometryGroup.BlendShapeGeometryBindings.Count; i++)
+                        for (var j = 0; j < geometryGroup.BlendShapeKeys.Count; j++)
                         {
-                            var blendShapeGeometryBinding = geometryGroup.BlendShapeGeometryBindings[i];
+                            var blendShapeGeometryBinding = geometryGroup.BlendShapeKeys[j];
                             if (Utils.StringComparer.Matches(StringComparisonMode, CaseInsensitive, blendShapeGeometryBinding.Name, candidateName))
                             {
-                                return i;
+                                return j;
                             }
                         }
                     }
                 }
             }
+
             return -1;
         }
     }

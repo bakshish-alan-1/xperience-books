@@ -154,10 +154,13 @@ void DialogSaveFilePanelAsync(const char* title,
                                                       initWithDocumentTypes:fileTypes
                                                       inMode:save?UIDocumentPickerModeExportToService:UIDocumentPickerModeImport];
         [controller setTitle:title];
+    if (@available(iOS 13.0, *))
         [controller setDirectoryURL:url];
+    if (@available(iOS 11.0, *))
         [controller setAllowsMultipleSelection:multiselect];
+    if (@available(iOS 13.0, *))
         [controller setShouldShowFileExtensions:true];
-        [controller setDelegate:self];
+        [controller setDelegate:NULL];
         [UnityGetGLViewController() presentViewController:controller animated:YES completion:nil];
 }
 @end

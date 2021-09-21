@@ -1,18 +1,21 @@
-﻿using System;
+﻿#pragma warning disable 168, 618
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
-using StbImageSharp;
 using TriLibCore.Extensions;
 using TriLibCore.General;
 using TriLibCore.Interfaces;
 using TriLibCore.Mappers;
+using TriLibCore.Textures;
 using TriLibCore.Utils;
 using UnityEngine;
 using FileMode = System.IO.FileMode;
 using HumanDescription = UnityEngine.HumanDescription;
 using Object = UnityEngine.Object;
 #if TRILIB_DRACO
+using TriLibCore.Gltf.Reader;
 using TriLibCore.Gltf.Draco;
 #endif
 #if UNITY_EDITOR
@@ -23,25 +26,52 @@ namespace TriLibCore
     /// <summary>Represents the main class containing methods to load the Models.</summary>
     public static class AssetLoader
     {
+        /// <summary>
+        /// The step-index used by progress handling when the Animations are processing.
+        /// </summary>
+        private const int ProcessingAnimationsStep = 0;
+
+        /// <summary>
+        /// The step-index used by progress handling when the Textures are processing.
+        /// </summary>
+        private const int ProcessingTexturesStep = 1;
+
+        /// <summary>
+        /// The step-index used by progress handling when the Material Renderers are processing.
+        /// </summary>
+        private const int ProcessingRenderersStep = 2;
+
+        /// <summary>
+        /// The step-index used by progress handling when everything has been processed.
+        /// </summary>
+        private const int FinalStep = 3;
+
+        /// <summary>
+        /// The number of steps the AssetLoader takes while processing the Models.
+        /// </summary>
+        private const int ExtraStepsCount = 4;
+
         /// <summary>Loads a Model from the given path asynchronously.</summary>
         /// <param name="path">The Model file path.</param>
-        /// <param name="onLoad">The Method to call on the Main Thread when the Model Meshes and hierarchy are loaded.</param>
-        /// <param name="onMaterialsLoad">The Method to call on the Main Thread when the Model (including Textures and Materials) has been fully loaded.</param>
+        /// <param name="onLoad">The Method to call on the Main Thread when the Model is loaded but resources may still pending.</param>
+        /// <param name="onMaterialsLoad">The Method to call on the Main Thread when the Model and resources are loaded.</param>
         /// <param name="onProgress">The Method to call when the Model loading progress changes.</param>
         /// <param name="onError">The Method to call on the Main Thread when any error occurs.</param>
         /// <param name="wrapperGameObject">The Game Object that will be the parent of the loaded Game Object. Can be null.</param>
-        /// <param name="assetLoaderOptions">The Asset Loader Options reference. Asset Loader Options contains various options used during the Model loading process.</param>
-        /// <param name="customContextData">The Custom Data that will be passed along the AssetLoaderContext.</param>
+        /// <param name="assetLoaderOptions">The options to use when loading the Model.</param>
+        /// <param name="customContextData">The Custom Data that will be passed along the Context.</param>
+        /// <param name="haltTask">Turn on this field to avoid loading the model immediately and chain the Tasks.</param>
         /// <returns>The Asset Loader Context, containing Model loading information and the output Game Object.</returns>
-        public static AssetLoaderContext LoadModelFromFile(string path, Action<AssetLoaderContext> onLoad, Action<AssetLoaderContext> onMaterialsLoad, Action<AssetLoaderContext, float> onProgress, Action<IContextualizedError> onError = null, GameObject wrapperGameObject = null, AssetLoaderOptions assetLoaderOptions = null, object customContextData = null)
+        public static AssetLoaderContext LoadModelFromFile(string path, Action<AssetLoaderContext> onLoad = null, Action<AssetLoaderContext> onMaterialsLoad = null, Action<AssetLoaderContext, float> onProgress = null, Action<IContextualizedError> onError = null, GameObject wrapperGameObject = null, AssetLoaderOptions assetLoaderOptions = null, object customContextData = null, bool haltTask = false)
         {
-#if UNITY_WEBGL || UNITY_UWP
+            MaterialMapper.LoadTextureCallback = TextureLoader.LoadTexture;
+#if UNITY_WEBGL || UNITY_UWP || TRILIB_FORCE_SYNC
             AssetLoaderContext assetLoaderContext = null;
             try
             {
-                assetLoaderContext = LoadModelFromFileNoThread(path, onError, wrapperGameObject, assetLoaderOptions, customContextData);
-                onLoad(assetLoaderContext);
-                onMaterialsLoad(assetLoaderContext);
+                assetLoaderContext = LoadModelFromFileNoThread(path, onError, wrapperGameObject, assetLoaderOptions ?? CreateDefaultLoaderOptions(), customContextData);
+                onLoad?.Invoke(assetLoaderContext);
+                onMaterialsLoad?.Invoke(assetLoaderContext);
             }
             catch (Exception exception)
             {
@@ -58,7 +88,7 @@ namespace TriLibCore
 #else
             var assetLoaderContext = new AssetLoaderContext
             {
-                Options = assetLoaderOptions ? assetLoaderOptions : CreateDefaultLoaderOptions(),
+                Options = assetLoaderOptions ?? CreateDefaultLoaderOptions(),
                 Filename = path,
                 BasePath = FileUtils.GetFileDirectory(path),
                 WrapperGameObject = wrapperGameObject,
@@ -69,7 +99,18 @@ namespace TriLibCore
                 OnError = onError,
                 CustomData = customContextData,
             };
-            assetLoaderContext.Tasks.Add(ThreadUtils.RunThread(assetLoaderContext, ref assetLoaderContext.CancellationToken, LoadModel, ProcessRootModel, HandleError, assetLoaderContext.Options != null ? assetLoaderContext.Options.Timeout : 0));
+            if (assetLoaderContext.Options.ForceGCCollectionWhileLoading)
+            {
+                GCHelper.GetInstance()?.RegisterLoading();
+            }
+#if TRILIB_USE_THREAD_NAMES
+            var threadName = "TriLib_LoadModelFromFile";
+#else
+            var threadName = string.Empty;
+#endif
+            var task = ThreadUtils.RunThread(assetLoaderContext, ref assetLoaderContext.CancellationToken, LoadModel, ProcessRootModel, HandleError, assetLoaderContext.Options.Timeout, threadName, !haltTask);
+            assetLoaderContext.Tasks.Add(task);
+            assetLoaderContext.Task = task;
             return assetLoaderContext;
 #endif
         }
@@ -78,23 +119,25 @@ namespace TriLibCore
         /// <param name="stream">The Stream containing the Model data.</param>
         /// <param name="filename">The Model filename.</param>
         /// <param name="fileExtension">The Model file extension. (Eg.: fbx)</param>
-        /// <param name="onLoad">The Method to call on the Main Thread when the Model Meshes and hierarchy are loaded.</param>
-        /// <param name="onMaterialsLoad">The Method to call on the Main Thread when the Model (including Textures and Materials) has been fully loaded.</param>
+        /// <param name="onLoad">The Method to call on the Main Thread when the Model is loaded but resources may still pending.</param>
+        /// <param name="onMaterialsLoad">The Method to call on the Main Thread when the Model and resources are loaded.</param>
         /// <param name="onProgress">The Method to call when the Model loading progress changes.</param>
         /// <param name="onError">The Method to call on the Main Thread when any error occurs.</param>
         /// <param name="wrapperGameObject">The Game Object that will be the parent of the loaded Game Object. Can be null.</param>
-        /// <param name="assetLoaderOptions">The Asset Loader Options reference. Asset Loader Options contains various options used during the Model loading process.</param>
-        /// <param name="customContextData">The Custom Data that will be passed along the AssetLoaderContext.</param>
+        /// <param name="assetLoaderOptions">The options to use when loading the Model.</param>
+        /// <param name="customContextData">The Custom Data that will be passed along the Context.</param>
+        /// <param name="haltTask">Turn on this field to avoid loading the model immediately and chain the Tasks.</param>
         /// <returns>The Asset Loader Context, containing Model loading information and the output Game Object.</returns>
-        public static AssetLoaderContext LoadModelFromStream(Stream stream, string filename = null, string fileExtension = null, Action<AssetLoaderContext> onLoad = null, Action<AssetLoaderContext> onMaterialsLoad = null, Action<AssetLoaderContext, float> onProgress = null, Action<IContextualizedError> onError = null, GameObject wrapperGameObject = null, AssetLoaderOptions assetLoaderOptions = null, object customContextData = null)
+        public static AssetLoaderContext LoadModelFromStream(Stream stream, string filename = null, string fileExtension = null, Action<AssetLoaderContext> onLoad = null, Action<AssetLoaderContext> onMaterialsLoad = null, Action<AssetLoaderContext, float> onProgress = null, Action<IContextualizedError> onError = null, GameObject wrapperGameObject = null, AssetLoaderOptions assetLoaderOptions = null, object customContextData = null, bool haltTask = false)
         {
-#if UNITY_WEBGL || UNITY_UWP
+            MaterialMapper.LoadTextureCallback = TextureLoader.LoadTexture;
+#if UNITY_WEBGL || UNITY_UWP || TRILIB_FORCE_SYNC
             AssetLoaderContext assetLoaderContext = null;
             try
             {
-                assetLoaderContext = LoadModelFromStreamNoThread(stream, filename, fileExtension, onError, wrapperGameObject, assetLoaderOptions, customContextData);
-                onLoad(assetLoaderContext);
-                onMaterialsLoad(assetLoaderContext);
+                assetLoaderContext = LoadModelFromStreamNoThread(stream, filename, fileExtension, onError, wrapperGameObject, assetLoaderOptions ?? CreateDefaultLoaderOptions(), customContextData);
+                onLoad?.Invoke(assetLoaderContext);
+                onMaterialsLoad?.Invoke(assetLoaderContext);
             }
             catch (Exception exception)
             {
@@ -111,18 +154,31 @@ namespace TriLibCore
 #else
             var assetLoaderContext = new AssetLoaderContext
             {
-                Options = assetLoaderOptions == null ? CreateDefaultLoaderOptions() : assetLoaderOptions,
+                Options = assetLoaderOptions ?? CreateDefaultLoaderOptions(),
                 Stream = stream,
+                Filename = filename,
                 FileExtension = fileExtension ?? FileUtils.GetFileExtension(filename, false),
                 BasePath = FileUtils.GetFileDirectory(filename),
                 WrapperGameObject = wrapperGameObject,
                 OnMaterialsLoad = onMaterialsLoad,
                 OnLoad = onLoad,
+                OnProgress = onProgress,
                 HandleError = HandleError,
                 OnError = onError,
                 CustomData = customContextData
             };
-            assetLoaderContext.Tasks.Add(ThreadUtils.RunThread(assetLoaderContext, ref assetLoaderContext.CancellationToken, LoadModel, ProcessRootModel, HandleError, assetLoaderContext.Options.Timeout));
+            if (assetLoaderContext.Options.ForceGCCollectionWhileLoading)
+            {
+                GCHelper.GetInstance()?.RegisterLoading();
+            }
+#if TRILIB_USE_THREAD_NAMES
+            var threadName = "TriLib_LoadModelFromStream";
+#else
+            var threadName = string.Empty;
+#endif
+            var task = ThreadUtils.RunThread(assetLoaderContext, ref assetLoaderContext.CancellationToken, LoadModel, ProcessRootModel, HandleError, assetLoaderContext.Options.Timeout, threadName, !haltTask);
+            assetLoaderContext.Tasks.Add(task);
+            assetLoaderContext.Task = task;
             return assetLoaderContext;
 #endif
         }
@@ -131,14 +187,15 @@ namespace TriLibCore
         /// <param name="path">The Model file path.</param>
         /// <param name="onError">The Method to call on the Main Thread when any error occurs.</param>
         /// <param name="wrapperGameObject">The Game Object that will be the parent of the loaded Game Object. Can be null.</param>
-        /// <param name="assetLoaderOptions">The Asset Loader Options reference. Asset Loader Options contains various options used during the Model loading process.</param>
-        /// <param name="customContextData">The Custom Data that will be passed along the AssetLoaderContext.</param> 
+        /// <param name="assetLoaderOptions">The options to use when loading the Model.</param>
+        /// <param name="customContextData">The Custom Data that will be passed along the Context.</param> 
         /// <returns>The Asset Loader Context, containing Model loading information and the output Game Object.</returns>
         public static AssetLoaderContext LoadModelFromFileNoThread(string path, Action<IContextualizedError> onError = null, GameObject wrapperGameObject = null, AssetLoaderOptions assetLoaderOptions = null, object customContextData = null)
         {
+            MaterialMapper.LoadTextureCallback = TextureLoader.LoadTexture;
             var assetLoaderContext = new AssetLoaderContext
             {
-                Options = assetLoaderOptions == null ? CreateDefaultLoaderOptions() : assetLoaderOptions,
+                Options = assetLoaderOptions ?? CreateDefaultLoaderOptions(),
                 Filename = path,
                 BasePath = FileUtils.GetFileDirectory(path),
                 CustomData = customContextData,
@@ -149,8 +206,15 @@ namespace TriLibCore
             };
             try
             {
+                if (assetLoaderContext.Options.ForceGCCollectionWhileLoading)
+                {
+                    GCHelper.GetInstance()?.RegisterLoading();
+                }
                 LoadModel(assetLoaderContext);
-                ProcessRootModel(assetLoaderContext);
+                if (assetLoaderContext.Reader != null)
+                {
+                    ProcessRootModel(assetLoaderContext);
+                }
             }
             catch (Exception exception)
             {
@@ -165,15 +229,17 @@ namespace TriLibCore
         /// <param name="fileExtension">The Model file extension. (Eg.: fbx)</param>
         /// <param name="onError">The Method to call on the Main Thread when any error occurs.</param>
         /// <param name="wrapperGameObject">The Game Object that will be the parent of the loaded Game Object. Can be null.</param>
-        /// <param name="assetLoaderOptions">The Asset Loader Options reference. Asset Loader Options contains various options used during the Model loading process.</param>
-        /// <param name="customContextData">The Custom Data that will be passed along the AssetLoaderContext.</param>
-         /// <returns>The Asset Loader Context, containing Model loading information and the output Game Object.</returns>
+        /// <param name="assetLoaderOptions">The options to use when loading the Model.</param>
+        /// <param name="customContextData">The Custom Data that will be passed along the Context.</param>
+        /// <returns>The Asset Loader Context, containing Model loading information and the output Game Object.</returns>
         public static AssetLoaderContext LoadModelFromStreamNoThread(Stream stream, string filename = null, string fileExtension = null, Action<IContextualizedError> onError = null, GameObject wrapperGameObject = null, AssetLoaderOptions assetLoaderOptions = null, object customContextData = null)
         {
+            MaterialMapper.LoadTextureCallback = TextureLoader.LoadTexture;
             var assetLoaderContext = new AssetLoaderContext
             {
-                Options = assetLoaderOptions ? assetLoaderOptions : CreateDefaultLoaderOptions(),
+                Options = assetLoaderOptions ?? CreateDefaultLoaderOptions(),
                 Stream = stream,
+                Filename = filename,
                 FileExtension = fileExtension ?? FileUtils.GetFileExtension(filename, false),
                 BasePath = FileUtils.GetFileDirectory(filename),
                 CustomData = customContextData,
@@ -184,8 +250,15 @@ namespace TriLibCore
             };
             try
             {
+                if (assetLoaderContext.Options.ForceGCCollectionWhileLoading)
+                {
+                    GCHelper.GetInstance()?.RegisterLoading();
+                }
                 LoadModel(assetLoaderContext);
-                ProcessRootModel(assetLoaderContext);
+                if (assetLoaderContext.Reader != null)
+                {
+                    ProcessRootModel(assetLoaderContext);
+                }
             }
             catch (Exception exception)
             {
@@ -215,7 +288,8 @@ namespace TriLibCore
             }
             var assetPath = $"{assetDirectory}/{type}.asset";
             var scriptableObject = AssetDatabase.LoadAssetAtPath(assetPath, typeof(Object));
-            if (scriptableObject == null) {
+            if (scriptableObject == null)
+            {
                 scriptableObject = ScriptableObject.CreateInstance(type);
                 AssetDatabase.CreateAsset(scriptableObject, assetPath);
             }
@@ -223,24 +297,27 @@ namespace TriLibCore
         }
 #endif
 
-        /// <summary>Creates an Asset Loader Options with the default options and Mappers using an existing pre-allocations List.</summary>
+        /// <summary>Creates an Asset Loader Options with the default settings and Mappers.</summary>
         /// <param name="generateAssets">Indicates whether created Scriptable Objects will be saved as assets.</param>
         /// <returns>The Asset Loader Options containing the default settings.</returns>
         public static AssetLoaderOptions CreateDefaultLoaderOptions(bool generateAssets = false)
         {
             var assetLoaderOptions = ScriptableObject.CreateInstance<AssetLoaderOptions>();
-            ByNameRootBoneMapper byNameRootBoneMapper;
+            ByBonesRootBoneMapper byBonesRootBoneMapper;
 #if UNITY_EDITOR
-            if (generateAssets) {
-                byNameRootBoneMapper = (ByNameRootBoneMapper)LoadOrCreateScriptableObject("ByNameRootBoneMapper", "RootBone");
-            } else {
-                byNameRootBoneMapper = ScriptableObject.CreateInstance<ByNameRootBoneMapper>();
+            if (generateAssets)
+            {
+                byBonesRootBoneMapper = (ByBonesRootBoneMapper)LoadOrCreateScriptableObject("ByBonesRootBoneMapper", "RootBone");
+            }
+            else
+            {
+                byBonesRootBoneMapper = ScriptableObject.CreateInstance<ByBonesRootBoneMapper>();
             }
 #else
-            byNameRootBoneMapper = ScriptableObject.CreateInstance<ByNameRootBoneMapper>();
+            byBonesRootBoneMapper = ScriptableObject.CreateInstance<ByBonesRootBoneMapper>();
 #endif
-            byNameRootBoneMapper.name = "ByNameRootBoneMapper";
-            assetLoaderOptions.RootBoneMapper = byNameRootBoneMapper;
+            byBonesRootBoneMapper.name = "ByBonesRootBoneMapper";
+            assetLoaderOptions.RootBoneMapper = byBonesRootBoneMapper;
             if (MaterialMapper.RegisteredMappers.Count == 0)
             {
                 Debug.LogWarning("Please add at least one MaterialMapper name to the MaterialMapper.RegisteredMappers static field to create the right MaterialMapper for the Render Pipeline you are using.");
@@ -259,7 +336,9 @@ namespace TriLibCore
                     if (generateAssets)
                     {
                         materialMapper = (MaterialMapper)LoadOrCreateScriptableObject(materialMapperName, "Material");
-                    } else {
+                    }
+                    else
+                    {
                         materialMapper = (MaterialMapper)ScriptableObject.CreateInstance(materialMapperName);
                     }
 #else
@@ -271,13 +350,13 @@ namespace TriLibCore
                         if (materialMapper.IsCompatible(null))
                         {
                             materialMappers.Add(materialMapper);
-                            assetLoaderOptions.FixedAllocations.Add(materialMapper);
                         }
                         else
                         {
 #if UNITY_EDITOR
                             var assetPath = AssetDatabase.GetAssetPath(materialMapper);
-                            if (assetPath == null) {
+                            if (assetPath == null)
+                            {
                                 Object.DestroyImmediate(materialMapper);
                             }
 #else
@@ -295,46 +374,23 @@ namespace TriLibCore
                     assetLoaderOptions.MaterialMappers = materialMappers.ToArray();
                 }
             }
-            //These two animation clip mappers are used to convert legacy to humanoid animations and add a simple generic animation playback component to the model, which will be disabled by default.
-            LegacyToHumanoidAnimationClipMapper legacyToHumanoidAnimationClipMapper;
-            SimpleAnimationPlayerAnimationClipMapper simpleAnimationPlayerAnimationClipMapper;
-#if UNITY_EDITOR
-            if (generateAssets)
-            {
-                legacyToHumanoidAnimationClipMapper = (LegacyToHumanoidAnimationClipMapper)LoadOrCreateScriptableObject("LegacyToHumanoidAnimationClipMapper", "AnimationClip");
-                simpleAnimationPlayerAnimationClipMapper = (SimpleAnimationPlayerAnimationClipMapper)LoadOrCreateScriptableObject("SimpleAnimationPlayerAnimationClipMapper", "AnimationClip");
-            } else {
-                legacyToHumanoidAnimationClipMapper = ScriptableObject.CreateInstance<LegacyToHumanoidAnimationClipMapper>();
-                simpleAnimationPlayerAnimationClipMapper = ScriptableObject.CreateInstance<SimpleAnimationPlayerAnimationClipMapper>();
-            }
-#else
-            legacyToHumanoidAnimationClipMapper = ScriptableObject.CreateInstance<LegacyToHumanoidAnimationClipMapper>();
-            simpleAnimationPlayerAnimationClipMapper = ScriptableObject.CreateInstance<SimpleAnimationPlayerAnimationClipMapper>();
-#endif
-            legacyToHumanoidAnimationClipMapper.name = "LegacyToHumanoidAnimationClipMapper";
-            simpleAnimationPlayerAnimationClipMapper.name = "SimpleAnimationPlayerAnimationClipMapper";
-            assetLoaderOptions.AnimationClipMappers = new AnimationClipMapper[]
-            {
-                legacyToHumanoidAnimationClipMapper,
-                simpleAnimationPlayerAnimationClipMapper
-            };
-            assetLoaderOptions.FixedAllocations.Add(assetLoaderOptions);
-            assetLoaderOptions.FixedAllocations.Add(legacyToHumanoidAnimationClipMapper);
-            assetLoaderOptions.FixedAllocations.Add(simpleAnimationPlayerAnimationClipMapper);
+
             return assetLoaderOptions;
         }
 
         /// <summary>Processes the Model from the given context and begin to build the Game Objects.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         private static void ProcessModel(AssetLoaderContext assetLoaderContext)
         {
             if (assetLoaderContext.RootModel != null)
             {
-                ParseModel(assetLoaderContext, assetLoaderContext.WrapperGameObject != null ? assetLoaderContext.WrapperGameObject.transform : null, assetLoaderContext.RootModel, out assetLoaderContext.RootGameObject);
-                assetLoaderContext.RootGameObject.transform.localScale = Vector3.one;
+                ParseModel(assetLoaderContext, assetLoaderContext.WrapperGameObject != null ? assetLoaderContext.WrapperGameObject.transform : null, assetLoaderContext.RootModel, assetLoaderContext.RootModel, out assetLoaderContext.RootGameObject);
+                if (assetLoaderContext.RootGameObject.transform.localScale.sqrMagnitude == 0f)
+                {
+                    assetLoaderContext.RootGameObject.transform.localScale = Vector3.one;
+                }
                 if (assetLoaderContext.Options.AnimationType != AnimationType.None || assetLoaderContext.Options.ImportBlendShapes)
                 {
-                    SetupRootBone(assetLoaderContext);
                     SetupModelBones(assetLoaderContext, assetLoaderContext.RootModel);
                     SetupModelLod(assetLoaderContext, assetLoaderContext.RootModel);
                     BuildGameObjectsPaths(assetLoaderContext);
@@ -346,80 +402,73 @@ namespace TriLibCore
                 }
             }
             assetLoaderContext.OnLoad?.Invoke(assetLoaderContext);
-            assetLoaderContext.ModelsProcessed = true;
         }
 
         /// <summary>Configures the context Model LODs (levels-of-detail) if there are any.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         /// <param name="model">The Model containing the LOD data.</param>
         private static void SetupModelLod(AssetLoaderContext assetLoaderContext, IModel model)
         {
             if (model.Children != null && model.Children.Count > 0)
             {
-                var lodModels = new Dictionary<int, Renderer[]>(model.Children.Count);
+                var lodModels = new Dictionary<int, List<Renderer>>(model.Children.Count);
                 var minLod = int.MaxValue;
                 var maxLod = 0;
-                foreach (var child in model.Children)
+                for (var i = 0; i < model.Children.Count; i++)
                 {
+                    var child = model.Children[i];
                     var match = Regex.Match(child.Name, "_LOD(?<number>[0-9]+)|LOD_(?<number>[0-9]+)");
                     if (match.Success)
                     {
                         var lodNumber = Convert.ToInt32(match.Groups["number"].Value);
-                        if (lodModels.ContainsKey(lodNumber))
-                        {
-                            continue;
-                        }
                         minLod = Mathf.Min(lodNumber, minLod);
                         maxLod = Mathf.Max(lodNumber, maxLod);
-                        lodModels.Add(lodNumber, assetLoaderContext.GameObjects[child].GetComponentsInChildren<Renderer>());
+                        if (!lodModels.TryGetValue(lodNumber, out var renderers))
+                        {
+                            renderers = new List<Renderer>();
+                            lodModels.Add(lodNumber, renderers);
+                        }
+                        renderers.AddRange(assetLoaderContext.GameObjects[child].GetComponentsInChildren<Renderer>());
                     }
                 }
                 if (lodModels.Count > 1)
                 {
                     var newGameObject = assetLoaderContext.GameObjects[model];
-                    var lods = new LOD[lodModels.Count + 1];
+                    var lods = new List<LOD>(lodModels.Count + 1);
                     var lodGroup = newGameObject.AddComponent<LODGroup>();
-                    var index = 0;
-                    var lastPosition = 1f;
+                    var lastPosition = assetLoaderContext.Options.LODScreenRelativeTransitionHeightBase;
                     for (var i = minLod; i <= maxLod; i++)
                     {
                         if (lodModels.TryGetValue(i, out var renderers))
                         {
-                            lods[index++] = new LOD(lastPosition, renderers);
+                            lods.Add(new LOD(lastPosition, renderers.ToArray()));
                             lastPosition *= 0.5f;
                         }
                     }
-                    lods[index] = new LOD(lastPosition, null);
-                    lodGroup.SetLODs(lods);
+                    lodGroup.SetLODs(lods.ToArray());
+                }
+                foreach (var child in model.Children)
+                {
+                    SetupModelLod(assetLoaderContext, child);
                 }
             }
         }
 
-        /// <summary>Tries to find the Context Model root-bone.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
-        private static void SetupRootBone(AssetLoaderContext assetLoaderContext)
-        {
-            var bones = new List<Transform>(assetLoaderContext.Models.Count);
-            assetLoaderContext.RootModel.GetBones(assetLoaderContext, bones);
-            assetLoaderContext.BoneTransforms = bones.ToArray();
-            if (assetLoaderContext.Options.RootBoneMapper != null)
-            {
-                assetLoaderContext.RootBone = assetLoaderContext.Options.RootBoneMapper.Map(assetLoaderContext);
-            }
-        }
-
         /// <summary>Builds the Game Object Converts hierarchy paths.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         private static void BuildGameObjectsPaths(AssetLoaderContext assetLoaderContext)
         {
-            foreach (var gameObject in assetLoaderContext.GameObjects.Values)
+            using (var values = assetLoaderContext.GameObjects.Values.GetEnumerator())
             {
-                assetLoaderContext.GameObjectPaths.Add(gameObject, gameObject.transform.BuildPath(assetLoaderContext.RootGameObject.transform));
+                while (values.MoveNext())
+                {
+                    assetLoaderContext.GameObjectPaths.Add(values.Current, values.Current.transform.BuildPath(assetLoaderContext.RootGameObject.transform));
+                }
             }
         }
 
         /// <summary>Configures the context Model rigging if there is any.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         private static void SetupRig(AssetLoaderContext assetLoaderContext)
         {
             var animations = assetLoaderContext.RootModel.AllAnimations;
@@ -440,6 +489,7 @@ namespace TriLibCore
                                 unityAnimation.clip = animationClip;
                                 unityAnimation.wrapMode = assetLoaderContext.Options.AnimationWrapMode;
                                 animationClips[i] = animationClip;
+                                assetLoaderContext.Reader.UpdateLoadingPercentage(i, assetLoaderContext.Reader.LoadingStepsCount + ProcessingAnimationsStep, animations.Count);
                             }
                         }
                         break;
@@ -455,16 +505,6 @@ namespace TriLibCore
                         {
                             SetupGenericAvatar(assetLoaderContext, animator);
                         }
-                        if (animations != null)
-                        {
-                            animationClips = new AnimationClip[animations.Count];
-                            for (var i = 0; i < animations.Count; i++)
-                            {
-                                var triLibAnimation = animations[i];
-                                var animationClip = ParseAnimation(assetLoaderContext, triLibAnimation);
-                                animationClips[i] = animationClip;
-                            }
-                        }
                         break;
                     }
                 case AnimationType.Humanoid:
@@ -478,16 +518,6 @@ namespace TriLibCore
                         {
                             SetupHumanoidAvatar(assetLoaderContext, animator);
                         }
-                        if (animations != null)
-                        {
-                            animationClips = new AnimationClip[animations.Count];
-                            for (var i = 0; i < animations.Count; i++)
-                            {
-                                var triLibAnimation = animations[i];
-                                var animationClip = ParseAnimation(assetLoaderContext, triLibAnimation);
-                                animationClips[i] = animationClip;
-                            }
-                        }
                         break;
                     }
             }
@@ -495,8 +525,9 @@ namespace TriLibCore
             {
                 if (assetLoaderContext.Options.AnimationClipMappers != null)
                 {
-                    foreach (var animationClipMapper in assetLoaderContext.Options.AnimationClipMappers)
+                    for (var i = 0; i < assetLoaderContext.Options.AnimationClipMappers.Length; i++)
                     {
+                        var animationClipMapper = assetLoaderContext.Options.AnimationClipMappers[i];
                         if (animationClipMapper == null)
                         {
                             continue;
@@ -504,8 +535,9 @@ namespace TriLibCore
                         animationClips = animationClipMapper.MapArray(assetLoaderContext, animationClips);
                     }
                 }
-                foreach (var animationClip in animationClips)
+                for (var i = 0; i < animationClips.Length; i++)
                 {
+                    var animationClip = animationClips[i];
                     assetLoaderContext.Allocations.Add(animationClip);
                 }
             }
@@ -557,109 +589,129 @@ namespace TriLibCore
         }
 
         /// <summary>Creates a Generic Avatar to the given context Model.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         /// <param name="animator">The Animator assigned to the given Context Root Game Object.</param>
         private static void SetupGenericAvatar(AssetLoaderContext assetLoaderContext, Animator animator)
         {
             var parent = assetLoaderContext.RootGameObject.transform.parent;
             assetLoaderContext.RootGameObject.transform.SetParent(null, true);
-            var avatar = AvatarBuilder.BuildGenericAvatar(assetLoaderContext.RootGameObject, assetLoaderContext.RootBone != null ? assetLoaderContext.RootBone.name : "");
+            var bones = new List<Transform>();
+            assetLoaderContext.RootModel.GetBones(assetLoaderContext, bones);
+            var rootBone = assetLoaderContext.Options.RootBoneMapper.Map(assetLoaderContext, bones);
+            var avatar = AvatarBuilder.BuildGenericAvatar(assetLoaderContext.RootGameObject, rootBone != null ? rootBone.name : "");
             avatar.name = $"{assetLoaderContext.RootGameObject.name}Avatar";
             animator.avatar = avatar;
             assetLoaderContext.RootGameObject.transform.SetParent(parent, true);
         }
 
         /// <summary>Creates a Humanoid Avatar to the given context Model.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         /// <param name="animator">The Animator assigned to the given Context Root Game Object.</param>
         private static void SetupHumanoidAvatar(AssetLoaderContext assetLoaderContext, Animator animator)
         {
-            var index = 0;
             var mapping = assetLoaderContext.Options.HumanoidAvatarMapper.Map(assetLoaderContext);
             if (mapping.Count > 0)
             {
-                assetLoaderContext.Options.HumanoidAvatarMapper.PostSetup(assetLoaderContext, mapping);
                 var parent = assetLoaderContext.RootGameObject.transform.parent;
-                assetLoaderContext.RootGameObject.transform.SetParent(null, true);
+                var rootGameObjectPosition = assetLoaderContext.RootGameObject.transform.position;
+                assetLoaderContext.RootGameObject.transform.SetParent(null, false);
+                assetLoaderContext.Options.HumanoidAvatarMapper.PostSetup(assetLoaderContext, mapping);
+                Transform hipsTransform = null;
                 var humanBones = new HumanBone[mapping.Count];
-                foreach (var kvp in mapping)
+                var boneIndex = 0;
+                using (var keys = mapping.Keys.GetEnumerator())
+                using (var values = mapping.Values.GetEnumerator())
                 {
-                    humanBones[index] = CreateHumanBone(kvp.Key, kvp.Value.name);
-                    index++;
-                }
-                var skeletonBones = new List<SkeletonBone>(assetLoaderContext.BoneTransforms.Length);
-                //todo: check if all loaders can get bone information
-                foreach (var humanBone in humanBones)
-                {
-                    AddBoneChain(skeletonBones, humanBone.boneName, assetLoaderContext.RootGameObject.transform);
-                }
-                HumanDescription humanDescription;
-                if (assetLoaderContext.Options.HumanDescription == null)
-                {
-                    humanDescription = new HumanDescription
+                    while (keys.MoveNext() && values.MoveNext())
                     {
-                        skeleton = skeletonBones.ToArray(),
-                        human = humanBones
-                    };
-                }
-                else
-                {
-                    humanDescription = new HumanDescription
-                    {
-                        armStretch = assetLoaderContext.Options.HumanDescription.armStretch,
-                        feetSpacing = assetLoaderContext.Options.HumanDescription.feetSpacing,
-                        hasTranslationDoF = assetLoaderContext.Options.HumanDescription.hasTranslationDof,
-                        legStretch = assetLoaderContext.Options.HumanDescription.legStretch,
-                        lowerArmTwist = assetLoaderContext.Options.HumanDescription.lowerArmTwist,
-                        lowerLegTwist = assetLoaderContext.Options.HumanDescription.lowerLegTwist,
-                        upperArmTwist = assetLoaderContext.Options.HumanDescription.upperArmTwist,
-                        upperLegTwist = assetLoaderContext.Options.HumanDescription.upperLegTwist,
-                        skeleton = skeletonBones.ToArray(),
-                        human = humanBones
-                    };
-                }
-                var avatar = AvatarBuilder.BuildHumanAvatar(assetLoaderContext.RootGameObject, humanDescription);
-                avatar.name = $"{assetLoaderContext.RootGameObject.name}Avatar";
-                animator.avatar = avatar;
-                assetLoaderContext.RootGameObject.transform.SetParent(parent, true);
-            }
-        }
-
-        /// <summary>Adds a bone to a bone chain.</summary>
-        /// <param name="skeletonBones">The Skeleton Bones list.</param>
-        /// <param name="humanBoneBoneName">The Human bone name to search.</param>
-        /// <param name="rootTransform">The Game Object root Transform.</param>
-        private static void AddBoneChain(List<SkeletonBone> skeletonBones, string humanBoneBoneName, Transform rootTransform)
-        {
-            var transform = rootTransform.FindDeepChild(humanBoneBoneName, StringComparisonMode.RightEqualsLeft, false);
-            if (transform != null)
-            {
-                do
-                {
-                    var existing = false;
-                    foreach (var skeletonBone in skeletonBones)
-                    {
-                        if (skeletonBone.name == transform.name)
+                        if (keys.Current.HumanBone == HumanBodyBones.Hips)
                         {
-                            existing = true;
-                            break;
+                            hipsTransform = values.Current;
+                        }
+                        humanBones[boneIndex++] = CreateHumanBone(keys.Current, values.Current.name);
+                    }
+                }
+                if (hipsTransform != null)
+                {
+                    var hipsRotation = hipsTransform.rotation;
+                    var skeletonBones = new Dictionary<Transform, SkeletonBone>();
+                    var extraTransforms = new List<Transform>();
+                    var parentTransform = hipsTransform.parent;
+                    while (parentTransform != null)
+                    {
+                        extraTransforms.Add(parentTransform);
+                        parentTransform = parentTransform.parent;
+                    }
+                    for (var i = extraTransforms.Count - 1; i >= 0; i--)
+                    {
+                        var extraTransform = extraTransforms[i];
+                        if (!skeletonBones.ContainsKey(extraTransform))
+                        {
+                            extraTransform.up = Vector3.up;
+                            extraTransform.forward = Vector3.forward;
+                            skeletonBones.Add(extraTransform, CreateSkeletonBone(extraTransform));
                         }
                     }
-                    if (!existing)
+                    var hipsRotationOffset = hipsRotation * Quaternion.Inverse(hipsTransform.rotation);
+                    hipsTransform.rotation = hipsRotationOffset * hipsTransform.rotation;
+                    var bounds = assetLoaderContext.RootGameObject.CalculatePreciseBounds();
+                    var toBottom = bounds.min.y;
+                    if (toBottom < 0f)
                     {
-                        skeletonBones.Add(CreateSkeletonBone(transform));
+                        var hipsTransformPosition = hipsTransform.position;
+                        hipsTransformPosition.y -= toBottom;
+                        hipsTransform.position = hipsTransformPosition;
                     }
-                    transform = transform.parent;
-                } while (transform != null);
+                    var toCenter = Vector3.zero - bounds.center;
+                    toCenter.y = 0f;
+                    if (toCenter.sqrMagnitude > 0.01f)
+                    {
+                        var hipsTransformPosition = hipsTransform.position;
+                        hipsTransformPosition += toCenter;
+                        hipsTransform.position = hipsTransformPosition;
+                    }
+                    using (var keys = assetLoaderContext.GameObjects.Keys.GetEnumerator())
+                    using (var values = assetLoaderContext.GameObjects.Values.GetEnumerator())
+                        while (keys.MoveNext() && values.MoveNext())
+                        {
+                            if (keys.Current.IsBone)
+                            {
+                                if (!skeletonBones.ContainsKey(values.Current.transform))
+                                {
+                                    skeletonBones.Add(values.Current.transform, CreateSkeletonBone(values.Current.transform));
+                                }
+                            }
+                        }
+                    var triLibHumanDescription = assetLoaderContext.Options.HumanDescription ?? new General.HumanDescription();
+                    var humanDescription = new HumanDescription
+                    {
+                        armStretch = triLibHumanDescription.armStretch,
+                        feetSpacing = triLibHumanDescription.feetSpacing,
+                        hasTranslationDoF = triLibHumanDescription.hasTranslationDof,
+                        legStretch = triLibHumanDescription.legStretch,
+                        lowerArmTwist = triLibHumanDescription.lowerArmTwist,
+                        lowerLegTwist = triLibHumanDescription.lowerLegTwist,
+                        upperArmTwist = triLibHumanDescription.upperArmTwist,
+                        upperLegTwist = triLibHumanDescription.upperLegTwist,
+                        skeleton = skeletonBones.Values.ToArray(),
+                        human = humanBones
+                    };
+                    var avatar = AvatarBuilder.BuildHumanAvatar(assetLoaderContext.RootGameObject, humanDescription);
+                    avatar.name = $"{assetLoaderContext.RootGameObject.name}Avatar";
+                    animator.avatar = avatar;
+                }
+                assetLoaderContext.RootGameObject.transform.SetParent(parent, false);
+                assetLoaderContext.RootGameObject.transform.position = rootGameObjectPosition;
             }
         }
 
         /// <summary>Converts the given Model into a Game Object.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         /// <param name="parentTransform">The parent Game Object Transform.</param>
+        /// <param name="rootModel">The root Model.</param>
         /// <param name="model">The Model to convert.</param>
         /// <param name="newGameObject">The Game Object to receive the converted Model.</param>
-        private static void ParseModel(AssetLoaderContext assetLoaderContext, Transform parentTransform, IModel model, out GameObject newGameObject)
+        private static void ParseModel(AssetLoaderContext assetLoaderContext, Transform parentTransform, IRootModel rootModel, IModel model, out GameObject newGameObject)
         {
             newGameObject = new GameObject(model.Name);
             assetLoaderContext.GameObjects.Add(model, newGameObject);
@@ -670,19 +722,27 @@ namespace TriLibCore
             newGameObject.transform.localScale = model.LocalScale;
             if (model.GeometryGroup != null)
             {
-                ParseGeometry(assetLoaderContext, newGameObject, model);
+                ParseGeometry(assetLoaderContext, newGameObject, rootModel, model);
             }
             if (model.Children != null && model.Children.Count > 0)
             {
-                foreach (var child in model.Children)
+                for (var i = 0; i < model.Children.Count; i++)
                 {
-                    ParseModel(assetLoaderContext, newGameObject.transform, child, out _);
+                    var child = model.Children[i];
+                    ParseModel(assetLoaderContext, newGameObject.transform, rootModel, child, out _);
+                }
+            }
+            if (assetLoaderContext.Options.UserPropertiesMapper != null && model.UserProperties != null)
+            {
+                foreach (var userProperty in model.UserProperties)
+                {
+                    assetLoaderContext.Options.UserPropertiesMapper.OnProcessUserData(assetLoaderContext, newGameObject, userProperty.Key, userProperty.Value);
                 }
             }
         }
 
         /// <summary>Configures the given Model skinning if there is any.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         /// <param name="model">The Model containing the bones.</param>
         private static void SetupModelBones(AssetLoaderContext assetLoaderContext, IModel model)
         {
@@ -695,43 +755,50 @@ namespace TriLibCore
                 {
                     var boneIndex = 0;
                     var gameObjectBones = new Transform[bones.Count];
-                    foreach (var bone in bones)
+                    for (var i = 0; i < bones.Count; i++)
                     {
+                        var bone = bones[i];
                         gameObjectBones[boneIndex++] = assetLoaderContext.GameObjects[bone].transform;
                     }
                     skinnedMeshRenderer.bones = gameObjectBones;
-                    skinnedMeshRenderer.rootBone = assetLoaderContext.RootBone;
+                    skinnedMeshRenderer.rootBone = assetLoaderContext.Options.RootBoneMapper.Map(assetLoaderContext, gameObjectBones);
                 }
             }
             if (model.Children != null && model.Children.Count > 0)
             {
-                foreach (var subModel in model.Children)
+                for (var i = 0; i < model.Children.Count; i++)
                 {
+                    var subModel = model.Children[i];
                     SetupModelBones(assetLoaderContext, subModel);
                 }
             }
         }
 
         /// <summary>Converts the given Animation into an Animation Clip.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         /// <param name="animation">The Animation to convert.</param>
         /// <returns>The converted Animation Clip.</returns>
         private static AnimationClip ParseAnimation(AssetLoaderContext assetLoaderContext, IAnimation animation)
         {
-            var animationClip = new AnimationClip { name = animation.Name, legacy = assetLoaderContext.Options.AnimationType != AnimationType.Generic, frameRate = animation.FrameRate };
+            var animationClip = new AnimationClip { name = animation.Name, legacy = assetLoaderContext.Options.AnimationType == AnimationType.Legacy, frameRate = animation.FrameRate };
             var animationCurveBindings = animation.AnimationCurveBindings;
-            var rootModel = assetLoaderContext.RootBone != null ? assetLoaderContext.Models[assetLoaderContext.RootBone.gameObject] : null;
-            foreach (var animationCurveBinding in animationCurveBindings)
+            if (animationCurveBindings == null)
             {
+                return animationClip;
+            }
+            var rootModel = assetLoaderContext.RootModel;
+            for (var i = 0; i < animationCurveBindings.Count; i++)
+            {
+                var animationCurveBinding = animationCurveBindings[i];
                 var animationCurves = animationCurveBinding.AnimationCurves;
                 var gameObject = assetLoaderContext.GameObjects[animationCurveBinding.Model];
-                foreach (var animationCurve in animationCurves)
+                for (var j = 0; j < animationCurves.Count; j++)
                 {
-                    var keyFrames = animationCurve.KeyFrames;
-                    var unityAnimationCurve = new AnimationCurve(keyFrames);
+                    var animationCurve = animationCurves[j];
+                    var unityAnimationCurve = animationCurve.AnimationCurve;
                     var gameObjectPath = assetLoaderContext.GameObjectPaths[gameObject];
                     var propertyName = animationCurve.Property;
-                    var propertyType = animationCurve.Property.StartsWith("blendShape.") ? typeof(SkinnedMeshRenderer) : typeof(Transform); //todo: refactoring
+                    var propertyType = animationCurve.AnimatedType;
                     if (assetLoaderContext.Options.AnimationType == AnimationType.Generic)
                     {
                         TryToRemapGenericCurve(rootModel, animationCurve, animationCurveBinding, ref gameObjectPath, ref propertyName, ref propertyType);
@@ -739,7 +806,17 @@ namespace TriLibCore
                     animationClip.SetCurve(gameObjectPath, propertyType, propertyName, unityAnimationCurve);
                 }
             }
-            animationClip.EnsureQuaternionContinuity();
+            if (assetLoaderContext.Options.EnsureQuaternionContinuity)
+            {
+                try
+                {
+                    animationClip.EnsureQuaternionContinuity();
+                }
+                catch
+                {
+
+                }
+            }
             return animationClip;
         }
 
@@ -786,7 +863,6 @@ namespace TriLibCore
                         remap = true;
                         break;
                 }
-
                 if (remap)
                 {
                     gameObjectPath = "";
@@ -796,25 +872,26 @@ namespace TriLibCore
         }
 
         /// <summary>Converts the given Geometry Group into a Mesh.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         /// <param name="meshGameObject">The Game Object where the Mesh belongs.</param>
+        /// <param name="rootModel">The root Model.</param>
         /// <param name="meshModel">The Model used to generate the Game Object.</param>
-        private static void ParseGeometry(AssetLoaderContext assetLoaderContext, GameObject meshGameObject, IModel meshModel)
+        private static void ParseGeometry(AssetLoaderContext assetLoaderContext, GameObject meshGameObject, IRootModel rootModel, IModel meshModel)
         {
             var geometryGroup = meshModel.GeometryGroup;
-            var geometries = geometryGroup.Geometries;
-            var mesh = new Mesh { name = geometryGroup.Name, subMeshCount = geometries?.Count ?? 0, indexFormat = assetLoaderContext.Options.IndexFormat };
-            assetLoaderContext.Allocations.Add(mesh);
-            if (geometries != null)
+            if (geometryGroup.GeometriesData != null)
             {
+                var mesh = geometryGroup.GenerateMesh(assetLoaderContext, assetLoaderContext.Options.AnimationType == AnimationType.None ? null : meshModel.BindPoses);
+                assetLoaderContext.Allocations.Add(mesh);
                 if (assetLoaderContext.Options.ReadAndWriteEnabled)
                 {
                     mesh.MarkDynamic();
                 }
                 if (assetLoaderContext.Options.LipSyncMappers != null)
                 {
-                    foreach (var lipSyncMapper in assetLoaderContext.Options.LipSyncMappers)
+                    for (var i = 0; i < assetLoaderContext.Options.LipSyncMappers.Length; i++)
                     {
+                        var lipSyncMapper = assetLoaderContext.Options.LipSyncMappers[i];
                         if (lipSyncMapper == null)
                         {
                             continue;
@@ -827,40 +904,22 @@ namespace TriLibCore
                         }
                     }
                 }
-                geometries = mesh.CombineGeometries(geometryGroup, meshModel.BindPoses, assetLoaderContext);
-
                 if (assetLoaderContext.Options.GenerateColliders)
                 {
-                    if (assetLoaderContext.RootModel.AllAnimations != null && assetLoaderContext.RootModel.AllAnimations.Count > 0)
+                    if (assetLoaderContext.RootModel.AllAnimations != null && assetLoaderContext.RootModel.AllAnimations.Count > 0 && assetLoaderContext.Options.ShowLoadingWarnings)
                     {
-                        if (assetLoaderContext.Options.ShowLoadingWarnings)
-                        {
-                            Debug.LogWarning("Trying to add a MeshCollider to an animated object.");
-                        }
+                        Debug.LogWarning("Adding a MeshCollider to an animated object.");
                     }
-                    else
-                    {
-                        var meshCollider = meshGameObject.AddComponent<MeshCollider>();
-                        meshCollider.sharedMesh = mesh;
-                        meshCollider.convex = assetLoaderContext.Options.ConvexColliders;
-                    }
-                }
-                var allMaterials = new IMaterial[geometries.Count];
-                var modelMaterials = meshModel.Materials;
-                if (modelMaterials != null)
-                {
-                    for (var i = 0; i < geometries.Count; i++)
-                    {
-                        var geometry = geometries[i];
-                        allMaterials[i] = modelMaterials[Mathf.Clamp(geometry.MaterialIndex, 0, meshModel.Materials.Count - 1)];
-                    }
+                    var meshCollider = meshGameObject.AddComponent<MeshCollider>();
+                    meshCollider.sharedMesh = mesh;
+                    meshCollider.convex = assetLoaderContext.Options.ConvexColliders;
                 }
                 Renderer renderer = null;
                 if (assetLoaderContext.Options.AnimationType != AnimationType.None || assetLoaderContext.Options.ImportBlendShapes)
                 {
                     var bones = meshModel.Bones;
-                    var geometryGroupBlendShapeGeometryBindings = geometryGroup.BlendShapeGeometryBindings;
-                    if (bones != null && bones.Count > 0 || geometryGroupBlendShapeGeometryBindings != null && geometryGroupBlendShapeGeometryBindings.Count > 0)
+                    var geometryGroupBlendShapeGeometryBindings = geometryGroup.BlendShapeKeys;
+                    if ((bones != null && bones.Count > 0 || geometryGroupBlendShapeGeometryBindings != null && geometryGroupBlendShapeGeometryBindings.Count > 0) && assetLoaderContext.Options.AnimationType != AnimationType.None)
                     {
                         var skinnedMeshRenderer = meshGameObject.AddComponent<SkinnedMeshRenderer>();
                         skinnedMeshRenderer.sharedMesh = mesh;
@@ -876,35 +935,55 @@ namespace TriLibCore
                     meshRenderer.enabled = !assetLoaderContext.Options.ImportVisibility || meshModel.Visibility;
                     renderer = meshRenderer;
                 }
-                var materials = new Material[allMaterials.Length];
                 Material loadingMaterial = null;
-                foreach (var mapper in assetLoaderContext.Options.MaterialMappers)
+                if (assetLoaderContext.Options.MaterialMappers != null)
                 {
-                    if (mapper != null && mapper.IsCompatible(null))
+                    for (var i = 0; i < assetLoaderContext.Options.MaterialMappers.Length; i++)
                     {
-                        loadingMaterial = mapper.LoadingMaterial;
-                        break;
+                        var mapper = assetLoaderContext.Options.MaterialMappers[i];
+                        if (mapper != null && mapper.IsCompatible(null))
+                        {
+                            loadingMaterial = mapper.LoadingMaterial;
+                            break;
+                        }
                     }
                 }
+                var unityMaterials = new Material[geometryGroup.GeometriesData.Count];
                 if (loadingMaterial == null)
                 {
                     if (assetLoaderContext.Options.ShowLoadingWarnings)
                     {
-                        Debug.LogWarning("Could not find a suitable loading Material");
+                        Debug.LogWarning("Could not find a suitable loading Material.");
                     }
                 }
                 else
                 {
-                    for (var i = 0; i < materials.Length; i++)
+                    for (var i = 0; i < unityMaterials.Length; i++)
                     {
-                        materials[i] = loadingMaterial;
+                        unityMaterials[i] = loadingMaterial;
                     }
                 }
-                renderer.sharedMaterials = materials;
-                for (var i = 0; i < allMaterials.Length; i++)
+                renderer.sharedMaterials = unityMaterials;
+                var materialIndices = meshModel.MaterialIndices;
+                foreach (var geometryData in geometryGroup.GeometriesData)
                 {
-                    var sourceMaterial = allMaterials[i];
+                    var geometry = geometryData.Value;
+                    if (geometry == null)
+                    {
+                        continue;
+                    }
+                    var geometryIndex = geometry.Index;
+                    var materialIndex = materialIndices[geometryIndex];
+                    if (materialIndex < 0 || materialIndex >= rootModel.AllMaterials.Count)
+                    {
+                        continue;
+                    }
+                    var sourceMaterial = rootModel.AllMaterials[materialIndex];
                     if (sourceMaterial == null)
+                    {
+                        continue;
+                    }
+                    if (geometryIndex < 0 || geometryIndex >= renderer.sharedMaterials.Length)
                     {
                         continue;
                     }
@@ -912,7 +991,7 @@ namespace TriLibCore
                     {
                         Context = assetLoaderContext,
                         Renderer = renderer,
-                        MaterialIndex = i,
+                        GeometryIndex = geometryIndex,
                         Material = sourceMaterial
                     };
                     if (assetLoaderContext.MaterialRenderers.TryGetValue(sourceMaterial, out var materialRendererContextList))
@@ -928,28 +1007,36 @@ namespace TriLibCore
         }
 
         /// <summary>Loads the root Model.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         private static void LoadModel(AssetLoaderContext assetLoaderContext)
         {
+            if (assetLoaderContext.Stream == null && string.IsNullOrWhiteSpace(assetLoaderContext.Filename))
+            {
+                throw new Exception("TriLib is unable to load the given file.");
+            }
             if (assetLoaderContext.Options.MaterialMappers != null)
             {
                 Array.Sort(assetLoaderContext.Options.MaterialMappers, (a, b) => a.CheckingOrder > b.CheckingOrder ? -1 : 1);
             }
-            else if (assetLoaderContext.Options.ShowLoadingWarnings)
+            else
             {
-                Debug.LogWarning("Your AssetLoaderOptions instance has no MaterialMappers. TriLib can't process materials without them.");
+                if (assetLoaderContext.Options.ShowLoadingWarnings)
+                {
+                    Debug.LogWarning("Your AssetLoaderOptions instance has no MaterialMappers. TriLib can't process materials without them.");
+                }
             }
 #if TRILIB_DRACO
             GltfReader.DracoDecompressorCallback = DracoMeshLoader.DracoDecompressorCallback;
 #endif
-            var fileExtension = assetLoaderContext.FileExtension ?? FileUtils.GetFileExtension(assetLoaderContext.Filename, false).ToLowerInvariant();
+            var fileExtension = assetLoaderContext.FileExtension ?? FileUtils.GetFileExtension(assetLoaderContext.Filename, false);
             if (assetLoaderContext.Stream == null)
             {
-                var fileStream = new FileStream(assetLoaderContext.Filename, FileMode.Open);
+                var fileStream = new FileStream(assetLoaderContext.Filename, FileMode.Open, FileAccess.Read, FileShare.Read);
                 assetLoaderContext.Stream = fileStream;
                 var reader = Readers.FindReaderForExtension(fileExtension);
                 if (reader != null)
                 {
+                    reader.ExtraStepsCount = ExtraStepsCount;
                     assetLoaderContext.RootModel = reader.ReadStream(fileStream, assetLoaderContext, assetLoaderContext.Filename, assetLoaderContext.OnProgress);
                 }
             }
@@ -958,120 +1045,126 @@ namespace TriLibCore
                 var reader = Readers.FindReaderForExtension(fileExtension);
                 if (reader != null)
                 {
-                    assetLoaderContext.RootModel = reader.ReadStream(assetLoaderContext.Stream, assetLoaderContext, null, assetLoaderContext.OnProgress);
+                    reader.ExtraStepsCount = ExtraStepsCount;
+                    assetLoaderContext.RootModel = reader.ReadStream(assetLoaderContext.Stream, assetLoaderContext, assetLoaderContext.Filename, assetLoaderContext.OnProgress);
+                }
+                else
+                {
+                    throw new Exception("Could not find a suitable reader for the given model. Please fill the 'fileExtension' parameter when calling any model loading method.");
                 }
             }
         }
 
         /// <summary>Processes the root Model.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         private static void ProcessRootModel(AssetLoaderContext assetLoaderContext)
         {
             ProcessModel(assetLoaderContext);
-            if (assetLoaderContext.Async)
-            {
-                ThreadUtils.RunThread(assetLoaderContext, ref assetLoaderContext.CancellationToken, ProcessTextures, null, assetLoaderContext.HandleError ?? assetLoaderContext.OnError, assetLoaderContext.Options.Timeout);
-            }
-            else
-            {
-                ProcessTextures(assetLoaderContext);
-            }
+            ProcessMaterials(assetLoaderContext);
         }
 
-        private static void TryProcessMaterials(AssetLoaderContext assetLoaderContext)
-        {
-            var allMaterialsLoaded = assetLoaderContext.RootModel?.AllTextures == null || assetLoaderContext.LoadedTexturesCount == assetLoaderContext.RootModel.AllTextures.Count;
-            if (!assetLoaderContext.MaterialsProcessed && allMaterialsLoaded)
-            {
-                assetLoaderContext.MaterialsProcessed = true;
-                if (assetLoaderContext.RootModel?.AllMaterials != null)
-                {
-                    ProcessMaterials(assetLoaderContext);
-                }
-                if (assetLoaderContext.Options.AddAssetUnloader && assetLoaderContext.RootGameObject != null || assetLoaderContext.WrapperGameObject != null)
-                {
-                    var gameObject = assetLoaderContext.RootGameObject ?? assetLoaderContext.WrapperGameObject;
-                    var assetUnloader = gameObject.AddComponent<AssetUnloader>();
-                    assetUnloader.Id = AssetUnloader.GetNextId();
-                    assetUnloader.Allocations = assetLoaderContext.Allocations;
-                }
-                assetLoaderContext.OnMaterialsLoad?.Invoke(assetLoaderContext);
-                TryToCloseStream(assetLoaderContext);
-            }
-        }
-
-        private static void ProcessTextures(AssetLoaderContext assetLoaderContext)
-        {
-            if (assetLoaderContext.RootModel?.AllTextures != null)
-            {
-                for (var i = 0; i < assetLoaderContext.RootModel.AllTextures.Count; i++)
-                {
-                    var texture = assetLoaderContext.RootModel.AllTextures[i];
-                    TextureLoadingContext textureLoadingContext = null;
-                    if (assetLoaderContext.Options.TextureMapper != null)
-                    {
-                        textureLoadingContext = assetLoaderContext.Options.TextureMapper.Map(assetLoaderContext, texture);
-                    }
-                    if (textureLoadingContext == null)
-                    {
-                        textureLoadingContext = new TextureLoadingContext
-                        {
-                            Context = assetLoaderContext,
-                            Texture = texture
-                        };
-                    }
-                    StbImage.LoadTexture(textureLoadingContext);
-                    assetLoaderContext.Reader.UpdateLoadingPercentage((float)i / assetLoaderContext.RootModel.AllTextures.Count, 1);
-                }
-            }
-            assetLoaderContext.Reader.UpdateLoadingPercentage(1f, 1);
-            if (assetLoaderContext.Async)
-            {
-                Dispatcher.InvokeAsync(new ContextualizedAction<AssetLoaderContext>(TryProcessMaterials, assetLoaderContext));
-            }
-            else
-            {
-                TryProcessMaterials(assetLoaderContext);
-            }
-        }
-
+        /// <summary>
+        /// Processes the Model Materials, if all source Materials have been loaded.
+        /// </summary>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         private static void ProcessMaterials(AssetLoaderContext assetLoaderContext)
         {
-            if (assetLoaderContext.Options.MaterialMappers != null)
+            if (assetLoaderContext.RootModel?.AllMaterials != null && assetLoaderContext.RootModel.AllMaterials.Count > 0)
             {
-                foreach (var material in assetLoaderContext.RootModel.AllMaterials)
+                assetLoaderContext.MaterialRenderersLoadedCallback = FinishLoading;
+                if (assetLoaderContext.Options.MaterialMappers != null)
                 {
-                    MaterialMapper usedMaterialMapper = null;
                     var materialMapperContext = new MaterialMapperContext
                     {
                         Context = assetLoaderContext,
-                        Material = material
+                        Material = assetLoaderContext.GetNextPendingMaterial()
                     };
-                    foreach (var materialMapper in assetLoaderContext.Options.MaterialMappers)
+                    if (assetLoaderContext.Async)
                     {
-                        if (materialMapper == null || !materialMapper.IsCompatible(materialMapperContext))
-                        {
-                            continue;
-                        }
-                        materialMapper.Map(materialMapperContext);
-                        usedMaterialMapper = materialMapper;
-                        break;
+                        var task = ThreadUtils.RunThread(materialMapperContext, ref assetLoaderContext.CancellationToken, ProcessMaterialRenderers, null, HandleError, assetLoaderContext.Options.Timeout);
+                        assetLoaderContext.Tasks.Add(task);
                     }
-                    if (usedMaterialMapper != null)
+                    else
                     {
-                        if (assetLoaderContext.MaterialRenderers.TryGetValue(material, out var materialRendererList))
-                        {
-                            foreach (var materialRendererContext in materialRendererList)
-                            {
-                                usedMaterialMapper.ApplyMaterialToRenderer(materialRendererContext, materialMapperContext);
-                            }
-                        }
+                        ProcessMaterialRenderers(materialMapperContext);
                     }
                 }
+                else if (assetLoaderContext.Options.ShowLoadingWarnings)
+                {
+                    Debug.LogWarning("Please specify a TriLib Material Mapper, otherwise Materials can't be created.");
+                }
             }
-            else if (assetLoaderContext.Options.ShowLoadingWarnings)
+            else
             {
-                Debug.LogWarning("The given AssetLoaderOptions contains no MaterialMapper. Materials will not be created.");
+                FinishLoading(assetLoaderContext);
+            }
+        }
+
+        ///<summary>
+        /// Finishes the Model loading, calling the OnMaterialsLoad callback, if present.
+        ///</summary>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
+        private static void FinishLoading(AssetLoaderContext assetLoaderContext)
+        {
+            foreach (var allocation in assetLoaderContext.Allocations)
+            {
+                if (!(allocation is Texture2D texture2D))
+                {
+                    continue;
+                }
+                if (texture2D.width <= 2 && texture2D.height <= 2)
+                {
+                    continue;
+                }
+                TextureUtils.FinishTexture2D(assetLoaderContext, texture2D);
+            }
+            if (assetLoaderContext.Options.AddAssetUnloader && assetLoaderContext.RootGameObject != null || assetLoaderContext.WrapperGameObject != null)
+            {
+                var gameObject = assetLoaderContext.RootGameObject ?? assetLoaderContext.WrapperGameObject;
+                var assetUnloader = gameObject.AddComponent<AssetUnloader>();
+                assetUnloader.Id = AssetUnloader.GetNextId();
+                assetUnloader.Allocations = assetLoaderContext.Allocations;
+            }
+            assetLoaderContext.Reader.UpdateLoadingPercentage(1f, assetLoaderContext.Reader.LoadingStepsCount + FinalStep);
+            assetLoaderContext.OnMaterialsLoad?.Invoke(assetLoaderContext);
+            Cleanup(assetLoaderContext);
+        }
+
+        /// <summary>
+        /// Processes Model Renderers.
+        /// </summary>
+        /// <param name="materialMapperContext">The source Material Mapper Context, containing the Virtual Material and Unity Material.</param>
+        private static void ProcessMaterialRenderers(MaterialMapperContext materialMapperContext)
+        {
+            var assetLoaderContext = materialMapperContext.Context;
+            assetLoaderContext.Reader.UpdateLoadingPercentage(assetLoaderContext.GetProcessedMaterialsCount(), assetLoaderContext.Reader.LoadingStepsCount + ProcessingRenderersStep, assetLoaderContext.RootModel.AllMaterials.Count);
+            for (var i = 0; i < assetLoaderContext.Options.MaterialMappers.Length; i++)
+            {
+                var materialMapper = assetLoaderContext.Options.MaterialMappers[i];
+                if (materialMapper != null)
+                {
+                    materialMapper.Map(materialMapperContext);
+                    if (assetLoaderContext.MaterialRenderers.TryGetValue(materialMapperContext.Material, out var materialRendererList))
+                    {
+                        for (var j = 0; j < materialRendererList.Count; j++)
+                        {
+                            var materialRendererContext = materialRendererList[j];
+                            materialRendererContext.MaterialMapperContext = materialMapperContext;
+                            Dispatcher.InvokeAsync(materialMapper.ApplyMaterialToRenderer, materialRendererContext, materialMapper);
+                        }
+                    }
+                    break;
+                }
+            }
+            var pendingMaterial = assetLoaderContext.GetNextPendingMaterial();
+            if (pendingMaterial != null)
+            {
+                var newMaterialMapperContext = new MaterialMapperContext
+                {
+                    Context = materialMapperContext.Context,
+                    Material = pendingMaterial
+                };
+                ProcessMaterialRenderers(newMaterialMapperContext);
             }
         }
 
@@ -1080,50 +1173,48 @@ namespace TriLibCore
         private static void HandleError(IContextualizedError error)
         {
             var exception = error.GetInnerException();
-            if (error.GetContext() is IAssetLoaderContext iassetLoaderContext)
+            if (error.GetContext() is IAssetLoaderContext context)
             {
-                var assetLoaderContext = iassetLoaderContext.Context;
+                var assetLoaderContext = context.Context;
                 if (assetLoaderContext != null)
                 {
-                    TryToCloseStream(assetLoaderContext);
+                    Cleanup(assetLoaderContext);
                     if (assetLoaderContext.Options.DestroyOnError && assetLoaderContext.RootGameObject != null)
                     {
 #if UNITY_EDITOR
                         Object.DestroyImmediate(assetLoaderContext.RootGameObject);
 #else
-                        Object.Destroy(assetLoaderContext.RootGameObject);          
+                        Object.Destroy(assetLoaderContext.RootGameObject);
 #endif
                         assetLoaderContext.RootGameObject = null;
                     }
-                    if (assetLoaderContext.Async)
+                    if (assetLoaderContext.OnError != null)
                     {
-                        Dispatcher.InvokeAsync(new ContextualizedAction<IContextualizedError>(assetLoaderContext.OnError, error));
-                    }
-                    else if (assetLoaderContext.OnError != null)
-                    {
-                        assetLoaderContext.OnError(error);
+                        Dispatcher.InvokeAsync(assetLoaderContext.OnError, error);
                     }
                 }
             }
             else
             {
-                var contextualizedAction = new ContextualizedAction<ContextualizedError<object>>(Rethrow, new ContextualizedError<object>(exception, null));
-                Dispatcher.InvokeAsync(contextualizedAction);
+                var contextualizedError = new ContextualizedError<object>(exception, null);
+                Dispatcher.InvokeAsync(Rethrow, contextualizedError);
             }
         }
 
-        private static void TryToCloseStream(AssetLoaderContext assetLoaderContext)
+        /// <summary>
+        /// Tries to close the Model Stream, if the used AssetLoaderOptions.CloseSteamAutomatically option is enabled.
+        /// Also, indicates the GCHelper instance a model loading has finished.
+        /// </summary>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
+        private static void Cleanup(AssetLoaderContext assetLoaderContext)
         {
             if (assetLoaderContext.Stream != null && assetLoaderContext.Options.CloseStreamAutomatically)
             {
-                try
-                {
-                    assetLoaderContext.Stream.Dispose();
-                }
-                catch (Exception e)
-                {
-
-                }
+                assetLoaderContext.Stream.TryToDispose();
+            }
+            if (Application.isPlaying)
+            {
+                GCHelper.GetInstance().UnRegisterLoading(assetLoaderContext.Options.GCHelperCollectionInterval);
             }
         }
 

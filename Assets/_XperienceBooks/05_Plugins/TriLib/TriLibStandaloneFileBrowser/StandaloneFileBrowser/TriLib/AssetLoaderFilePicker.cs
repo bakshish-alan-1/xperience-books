@@ -1,14 +1,14 @@
-﻿using System;
+﻿#pragma warning disable 618
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using SFB;
+using TriLibCore.SFB;
 using TriLibCore.General;
 using TriLibCore.Mappers;
 using TriLibCore.Utils;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace TriLibCore
 {
@@ -24,6 +24,7 @@ namespace TriLibCore
         private Action<bool> _onBeginLoad;
         private GameObject _wrapperGameObject;
         private AssetLoaderOptions _assetLoaderOptions;
+        private bool _haltTask;
 
         /// <summary>Creates the Asset Loader File Picker Singleton instance.</summary>
         /// <returns>The created AssetLoaderFilePicker.</returns>
@@ -36,14 +37,15 @@ namespace TriLibCore
 
         /// <summary>Loads a Model from the OS file picker asynchronously, or synchronously when the OS doesn't support Threads.</summary>
         /// <param name="title">The dialog title.</param>
-        /// <param name="onLoad">The Method to call on the Main Thread when the Model Meshes and hierarchy are loaded.</param>
-        /// <param name="onMaterialsLoad">The Method to call on the Main Thread when the Model (including Textures and Materials) has been fully loaded.</param>
+        /// <param name="onLoad">The Method to call on the Main Thread when the Model is loaded but resources may still pending.</param>
+        /// <param name="onMaterialsLoad">The Method to call on the Main Thread when the Model and resources are loaded.</param>
         /// <param name="onProgress">The Method to call when the Model loading progress changes.</param>
         /// <param name="onBeginLoad">The Method to call when the model begins to load.</param>
         /// <param name="onError">The Method to call on the Main Thread when any error occurs.</param>
         /// <param name="wrapperGameObject">The Game Object that will be the parent of the loaded Game Object. Can be null.</param>
-        /// <param name="assetLoaderOptions">The Asset Loader Options reference. Asset Loader Options contains various options used during the Model loading process.</param>
-        public void LoadModelFromFilePickerAsync(string title, Action<AssetLoaderContext> onLoad, Action<AssetLoaderContext> onMaterialsLoad, Action<AssetLoaderContext, float> onProgress, Action<bool> onBeginLoad, Action<IContextualizedError> onError, GameObject wrapperGameObject, AssetLoaderOptions assetLoaderOptions)
+        /// <param name="assetLoaderOptions">The options to use when loading the Model.</param>
+        /// <param name="haltTask">Turn on this field to avoid loading the model immediately and chain the Tasks.</param>
+        public void LoadModelFromFilePickerAsync(string title, Action<AssetLoaderContext> onLoad, Action<AssetLoaderContext> onMaterialsLoad, Action<AssetLoaderContext, float> onProgress, Action<bool> onBeginLoad, Action<IContextualizedError> onError, GameObject wrapperGameObject, AssetLoaderOptions assetLoaderOptions, bool haltTask = false)
         {
             _onLoad = onLoad;
             _onMaterialsLoad = onMaterialsLoad;
@@ -52,17 +54,14 @@ namespace TriLibCore
             _onBeginLoad = onBeginLoad;
             _wrapperGameObject = wrapperGameObject;
             _assetLoaderOptions = assetLoaderOptions;
+            _haltTask = haltTask;
             try
             {
 				StandaloneFileBrowser.OpenFilePanelAsync(title, null, GetExtensions(), true, OnItemsWithStreamSelected);
             }
             catch (Exception)
             {
-#if (UNITY_WSA || UNITY_ANDROID) && !UNITY_EDITOR
-                Dispatcher.InvokeAsync(new ContextualizedAction(DestroyMe));
-#else
-                DestroyMe();
-#endif
+                Dispatcher.InvokeAsync(DestroyMe);
                 throw;
             }
         }
@@ -79,11 +78,8 @@ namespace TriLibCore
 
         private IEnumerator DoHandleFileLoading()
         {
-            var hasFiles = _items != null && (_items.Count > 0 || _items.Count == 1 && _items[0].HasData);
-            if (_onBeginLoad != null)
-            {
-                _onBeginLoad(hasFiles);
-            }
+            var hasFiles = _items != null && _items.Count > 0 && _items[0].HasData;
+            _onBeginLoad?.Invoke(hasFiles);
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
             if (!hasFiles)
@@ -100,8 +96,6 @@ namespace TriLibCore
             }
             _assetLoaderOptions.TextureMapper = ScriptableObject.CreateInstance<FilePickerTextureMapper>();
             _assetLoaderOptions.ExternalDataMapper = ScriptableObject.CreateInstance<FilePickerExternalDataMapper>();
-            _assetLoaderOptions.FixedAllocations.Add(_assetLoaderOptions.ExternalDataMapper);
-            _assetLoaderOptions.FixedAllocations.Add(_assetLoaderOptions.TextureMapper);
             _modelExtension = modelFilename != null ? FileUtils.GetFileExtension(modelFilename, false) : null;
             if (_modelExtension == "zip")
             {
@@ -118,11 +112,11 @@ namespace TriLibCore
             {
                 if (modelStream != null)
                 {
-                    AssetLoader.LoadModelFromStream(modelStream, modelFilename, _modelExtension, _onLoad, _onMaterialsLoad, _onProgress, _onError, _wrapperGameObject, _assetLoaderOptions, _items);
+                    AssetLoader.LoadModelFromStream(modelStream, modelFilename, _modelExtension, _onLoad, _onMaterialsLoad, _onProgress, _onError, _wrapperGameObject, _assetLoaderOptions, _items, _haltTask);
                 }
                 else
                 {
-                    AssetLoader.LoadModelFromFile(modelFilename, _onLoad, _onMaterialsLoad, _onProgress, _onError, _wrapperGameObject, _assetLoaderOptions, _items);
+                    AssetLoader.LoadModelFromFile(modelFilename, _onLoad, _onMaterialsLoad, _onProgress, _onError, _wrapperGameObject, _assetLoaderOptions, _items, _haltTask);
                 }
             }
             DestroyMe();
@@ -172,7 +166,7 @@ namespace TriLibCore
 			if (itemsWithStream != null)
             {
                 _items = itemsWithStream;
-                Dispatcher.InvokeAsync(new ContextualizedAction(HandleFileLoading)); //todo: no need for dispatcher on some platforms
+                Dispatcher.InvokeAsync(HandleFileLoading);
             } else {
                 DestroyMe();
             }    

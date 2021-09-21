@@ -1,4 +1,5 @@
-﻿using TriLibCore.Extensions;
+﻿#pragma warning disable 649
+using TriLibCore.Extensions;
 using TriLibCore.General;
 using TriLibCore.Mappers;
 using UnityEngine;
@@ -6,7 +7,6 @@ using UnityEngine;
 namespace TriLibCore.Samples
 {
     /// <summary>Represents a TriLib sample which allows the user to load and control a custom avatar.</summary>
-
     public class AvatarLoader : AssetViewerBase
     {
         /// <summary>
@@ -16,6 +16,12 @@ namespace TriLibCore.Samples
         private GameObject _wrapper;
 
         /// <summary>
+        /// Mapper to be used when loading the Avatar.
+        /// </summary>
+        [SerializeField]
+        private HumanoidAvatarMapper _humanoidAvatarMapper;
+
+        /// <summary>
         /// Shows the file picker so the user can load an avatar from the local file system.
         /// </summary>
         public void LoadAvatarFromFile()
@@ -23,23 +29,8 @@ namespace TriLibCore.Samples
             LoadModelFromFile(_wrapper);
         }
 
-        /// <summary>
-        /// Shows the file picker so the user can load a new animation for the current avatar from the local file system.
-        /// </summary>
-        public void LoadAnimationFromFile()
-        {
-            LoadModelFromFile(_wrapper, OnAnimationMaterialsLoad);
-        }
-
-        /// <summary>Event triggered when the Model (including Textures and Materials) has been fully loaded, when user loads a new Animation.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
-        private void OnAnimationMaterialsLoad(AssetLoaderContext assetLoaderContext)
-        {
-
-        }
-
         /// <summary>Event triggered when the Model (including Textures and Materials) has been fully loaded.</summary>
-        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the information used during the Model loading process, which is available to almost every Model processing method</param>
+        /// <param name="assetLoaderContext">The Asset Loader Context reference. Asset Loader Context contains the Model loading data.</param>
         protected override void OnMaterialsLoad(AssetLoaderContext assetLoaderContext)
         {
             base.OnMaterialsLoad(assetLoaderContext);
@@ -61,13 +52,13 @@ namespace TriLibCore.Samples
             }
         }
 
-        /// <summary>Checks if the Dispatcher instance exists and stores this class instance as the Singleton and adjusts avatar size.</summary>
+        /// <summary>Configures the avatar loading and adjusts avatar size factor based on the existing avatar.</summary>
         protected override void Start()
         {
             base.Start();
             AssetLoaderOptions = AssetLoader.CreateDefaultLoaderOptions();
             AssetLoaderOptions.AnimationType = AnimationType.Humanoid;
-            AssetLoaderOptions.HumanoidAvatarMapper = Resources.Load<HumanoidAvatarMapper>("Mappers/Avatar/MixamoAndBipedByNameHumanoidAvatarMapper");
+            AssetLoaderOptions.HumanoidAvatarMapper = _humanoidAvatarMapper;
             var bounds = AvatarController.Instance.InnerAvatar.CalculateBounds();
             var factor = AvatarController.Instance.CharacterController.height / bounds.size.y;
             AvatarController.Instance.InnerAvatar.transform.localScale = factor * Vector3.one;

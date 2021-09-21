@@ -1,4 +1,4 @@
-﻿namespace SFB
+﻿namespace TriLibCore.SFB
 {
     /// <summary>
     /// Represents a file picker extension filter.
