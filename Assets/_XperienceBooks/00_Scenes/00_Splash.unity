@@ -4002,6 +4002,7 @@ GameObject:
   - component: {fileID: 1463931695}
   - component: {fileID: 1463931696}
   - component: {fileID: 1463931697}
+  - component: {fileID: 1463931698}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -4199,6 +4200,18 @@ MonoBehaviour:
   m_RayCastBlocker: {fileID: 354941233}
   errorWindow: {fileID: 783227975}
   ErrorMessage: []
+--- !u!114 &1463931698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463931693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e6a6703856454ee9a53344539baf0a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1588097098
 GameObject:
   m_ObjectHideFlags: 0

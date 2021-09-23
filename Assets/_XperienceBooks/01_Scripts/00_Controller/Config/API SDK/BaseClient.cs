@@ -7,46 +7,29 @@ namespace Intellify.core
         protected Properties properties;
         protected APIEnvironment APIEnvironment;
 
-
         public BaseClient()
         {
-
             Init();
         }
-
 
         public void Init()
         {
             properties = Resources.Load<Properties>("Properties");
 
-            /*  switch (properties.m_CurrentEnvirnment)
-              {
-                  case DevEnvironment.Testing:
-                      APIEnvironment = new APIEnvironment(properties.TestingBaseURL);
-                      break;
-                  case DevEnvironment.Local:
-                      APIEnvironment = new APIEnvironment(properties.ProductionNew);
-                      break;
-                  case DevEnvironment.Production:
-                      APIEnvironment = new APIEnvironment(properties.ProductionBaseURL);
-                      break;
-              }*/
-
-            switch (PlayerPrefs.GetInt("ENV"))
+            switch (properties.m_CurrentEnvirnment)
             {
-                case 1:
+                case DevEnvironment.Testing:
                     APIEnvironment = new APIEnvironment(properties.TestingBaseURL);
                     break;
                 
-                case 2:
+                case DevEnvironment.Production:
                     APIEnvironment = new APIEnvironment(properties.ProductionBaseURL);
                     break;
 
-                //case 3:
-                //    APIEnvironment = new APIEnvironment(properties.ProductionNew);
-                //    break;
+                case DevEnvironment.Staging:
+                    APIEnvironment = new APIEnvironment(properties.Staging);
+                    break;
             }
         }
-
     }
 }

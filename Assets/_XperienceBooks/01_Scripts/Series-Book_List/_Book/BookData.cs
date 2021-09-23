@@ -44,7 +44,8 @@ public class BookData : MonoBehaviour
         }
         else
         {
-            seriesImg.sprite = GameManager.Instance.Texture2DToSprite(((DownloadHandlerTexture)request.downloadHandler).texture);
+            if (seriesImg)
+                seriesImg.sprite = GameManager.Instance.Texture2DToSprite(((DownloadHandlerTexture)request.downloadHandler).texture);
         }
     }
 

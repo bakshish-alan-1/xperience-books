@@ -9,34 +9,10 @@ public class LoadMainScene : MonoBehaviour
     public Dropdown env;
     public void LoadNextScene()
     {
-        // remove comment for internal test with api selection drop down
-        /* 
-        if (PlayerPrefs.GetInt("IsFreshInstall") == 0)
-        {
-            envirnmentSelector.SetActive(true);
-        }
-        else {
-           
-            UnityEngine.SceneManagement.SceneManager.LoadScene(1);
-        }
-        */
-
-        PlayerPrefs.SetInt("ENV", 1);// 1 = testing , 2 = production
-        PlayerPrefs.SetInt("IsFreshInstall", 1);
+        PlayerPrefs.SetInt("IsFreshInstall", 1);// if value is 0 then localstorage folder delete or created from gamemanager
         Debug.Log("Load home scene");
         SceneLoader.LoadScene(1);
         //UnityEngine.SceneManagement.SceneManager.LoadScene(1);
         //UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(1);
-    }
-
-
-    public void DropBpoxUpdated() {
-
-        if (env.value != 0) {
-            PlayerPrefs.SetInt("IsFreshInstall", 1);
-            PlayerPrefs.SetInt("ENV", env.value);
-            UnityEngine.SceneManagement.SceneManager.LoadScene(1);
-
-        }
     }
 }

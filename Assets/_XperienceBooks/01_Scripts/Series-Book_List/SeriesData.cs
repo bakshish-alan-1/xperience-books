@@ -56,7 +56,8 @@ public class SeriesData : MonoBehaviour
         else
         {
             texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
-            seriesImg.sprite = GameManager.Instance.Texture2DToSprite(texture);
+            if (seriesImg)
+                seriesImg.sprite = GameManager.Instance.Texture2DToSprite(texture);
         }
     }
 

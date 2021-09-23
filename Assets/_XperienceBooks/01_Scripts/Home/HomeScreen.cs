@@ -160,7 +160,7 @@ public class HomeScreen : MonoBehaviour
         string theme = GameManager.Instance.GetThemePath();
 
         ThemeManager.Instance.OnLoadImage(theme, StaticKeywords.BGTheme, Bg);
-        ThemeManager.Instance.OnLoadImage(theme, StaticKeywords.ScanTheme, scaneIcon);
+        ThemeManager.Instance.OnLoadImage(theme, StaticKeywords.DialogBoxBtn, scaneIcon);
         ThemeManager.Instance.OnLoadImage(theme, StaticKeywords.BackBtnTheme, backIcon);
         ThemeManager.Instance.OnLoadImage(theme, StaticKeywords.ProfileTheme, profileIcon);
         ThemeManager.Instance.OnLoadImage(theme, StaticKeywords.NotificationTheme, notificationIcon);

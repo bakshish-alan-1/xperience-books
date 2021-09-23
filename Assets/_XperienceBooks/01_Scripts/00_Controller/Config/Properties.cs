@@ -5,7 +5,7 @@ using UnityEngine;
 public enum DevEnvironment
 {
     Testing,
-    Local,
+    Staging,
     Production
 }
 
@@ -24,8 +24,8 @@ public class Properties : ScriptableObject
     [Header("Testing Server")]
     public string TestingBaseURL = "https://arbooks.theintellify.net/api/";
 
-    //[Header("New Production")]
-    //public string ProductionNew = "http://192.168.1.3:8000/api/";
+    [Header("Staging")]
+    public string Staging = "https://arbooks-test.theintellify.net/api/";
 
     [Header("Client Server")]
     public string ProductionBaseURL = "https://admin.continuummultimedia.com/api/";  //"https://arbooks-prod.theintellify.net/api/";

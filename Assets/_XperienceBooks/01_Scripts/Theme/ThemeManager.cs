@@ -11,6 +11,10 @@ public class ThemeManager : MonoBehaviour
 {
     public static ThemeManager Instance = null;
 
+    public Image background, scanBackground;
+    public Image dialoguebox, commonBtn, backBtn, profileIcon, newIcon;
+    public Image facebook, insta, youtube, website, twitter;
+
     private void Start()
     {
         if (Instance == null)
@@ -150,45 +154,7 @@ public class ThemeManager : MonoBehaviour
                 no += 1;
         }
     }
-    /*
-    IEnumerator saveTheame(string url, string imageName)
-    {
-        Debug.Log("url: " + url + ", name: " + imageName);
-        
-        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-        yield return request.SendWebRequest();
-
-        if (request.isNetworkError || request.isHttpError)
-        {
-            Debug.Log(request.error);
-            GameManager.Instance.OpenPrepareThemWindow(false);
-            ErrorWindow.Instance.SetErrorMessage("Something Went Wrong",request.error, "TRY AGAIN", ErrorWindow.ResponseData.InternetIssue, true);
-        }
-        else
-        {
-            File.WriteAllBytes(imageName, request.downloadHandler.data);
-
-            if ((no + 1) < urls.Count)
-            {
-                no += 1;
-                Debug.Log("saveTheame image: " + no);
-                StartCoroutine(saveTheame(urls[no], name[no]));
-            }
-            else
-            {
-                if (imageName.Equals(StaticKeywords.Font1Theme))
-                    GameManager.Instance.TitleFont = onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font1Theme);
-
-                if (imageName.Equals(StaticKeywords.Font2Theme))
-                    GameManager.Instance.DetailFont = onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font2Theme);
-
-                PlayerPrefs.SetString("IsThemeSaved", "true");
-                HomeScreen.Instance.OnSetHomePanelData();
-            }
-        }
-    }
-    */
-
+    
     // return TMP_FontAsset object for TextMesh pro text
     public async void onCreateFontAsset(string myFontPath, TMP_FontAsset textFont)
     {
@@ -196,7 +162,8 @@ public class ThemeManager : MonoBehaviour
         while (!data)
             await Task.Yield();
 
-        textFont = TMP_FontAsset.CreateFontAsset(new Font(myFontPath));
+        if (textFont)
+            textFont = TMP_FontAsset.CreateFontAsset(new Font(myFontPath));
     }
 
     public async void OnLoadImage(string path, string name, Image image)

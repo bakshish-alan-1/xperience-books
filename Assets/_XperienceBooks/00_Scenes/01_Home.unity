@@ -8551,7 +8551,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1244592058}
   m_HandleRect: {fileID: 1244592057}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -8656,7 +8656,6 @@ GameObject:
   m_Component:
   - component: {fileID: 326679668}
   - component: {fileID: 326679667}
-  - component: {fileID: 326679669}
   m_Layer: 0
   m_Name: HomeScreenScript
   m_TagString: Untagged
@@ -8717,18 +8716,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &326679669
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 326679666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e6a6703856454ee9a53344539baf0a5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &331501647
 GameObject:
   m_ObjectHideFlags: 0
@@ -32982,11 +32969,11 @@ RectTransform:
   m_Father: {fileID: 1925493688}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -580}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 80}
   m_SizeDelta: {x: 270, y: 81}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1466235316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44726,7 +44713,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1626603890}
   m_Direction: 2
   m_Value: 0.5
-  m_Size: 0.037814416
+  m_Size: 0.039338388
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -48918,8 +48905,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_Maskable: 1
+  m_RaycastTarget: 0
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []

@@ -92,21 +92,6 @@ public class WindowManager : MonoBehaviour
             OpenPanel("PrivacyPolicy");
     }
 
-    /*public GameObject m_AddressListView;
-    public GameObject m_AddressCreateView;
-    public void AddressManagerBackButton()// only working for address manager scripts
-    {
-        if (m_AddressCreateView.GetComponent<CanvasGroup>().alpha == 1)
-        {
-            m_AddressListView.GetComponent<Animator>().Play(windowFadeIn);
-            m_AddressCreateView.GetComponent<Animator>().Play(windowFadeOut);
-        }
-        else
-        {
-            OpenPanel("UserProfileOptions");
-        }
-    }*/
-
     void SocialMediaList(string name)
     {
         if (name.Equals(StaticKeywords.HomePanel) || name.Equals(StaticKeywords.ContentList))
