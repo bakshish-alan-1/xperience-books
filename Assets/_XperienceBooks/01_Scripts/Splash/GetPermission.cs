@@ -4,51 +4,67 @@ using UnityEngine.Android;
 
 public class GetPermission : MonoBehaviour
 {
+    static public GetPermission Instance = null;
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+    }
+
     void Start()
     {
-
-#if !UNITY_EDITOR && UNITY_ANDROID
+#if !UNITY_EDITOR
         getCameraPermission();
         getLocationPermission();
         getStoragePermission();
 #endif
-
     }
 
     void getLocationPermission()
     {
+#if UNITY_ANDROID
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
             Permission.RequestUserPermission(Permission.FineLocation);
         }
+#endif
     }
 
     void getStoragePermission()
     {
+#if UNITY_ANDROID
         if (!Permission.HasUserAuthorizedPermission(Permission.ExternalStorageWrite))
         {
             Permission.RequestUserPermission(Permission.ExternalStorageWrite);
         }
+#endif
     }
 
     void getCameraPermission()
     {
-        CameraPermissionsController.RequestPermission(new[] { EasyWebCam.CAMERA_PERMISSION }, new AndroidPermissionCallback(
-            grantedPermission =>
-            {
-                Debug.Log("Camera Permission Granted");
-                // The permission was successfully granted, restart the change avatar routine
-            },
-            deniedPermission =>
-            {
-                // The permission was denied
-                Debug.Log("Camera Permission denied");
-            },
-            deniedPermissionAndDontAskAgain =>
-            {
-                // The permission was denied, and the user has selected "Don't ask again"
-                // Show in-game pop-up message stating that the user can change permissions in Android Application Settings
-                // if he changes his mind (also required by Google Featuring program)
-            }));
+#if UNITY_ANDROID
+        if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
+        {
+            Permission.RequestUserPermission(Permission.Camera);
+        }
+#elif UNITY_IOS
+        if (!Application.HasUserAuthorization(UserAuthorization.WebCam))
+        {
+            Application.RequestUserAuthorization(UserAuthorization.WebCam);
+        }
+#endif
+    }
+
+    public bool IsCameraPermissionGranted()
+    {
+        bool value = false;
+#if UNITY_ANDROID
+        value = Permission.HasUserAuthorizedPermission(Permission.Camera);
+#elif UNITY_IOS
+        value = Application.HasUserAuthorization(UserAuthorization.WebCam);
+#endif
+
+        return value;
     }
 }

@@ -136,15 +136,15 @@ public class ARPortalController : MonoBehaviour
     public void ModelLoaded(AssetLoaderContext assetLoaderContext)
     {
         Debug.Log("ModelLoaded: ");
-        //doorRootObject.transform.GetChild(0).GetComponent<Animation>().playAutomatically = false;
-        //doorRootObject.transform.GetChild(0).GetComponent<Animation>().wrapMode = WrapMode.Once;
+        doorRootObject.transform.GetChild(0).GetComponent<Animation>().playAutomatically = false;
+        doorRootObject.transform.GetChild(0).GetComponent<Animation>().wrapMode = WrapMode.Once;
 
-        GameObject DoorParent = new GameObject("doorParent");
+        /*GameObject DoorParent = new GameObject("doorParent");
         DoorParent.transform.SetParent(doorRootObject.transform.GetChild(0).transform);
         DoorParent.transform.localScale = Vector3.one;
         DoorParent.transform.localPosition = new Vector3(0.45f, 0, 0);//new Vector3(15f, 0, 0);
 
-        doorRootObject.transform.GetChild(0).transform.GetChild(0).SetParent(DoorParent.transform);
+        doorRootObject.transform.GetChild(0).transform.GetChild(0).SetParent(DoorParent.transform);*/
     }
 
     private IEnumerator LoadImageTexture(string path)

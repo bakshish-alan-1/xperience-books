@@ -18,7 +18,6 @@ public class Book
     public string series_name;
     public List<int> b_MapModules = new List<int>();
 
-   
     public string BasePath() {
 
         StringBuilder path = new StringBuilder();

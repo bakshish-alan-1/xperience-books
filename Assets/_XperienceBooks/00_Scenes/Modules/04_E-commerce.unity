@@ -12459,6 +12459,7 @@ MonoBehaviour:
   m_BillingAddressParent: {fileID: 2093986206}
   m_AddressListView: {fileID: 1109050884}
   m_AddressCreateView: {fileID: 629463326}
+  checkoutBtn: {fileID: 706716600}
   InAnimation: Window In
   OutAnimation: Window Out
   isSelectAddress: 1

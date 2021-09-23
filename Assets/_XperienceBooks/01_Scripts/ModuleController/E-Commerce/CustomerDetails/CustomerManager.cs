@@ -36,6 +36,8 @@ namespace Ecommerce.address
         public GameObject m_AddressListView;
         public GameObject m_AddressCreateView;
 
+        [SerializeField] Button checkoutBtn;// countinue button in address view screen
+
         public string InAnimation = "";
         public string OutAnimation = "";
 
@@ -226,6 +228,10 @@ namespace Ecommerce.address
                 m_BillingAddressBook.Add(address);
             }
             Debug.Log("Address Added " + type.ToString());
+            if ((m_ShippingAddressParent.transform.childCount > 0 && IsBillingAddressSame.isOn) || (!IsBillingAddressSame.isOn && m_ShippingAddressParent.transform.childCount > 0 && m_BillingAddressParent.transform.childCount > 0))
+                checkoutBtn.interactable = true;
+            else
+                checkoutBtn.interactable = false;
         }
 
         private void AddressSelected(int index, AddressType type)

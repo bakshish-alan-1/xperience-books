@@ -43,7 +43,10 @@ public class VirtualButton : MonoBehaviour
         if (isObjectPlced) {
             isObjectPlced = false;
             Debug.Log("Click");
-            iTween.RotateTo(doorRoot.transform.GetChild(0).transform.GetChild(1).gameObject, iTween.Hash("y", -100f, "time", 2f, "easeType", iTween.EaseType.linear, "loopType", iTween.LoopType.none));
+
+            doorRoot.transform.GetChild(0).GetComponent<Animation>().Play("Door");
+            //doorRoot.transform.GetChild(0).GetComponent<Animation>().Play("Take 001");
+            //iTween.RotateTo(doorRoot.transform.GetChild(0).transform.GetChild(1).gameObject, iTween.Hash("y", -100f, "time", 2f, "easeType", iTween.EaseType.linear, "loopType", iTween.LoopType.none));
         }
     }
 }

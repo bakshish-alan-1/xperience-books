@@ -49,7 +49,6 @@ namespace TriLibCore
                     break;
                 default:
                     unityWebRequest = new UnityWebRequest(uri);
-                    //unityWebRequest = UnityWebRequest.Get($"{uri}?{data}");
                     break;
             }
             unityWebRequest.timeout = timeout;
@@ -71,17 +70,14 @@ namespace TriLibCore
         /// <returns>The AssetLoaderContext used to load the model.</returns>
         public static Coroutine LoadModelFromUri(UnityWebRequest unityWebRequest, Action<AssetLoaderContext> onLoad, Action<AssetLoaderContext> onMaterialsLoad, Action<AssetLoaderContext, float> onProgress, Action<IContextualizedError> onError = null, GameObject wrapperGameObject = null, AssetLoaderOptions assetLoaderOptions = null, object customContextData = null, string fileExtension = null, bool? isZipFile = null, bool haltTask = false)
         {
-            Debug.Log("Load from Live");
             var assetDownloader = new GameObject("Asset Downloader").AddComponent<AssetDownloaderBehaviour>();
-            return assetDownloader.StartCoroutine(assetDownloader.DownloadAsset(unityWebRequest, onLoad, onMaterialsLoad, onProgress, wrapperGameObject, onError, assetLoaderOptions, customContextData, fileExtension, true));
+            return assetDownloader.StartCoroutine(assetDownloader.DownloadAsset(unityWebRequest, onLoad, onMaterialsLoad, onProgress, wrapperGameObject, onError, assetLoaderOptions, customContextData, fileExtension, isZipFile));
         }
 
-        //Akash
         public static Coroutine LoadModelFromZip(string path, Action<AssetLoaderContext> onLoad, Action<AssetLoaderContext> onMaterialsLoad, Action<AssetLoaderContext, float> onProgress, Action<IContextualizedError> onError = null, GameObject wrapperGameObject = null, AssetLoaderOptions assetLoaderOptions = null, object customContextData = null, string fileExtension = null, bool? isZipFile = null)
         {
-            Debug.Log("Load from Local");
             var assetDownloader = new GameObject("Asset Downloader from zip").AddComponent<AssetDownloaderBehaviour>();
-            return assetDownloader.StartCoroutine(assetDownloader.DownloadAssetFromZip(path, onLoad, onMaterialsLoad, onProgress, wrapperGameObject, onError, assetLoaderOptions, customContextData, fileExtension, true));
+            return assetDownloader.StartCoroutine(assetDownloader.DownloadAssetFromZip(path, onLoad, onMaterialsLoad, onProgress, wrapperGameObject, onError, assetLoaderOptions, customContextData, fileExtension, isZipFile));
         }
     }
 }

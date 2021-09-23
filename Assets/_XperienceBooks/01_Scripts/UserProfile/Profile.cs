@@ -1,4 +1,5 @@
-﻿using Intellify.core;
+﻿using System.IO;
+using Intellify.core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +24,7 @@ public class Profile : MonoBehaviour
 
     [SerializeField]
     private Toggle m_Gender_Male, m_Gender_Female, m_Gender_Other;
+    [SerializeField] Image m_Male_checkmark, m_Female_checkmark, m_Other_checkmark;
 
     [SerializeField]
     private ToggleGroup m_Gender_Group;
@@ -35,11 +37,79 @@ public class Profile : MonoBehaviour
 
     [SerializeField] GameObject ConfirmPasswordOBJ;
 
+    bool isThemeSet = false;
+    [Header("Theme")]
+    [SerializeField] Image BGImage;
+    [SerializeField] Image UpdateImg;
+    [SerializeField] Image BackIcon;
+    [SerializeField] TMP_Text title;
+    [SerializeField] TMP_Text ID_Lbl;
+    [SerializeField] TMP_Text FName_Lbl;
+    [SerializeField] TMP_Text LName_Lbl;
+    [SerializeField] TMP_Text Email_Lbl;
+    [SerializeField] TMP_Text ParentEmail_Lbl;
+    [SerializeField] TMP_Text Age_Lbl;
+    [SerializeField] TMP_Text Gender_Lbl;
+    [SerializeField] Text Male_Lbl;
+    [SerializeField] Text Female_Lbl;
+    [SerializeField] Text Other_Lbl;
+    [SerializeField] TMP_Text Password_Lbl;
+    [SerializeField] TMP_Text CPassword_Lbl;
+
 
     // Start is called before the first frame update
     void Start()
     {
         m_errorText.text = "";
+    }
+
+    void OnSetThem()
+    {
+        if (!isThemeSet || GameManager.Instance.isNewThemeDownload)
+        {
+            isThemeSet = true;
+
+            if (!File.Exists(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.BGTheme))
+            {
+                m_Male_checkmark.color = new Color32(95, 93, 169, 255);
+                m_Female_checkmark.color = new Color32(95, 93, 169, 255);
+                m_Other_checkmark.color = new Color32(95, 93, 169, 255);
+            }
+            else
+            {
+                m_Male_checkmark.color = new Color32(255, 255, 255, 255);
+                m_Female_checkmark.color = new Color32(255, 255, 255, 255);
+                m_Other_checkmark.color = new Color32(255, 255, 255, 255);
+            }
+
+            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.BGTheme, BGImage);
+            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.BackBtnTheme, BackIcon);
+            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBoxBtn, UpdateImg);
+            if (GameManager.Instance.TitleFont != null)
+            {
+                title.font = GameManager.Instance.TitleFont;
+                m_LogoutButtonText.font = GameManager.Instance.TitleFont;
+            }
+            Color newCol;
+            if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
+            {
+                title.color = newCol;
+                m_UserId.color = newCol;
+                ID_Lbl.color = newCol;
+                FName_Lbl.color = newCol;
+                LName_Lbl.color = newCol;
+                Email_Lbl.color = newCol;
+                ParentEmail_Lbl.color = newCol;
+                Age_Lbl.color = newCol;
+                Gender_Lbl.color = newCol;
+                Male_Lbl.color = newCol;
+                Female_Lbl.color = newCol;
+                Other_Lbl.color = newCol;
+                Password_Lbl.color = newCol;
+                CPassword_Lbl.color = newCol;
+                m_LogoutButtonText.color = newCol;
+            }
+        }
     }
 
     public void callSetProfileData()
@@ -48,6 +118,7 @@ public class Profile : MonoBehaviour
     }
 
     public void SetProfileData(UserData data) {
+        OnSetThem();
 
         ConfirmPasswordOBJ.SetActive(false);
         m_UserId.text = data.user.id.ToString();

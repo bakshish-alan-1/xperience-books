@@ -75,7 +75,7 @@ namespace TriLibCore
                     {
                         _assetLoaderContext = AssetLoader.LoadModelFromStream(memoryStream, null, fileExtension, onLoad, onMaterialsLoad, delegate (AssetLoaderContext assetLoaderContext, float progress) { onProgress?.Invoke(assetLoaderContext, 0.5f + progress * 0.5f); }, onError, wrapperGameObject, assetLoaderOptions, uriLoadCustomContextData);
                     }
-                    OnDownloadFinished(_unityWebRequest);//Akash
+                    OnDownloadFinished(_unityWebRequest);
                 }
                 else
                 {
@@ -98,7 +98,12 @@ namespace TriLibCore
             Destroy(gameObject);
         }
 
-        // Akash
+        /// <summary>Updates the download progress.</summary>
+        private void Update()
+        {
+            _onProgress?.Invoke(_assetLoaderContext, _unityWebRequest.downloadProgress * 0.5F);
+        }
+
         public IEnumerator DownloadAssetFromZip(string path, Action<AssetLoaderContext> onLoad, Action<AssetLoaderContext> onMaterialsLoad, Action<AssetLoaderContext, float> onProgress, GameObject wrapperGameObject, Action<IContextualizedError> onError, AssetLoaderOptions assetLoaderOptions, object customContextData, string fileExtension, bool? isZipFile = null)
         {
             yield return new WaitForEndOfFrame();
@@ -109,12 +114,6 @@ namespace TriLibCore
             OnDownloadFinished(_unityWebRequest);
 
             Destroy(gameObject);
-        }
-
-        /// <summary>Updates the download progress.</summary>
-        private void Update()
-        {
-            _onProgress?.Invoke(_assetLoaderContext, _unityWebRequest.downloadProgress * 0.5F);
         }
     }
 }

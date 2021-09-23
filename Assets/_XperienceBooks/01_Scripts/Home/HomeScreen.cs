@@ -17,6 +17,8 @@ public class HomeScreen : MonoBehaviour
     [SerializeField] string youtubeLink = "";
     [SerializeField] string facebookLink = "";
 
+    [SerializeField] GameObject backBtn;// this is common back btn for all screen before series selection screen
+
     [SerializeField] GameObject Series;
     [SerializeField] GameObject Books;
 
@@ -38,6 +40,21 @@ public class HomeScreen : MonoBehaviour
     {
         if (Instance == null)
             Instance = this;
+    }
+
+    public void OnScanBtnHit()
+    {
+        if (GetPermission.Instance.IsCameraPermissionGranted())
+        {
+            backBtn.SetActive(false);
+            WindowManager.Instance.OpenPanel("QRScan");
+            QRScanController.Instance.Play();
+        }
+        else
+        {
+            string msg = "Camera permission is required in order to use this application.\n\nIf you have denied the camera permission then please go to settings and give the camera permission manually. Otherwise you will not be able to proceed ahead in the application.";
+            ErrorWindow.Instance.SetErrorMessage("", msg, "OKAY", ErrorWindow.ResponseData.JustClose, false);
+        }
     }
 
     public void OnBackBtnClick()

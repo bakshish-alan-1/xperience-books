@@ -35,8 +35,6 @@ public class ContentButton : MonoBehaviour
 
         string name = "module_" + (moduleNo + 1) + ".png";
 
-        Debug.Log("<color=green> Hello I am Here " + name + "</color>");
-
         if (File.Exists(GameManager.Instance.GetThemePath() + "/" + name))
             ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), name, m_Sprite);
         else

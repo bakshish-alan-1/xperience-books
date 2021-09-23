@@ -374,7 +374,6 @@ namespace TriLibCore
                     assetLoaderOptions.MaterialMappers = materialMappers.ToArray();
                 }
             }
-
             return assetLoaderOptions;
         }
 
