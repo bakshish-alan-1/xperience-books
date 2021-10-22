@@ -54,8 +54,8 @@ public class QRScanController : MonoBehaviour
         if (!isThemeSet || GameManager.Instance.isNewThemeDownload)
         {
             isThemeSet = true;
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.Scan_BGTheme, BG);
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.BackBtnTheme, BackIcon);
+            BG.sprite = (ThemeManager.Instance.scanBackground);
+            BackIcon.sprite = (ThemeManager.Instance.backBtn);
             if (GameManager.Instance.TitleFont != null)
                 TitleTxt.font = GameManager.Instance.TitleFont;
 
@@ -69,6 +69,11 @@ public class QRScanController : MonoBehaviour
                 InfoTxt.color = newCol;
             }
         }
+    }
+
+    public void OnsetScanQRInfo(string msg)
+    {
+        InfoTxt.text = msg;
     }
 
     private IEnumerator GetLocation()
@@ -157,7 +162,6 @@ public class QRScanController : MonoBehaviour
         }
     }
 
-
     public void StopQRCode() {
 
         Stop();
@@ -171,7 +175,6 @@ public class QRScanController : MonoBehaviour
 #endif
     }
 
-
     public void Reset()
     {
         GlobalControl.Instance.scanComplete = false;
@@ -184,6 +187,11 @@ public class QRScanController : MonoBehaviour
         {
             this.scanLineObj.SetActive(true);
         }
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+        isTorchOn = false;
+        torchImage.sprite = torchOffSprite;
+        EasyWebCam.setTorchMode(TBEasyWebCam.Setting.TorchMode.Off);
+#endif
     }
 
     public void Play()
@@ -203,7 +211,6 @@ public class QRScanController : MonoBehaviour
             this.e_qrController.StopWork();
         }
 
-        
         if (this.scanLineObj != null)
         {
             this.scanLineObj.SetActive(false);
@@ -216,7 +223,6 @@ public class QRScanController : MonoBehaviour
         {
             this.e_qrController.StopWork();
         }
-        //Application.LoadLevel(scenename);
         SceneManager.LoadScene(scenename);
     }
 
@@ -242,7 +248,10 @@ public class QRScanController : MonoBehaviour
 
     void OnApplicationFocus(bool focus)
     {
-        if (focus)
-            toggleTorch();
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+		torchImage.sprite = torchOffSprite;
+		EasyWebCam.setTorchMode (TBEasyWebCam.Setting.TorchMode.Off);
+        isTorchOn = false;
+#endif
     }
 }

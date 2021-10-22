@@ -4,6 +4,7 @@ using System.Text;
 using Intellify.core;
 using KetosGames.SceneTransition;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR.ARFoundation;
 
@@ -43,7 +44,7 @@ public class GameManager : MonoBehaviour
     public List<Series> m_Series = new List<Series>();
 
     /// <summary>
-    /// Series Details
+    /// Books of selected series Details
     /// </summary>
     public List<SeriesBooks> m_SeriesDetails = new List<SeriesBooks>();
 
@@ -51,7 +52,6 @@ public class GameManager : MonoBehaviour
     /// User Property that will use in all Project
     /// </summary>
     public UserData m_UserData;
-
 
     /// <summary>
     /// Book Details That will used in all Project
@@ -72,8 +72,8 @@ public class GameManager : MonoBehaviour
     /// Store local storage path
     /// </summary>
     [SerializeField] string m_LocalPath;
-    public Texture2D SeriesImageTexture; // hold selected series Image texture
-    public Texture2D SeriesLogoTexture; // hold selected series Logo texture
+    //public Texture2D SeriesImageTexture; // hold selected series Image texture
+    //public Texture2D SeriesLogoTexture; // hold selected series Logo texture
 
     /// <summary>
     /// Store warning window info
@@ -105,6 +105,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMPro.TMP_Text closeBtnText;
     [SerializeField] TMPro.TMP_Text websiteBtnText;
 
+    [SerializeField] FirebaseNotificaitonManager firebase;
+
+    public string FirebaseToken = "";
     public string LocalStoragePath
     {
         get => m_LocalPath;
@@ -226,9 +229,9 @@ public class GameManager : MonoBehaviour
     #region markerDetailInfo
     private void setMarkerInfoTheme()
     {
-        ThemeManager.Instance.OnLoadImage(GetThemePath(), StaticKeywords.DialogBox, DialogBox);
-        ThemeManager.Instance.OnLoadImage(GetThemePath(), StaticKeywords.DialogBoxBtn, CloseBoxBtn);
-        ThemeManager.Instance.OnLoadImage(GetThemePath(), StaticKeywords.DialogBoxBtn, WebsiteBoxBtn);
+        DialogBox.sprite = (ThemeManager.Instance.dialoguebox);
+        CloseBoxBtn.sprite = (ThemeManager.Instance.commonBtn);
+        WebsiteBoxBtn.sprite = (ThemeManager.Instance.commonBtn);
 
         Color newCol;
         if (!string.IsNullOrEmpty(selectedSeries.theme.color_code) && ColorUtility.TryParseHtmlString(selectedSeries.theme.color_code, out newCol))
@@ -289,6 +292,8 @@ public class GameManager : MonoBehaviour
             WindowManager.Instance.LogOut();
             SeriesController.Instance.OnRemoveChield();
 
+            firebase.OnDeInitializeToken();
+
             Debug.Log(LocalStoragePath);
 
             if (File.Exists(LocalStoragePath + "Theme/SeriesData.json"))
@@ -321,7 +326,17 @@ public class GameManager : MonoBehaviour
         return isPrepared;
     }
 
+    public bool IsCameraPermissionGranted()
+    {
+        bool value = false;
+#if UNITY_ANDROID
+        value = Permission.HasUserAuthorizedPermission(Permission.Camera);
+#elif UNITY_IOS
+        value = Application.HasUserAuthorization(UserAuthorization.WebCam);
+#endif
 
+        return value;
+    }
 
     //Todo : create by hardik shah
     // Clear all data before logout so can load new data on login 

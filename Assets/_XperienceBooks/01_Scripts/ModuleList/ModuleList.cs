@@ -40,9 +40,9 @@ public class ModuleList : MonoBehaviour
         if (!isThemeSet || GameManager.Instance.isNewThemeDownload)
         {
             isThemeSet = true;
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.BGTheme, BG);
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.BackBtnTheme, BackIcon);
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.LogoTheme, SeriesLogo); 
+            BG.sprite = (ThemeManager.Instance.background);
+            BackIcon.sprite = (ThemeManager.Instance.backBtn);
+            SeriesLogo.sprite = (ThemeManager.Instance.seriesLogo);
         }
     }
 

@@ -52,8 +52,8 @@ public class ErrorWindow : MonoBehaviour
         else
         {
             Debug.Log("set them for error msg");
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBox, BG);
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBoxBtn, ButtonImg);
+            BG.sprite = (ThemeManager.Instance.dialoguebox);
+            ButtonImg.sprite = (ThemeManager.Instance.commonBtn);
             Color newCol;
             if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
             {

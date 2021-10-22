@@ -55,16 +55,4 @@ public class GetPermission : MonoBehaviour
         }
 #endif
     }
-
-    public bool IsCameraPermissionGranted()
-    {
-        bool value = false;
-#if UNITY_ANDROID
-        value = Permission.HasUserAuthorizedPermission(Permission.Camera);
-#elif UNITY_IOS
-        value = Application.HasUserAuthorization(UserAuthorization.WebCam);
-#endif
-
-        return value;
-    }
 }

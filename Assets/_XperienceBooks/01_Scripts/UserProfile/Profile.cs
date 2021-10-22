@@ -63,7 +63,7 @@ public class Profile : MonoBehaviour
         m_errorText.text = "";
     }
 
-    void OnSetThem()
+    public void OnSetThem()
     {
         if (!isThemeSet || GameManager.Instance.isNewThemeDownload)
         {
@@ -81,10 +81,10 @@ public class Profile : MonoBehaviour
                 m_Female_checkmark.color = new Color32(255, 255, 255, 255);
                 m_Other_checkmark.color = new Color32(255, 255, 255, 255);
             }
+            BGImage.sprite = (ThemeManager.Instance.background);
+            BackIcon.sprite = (ThemeManager.Instance.backBtn);
+            UpdateImg.sprite = (ThemeManager.Instance.commonBtn);
 
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.BGTheme, BGImage);
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.BackBtnTheme, BackIcon);
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBoxBtn, UpdateImg);
             if (GameManager.Instance.TitleFont != null)
             {
                 title.font = GameManager.Instance.TitleFont;
@@ -118,7 +118,7 @@ public class Profile : MonoBehaviour
     }
 
     public void SetProfileData(UserData data) {
-        OnSetThem();
+        //OnSetThem();
 
         ConfirmPasswordOBJ.SetActive(false);
         m_UserId.text = data.user.id.ToString();

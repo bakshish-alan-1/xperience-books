@@ -116,8 +116,8 @@ public class ForgotPassword : MonoBehaviour
         {
 
             forgotEmail.text = "";
-            forgotEmail.placeholder.GetComponent<Text>().color = Color.red;
-            forgotEmail.placeholder.GetComponent<Text>().text = "Email-id not valid !";
+            forgotEmail.placeholder.GetComponent<TMP_Text>().color = Color.red;
+            forgotEmail.placeholder.GetComponent<TMP_Text>().text = "Email-id not valid !";
         }
 
     }

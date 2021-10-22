@@ -47,6 +47,7 @@ public class ContentModel
     public string book_name;
     public string author_name;
     public string series_name;
+    public string clipboard_data;
     public builder_position position;
     public builder_rotation rotation;
     public builder_scale scale;

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class NotificationPanel : MonoBehaviour
@@ -34,9 +35,10 @@ public class NotificationPanel : MonoBehaviour
         if (!isThemeSet || GameManager.Instance.isNewThemeDownload)
         {
             isThemeSet = true;
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.BGTheme, BG);
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.BackBtnTheme, BackIcon);
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.Fan_art_Img_Bg, HeaderBg);
+            BG.sprite = (ThemeManager.Instance.background);
+            BackIcon.sprite = (ThemeManager.Instance.backBtn);
+            HeaderBg.sprite = (ThemeManager.Instance.fanArtHeaderBg);
+
             if (GameManager.Instance.TitleFont != null)
             {
                 title.font = GameManager.Instance.TitleFont;
@@ -51,10 +53,21 @@ public class NotificationPanel : MonoBehaviour
         }
     }
 
-    public void setNotificationData()
+    public void OnReleaseData()
+    {
+        for (int i = 0; i < parentObj.transform.childCount; i++)
+        {
+            Destroy(parentObj.transform.GetChild(i).gameObject);
+        }
+    }
+
+    public void setNotificationData(List<NotificationData> data)
     {
         nodataMsg.text = "";//No Data available
-        GameObject obj = Instantiate(notificationCell, parentObj.transform);
-        obj.GetComponent<NotificationCellController>().SetData("title");
+        for (int i = 0; i < data.Count; i++)
+        {
+            GameObject obj = Instantiate(notificationCell, parentObj.transform);
+            obj.GetComponent<NotificationCellController>().SetData(data[i].id, data[i].body, data[i].sc_qr_title);
+        }
     }
 }

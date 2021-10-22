@@ -144,7 +144,7 @@ namespace Ecommerce
 
             UnityWebRequest request = new UnityWebRequest("http://google.com");
             yield return request.SendWebRequest();
-            if (request.error != null)
+            if (request.isNetworkError)
             {
                 ApiManager.Instance.errorWindow.SetErrorMessage("Internet Connection Failed !", "Please, Check you internet connection and try again.", "TRY AGAIN", ErrorWindow.ResponseData.InternetIssue, false);
                 ApiManager.Instance.RaycastUnblock();

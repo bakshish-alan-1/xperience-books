@@ -33,6 +33,9 @@ public class Login : MonoBehaviour
     {
         if (Instance == null)
             Instance = this;
+
+        if (!string.IsNullOrEmpty(PlayerPrefs.GetString("UserEmailID", "")))
+            email.text = PlayerPrefs.GetString("UserEmailID");
     }
 
     public void LoginUser() {
@@ -50,12 +53,10 @@ public class Login : MonoBehaviour
                 ApiManager.Instance.NewLogin(user);
                 ResetField();
             }
-
         }
         catch (Exception ex) {
             Debug.LogError(ex.Message);
         }
-
     }
 
     public void OnForgotPasswordTextHit()
@@ -67,18 +68,15 @@ public class Login : MonoBehaviour
     public bool ValidateInput() {
         bool confirm = true;
 
-
         if (string.IsNullOrEmpty(email.text))
         {
             SetError(email);
-
             return false;
         }
 
         if (string.IsNullOrEmpty(password.text))
         {
             SetError(password);
-
             return false;
         }
 
@@ -99,22 +97,17 @@ public class Login : MonoBehaviour
 
         if (Validator.validateEmail(emailID.text))
         {
+            if (name == "user")
+                PlayerPrefs.SetString("UserEmailID", emailID.text);
 
-#if UNITY_EDITOR
             Debug.Log("<color=green>Email ID in Correct format</green>");
-            #endif
         }
         else
         {
-
-            if (emailID) {
-                emailID.text = "";
-                emailID.placeholder.GetComponent<Text>().color = Color.red;
-                emailID.placeholder.GetComponent<Text>().text = "Email-id not valid !";
-            }
-           
+            emailID.text = "";
+            emailID.placeholder.GetComponent<TMP_Text>().color = Color.red;
+            emailID.placeholder.GetComponent<TMP_Text>().text = "Email-id not valid !";
         }
-        
     }
 
     public void OnBackBtn()
@@ -163,24 +156,19 @@ public class Login : MonoBehaviour
 
     public void ResetField()
     {
-        ResetError(email,"abc@xyz.com");
+        //ResetError(email,"abc@xyz.com");
         ResetError(password, "Password");
     }
 
-
     public void SetError(TMP_InputField field)
     {
-
         field.text = "";
         field.placeholder.GetComponent<TMP_Text>().color = errorColor;
         field.placeholder.GetComponent<TMP_Text>().text = "Cannot be empty.";
-
     }
-
 
     public void ResetError(TMP_InputField field, string msg=null)
     {
-
         field.text = "";
         field.placeholder.GetComponent<TMP_Text>().color = defaultColor;
         if (msg != null)

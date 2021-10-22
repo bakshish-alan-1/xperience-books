@@ -59,21 +59,20 @@ public class GalleryView : MonoBehaviour
     void loadTheme()
     {
         // fan art theme
-        ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.Fan_art_Img_Bg, HeaderBg);
+        HeaderBg.sprite = ThemeManager.Instance.fanArtHeaderBg;
         if (isFanART)
         {
             //Todo : Manage Email theme for Fan ART from here only
-
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBoxBtn, emailBtnIcon);//ScanTheme
-
+            emailBtnIcon.sprite = ThemeManager.Instance.commonBtn;
+            
             EmailBtnTxt.font = GameManager.Instance.TitleFont;
             Color newCol;
             if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
                 EmailBtnTxt.color = newCol;
 
             // email box theme
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBox, BoxBg);
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBoxBtn, boxBtnIcon);
+            BoxBg.sprite = ThemeManager.Instance.dialoguebox;
+            boxBtnIcon.sprite = ThemeManager.Instance.commonBtn;
 
             boxBtnTxt.font = GameManager.Instance.TitleFont;
             boxBtnTxt.color = newCol;

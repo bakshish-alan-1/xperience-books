@@ -27,13 +27,9 @@ public class SeriesController : MonoBehaviour
 
     public void SetSeriesIcons()
     {
-        if (Directory.Exists(GameManager.Instance.GetThemePath()))
-        {
-            Directory.Delete(GameManager.Instance.GetThemePath(), true);// delete downloaded theme folder
-            // Delete bookInfo stored json file
-            if (File.Exists(GameManager.Instance.LocalStoragePath + "Theme/BooksData.json"))
-                File.Delete(GameManager.Instance.LocalStoragePath + "Theme/BooksData.json");
-        }
+        // Delete bookInfo stored json file
+        if (File.Exists(GameManager.Instance.LocalStoragePath + "Theme/BooksData.json"))
+            File.Delete(GameManager.Instance.LocalStoragePath + "Theme/BooksData.json");
 
         for (int i = 0; i < GameManager.Instance.m_Series.Count; i++)
         {

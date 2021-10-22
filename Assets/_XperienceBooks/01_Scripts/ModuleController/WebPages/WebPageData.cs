@@ -32,7 +32,7 @@ public class WebPageData : MonoBehaviour
 
     void setTheme()
     {
-        ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.ScanTheme, btnBg);
+        btnBg.sprite = ThemeManager.Instance.commonBtn;
         text.font = GameManager.Instance.TitleFont;
         Color newCol;
         if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))

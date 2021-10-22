@@ -44,9 +44,10 @@ public class HomeScreen : MonoBehaviour
 
     public void OnScanBtnHit()
     {
-        if (GetPermission.Instance.IsCameraPermissionGranted())
+        if (GameManager.Instance.IsCameraPermissionGranted())
         {
             backBtn.SetActive(false);
+            QRScanController.Instance.OnsetScanQRInfo("Scan QR");
             WindowManager.Instance.OpenPanel("QRScan");
             QRScanController.Instance.Play();
         }
@@ -135,16 +136,6 @@ public class HomeScreen : MonoBehaviour
 
         if (GameManager.Instance.DetailFont == null)
             ThemeManager.Instance.onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font2Theme, GameManager.Instance.DetailFont);
-
-        if (GameManager.Instance.SeriesImageTexture != null)
-            seriesImage.sprite = GameManager.Instance.Texture2DToSprite(GameManager.Instance.SeriesImageTexture);
-        else if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.image_path))
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.SeriesImage, seriesImage);
-
-        if (GameManager.Instance.SeriesLogoTexture != null)
-            seriesLogo.sprite = GameManager.Instance.Texture2DToSprite(GameManager.Instance.SeriesLogoTexture);
-        else if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.logo))
-            ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.LogoTheme, seriesLogo);
         
         Title.text = "";
         OnSetHomeScreenSocialMediaObject();
@@ -152,6 +143,7 @@ public class HomeScreen : MonoBehaviour
         GameManager.Instance.OpenMarkerDetailsWindow();
 
         NotificationPanel.Instance.OnSetThem();// set downloaded theme for notification panel
+        Profile.Instance.OnSetThem();// set theme for profile screen
     }
 
     public void setHomeTheameOfSeries()
@@ -159,11 +151,13 @@ public class HomeScreen : MonoBehaviour
         Debug.Log("Inside setTheameOfSeries");
         string theme = GameManager.Instance.GetThemePath();
 
-        ThemeManager.Instance.OnLoadImage(theme, StaticKeywords.BGTheme, Bg);
-        ThemeManager.Instance.OnLoadImage(theme, StaticKeywords.DialogBoxBtn, scaneIcon);
-        ThemeManager.Instance.OnLoadImage(theme, StaticKeywords.BackBtnTheme, backIcon);
-        ThemeManager.Instance.OnLoadImage(theme, StaticKeywords.ProfileTheme, profileIcon);
-        ThemeManager.Instance.OnLoadImage(theme, StaticKeywords.NotificationTheme, notificationIcon);
+        Bg.sprite = (ThemeManager.Instance.background);
+        scaneIcon.sprite = (ThemeManager.Instance.commonBtn);
+        backIcon.sprite = (ThemeManager.Instance.backBtn);
+        profileIcon.sprite = (ThemeManager.Instance.profileIcon);
+        notificationIcon.sprite = (ThemeManager.Instance.newIcon);
+        seriesImage.sprite = (ThemeManager.Instance.seriesIcon);
+        seriesLogo.sprite = (ThemeManager.Instance.seriesLogo);
 
         ScanBtnTxt.font = GameManager.Instance.TitleFont;
         Color newCol;
@@ -173,6 +167,8 @@ public class HomeScreen : MonoBehaviour
         GameManager.Instance.OpenPrepareThemWindow(false);
         isThemeSet = true;
         WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel);
+
+        ApiManager.Instance.GetNotificationList();
     }
 
     // set the position of button as per the no of links
@@ -182,11 +178,11 @@ public class HomeScreen : MonoBehaviour
         socialMedia.Clear();
         string themePath = GameManager.Instance.GetThemePath();
 
-        ThemeManager.Instance.OnLoadImage(themePath, StaticKeywords.FacebookTheme, facebookIcon);
-        ThemeManager.Instance.OnLoadImage(themePath, StaticKeywords.TwitterTheme, twitterIcon);
-        ThemeManager.Instance.OnLoadImage(themePath, StaticKeywords.WebsiteTheme, websiteIcon);
-        ThemeManager.Instance.OnLoadImage(themePath, StaticKeywords.InstaTheme, instaIcon);
-        ThemeManager.Instance.OnLoadImage(themePath, StaticKeywords.YoutubeTheme, youtubeIcon);
+        facebookIcon.sprite = (ThemeManager.Instance.facebook);
+        twitterIcon.sprite = (ThemeManager.Instance.twitter);
+        websiteIcon.sprite = (ThemeManager.Instance.website);
+        instaIcon.sprite = (ThemeManager.Instance.insta);
+        youtubeIcon.sprite = (ThemeManager.Instance.youtube);
 
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.instagram_link))
         { nooflinks += 1; socialMedia.Add(insta); insta.SetActive(false); }

@@ -105,25 +105,21 @@ public class Register : MonoBehaviour
     {
         bool confirm = true;
 
-
         if (string.IsNullOrEmpty(firstname.text))
         {
             SetError(firstname);
-
             return false;
         }
 
         if (string.IsNullOrEmpty(lastname.text))
         {
             SetError(lastname);
-
             return false;
         }
 
         if (string.IsNullOrEmpty(email.text))
         {
             SetError(email);
-
             return false;
         }
 
@@ -132,7 +128,6 @@ public class Register : MonoBehaviour
             if (string.IsNullOrEmpty(parentEmail.text))
             {
                 SetError(parentEmail);
-
                 return false;
             }
         }
@@ -155,32 +150,43 @@ public class Register : MonoBehaviour
         return confirm;
     }
 
-
-    public void ValidateEmail(string name)
+    public void ValidateParentEmail()
     {
-        TMP_InputField emailID;
-        if (name == "user")
-            emailID = email;
-        else
-            emailID = parentEmail;
-
-        Debug.Log("Function Called"+ emailID.text);
-        if (Validator.validateEmail(emailID.text))
+        Debug.Log("ValidateParentEmail Called: " + parentEmail.text);
+        if (Validator.validateEmail(parentEmail.text))
         {
-
             Debug.Log("Done");
         }
-        else
+        else if (parentEmail != null)
         {
-            emailID.text = "";
-            emailID.placeholder.GetComponent<Text>().color = errorColor;
-            emailID.placeholder.GetComponent<Text>().text = "Email-id not valid.";
+            parentEmail.text = "";
+            parentEmail.placeholder.GetComponent<TMP_Text>().color = Color.red;
+            parentEmail.placeholder.GetComponent<TMP_Text>().text = "Email-id not valid.";
         }
+    }
 
+    public void ValidateUserEmail()
+    {
+        Debug.Log("ValidateUserEmail Called: " + email.text);
+        if (Validator.validateEmail(email.text))
+        {
+            Debug.Log("Done");
+        }
+        else if (email != null)
+        {
+            email.text = "";
+            email.placeholder.GetComponent<TMP_Text>().color = Color.red;
+            email.placeholder.GetComponent<TMP_Text>().text = "Email-id not valid.";
+        }
     }
 
     public void CheckAgeValidation()
     {
+        if (string.IsNullOrEmpty(age.text))
+        {
+            SetError(age);
+            return;
+        }
         if (int.Parse(age.text) >= AgeLimit)
         {
             parentEmail.text = "";
@@ -210,13 +216,11 @@ public class Register : MonoBehaviour
         parentEmailRoot.color = Color.white;
     }
 
-
     public void SetError(TMP_InputField field) {
 
         field.text = "";
         field.placeholder.GetComponent<TMP_Text>().color = errorColor;
         field.placeholder.GetComponent<TMP_Text>().text = "Cannot be empty.";
-
     }
 
     public void SetSameFieldError(TMP_InputField field)
@@ -227,7 +231,6 @@ public class Register : MonoBehaviour
         field.placeholder.GetComponent<TMP_Text>().text = "Cannot be same.";
 
     }
-
 
     public void ResetError(TMP_InputField field, string placeHolder) {
 

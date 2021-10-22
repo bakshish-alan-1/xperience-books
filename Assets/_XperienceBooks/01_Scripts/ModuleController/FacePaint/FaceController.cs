@@ -105,10 +105,17 @@ public class FaceController : MonoBehaviour
     }
 
     IEnumerator GetAllTexture(string filePath) {
-                
-        FileInfo m_FileInfo = new FileInfo(filePath);
 
+        FileInfo m_FileInfo = new FileInfo(filePath);
         var extractDir = Path.Combine(m_FileInfo.Directory.FullName, m_FileInfo.Name.Substring(0, m_FileInfo.Name.Length - m_FileInfo.Extension.Length));
+
+#if UNITY_ANDROID
+        extractDir += "/android";
+#elif UNITY_IOS
+        extractDir += "/ios";
+#endif
+        Debug.Log("Final path: " + extractDir);
+
         DirectoryInfo dirInfo = new DirectoryInfo(extractDir);
         FileInfo[] fileNames = dirInfo.GetFiles("*.*");
         totalFileCount = fileNames.Length;

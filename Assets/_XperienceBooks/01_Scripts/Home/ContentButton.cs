@@ -10,7 +10,6 @@ public class ContentButton : MonoBehaviour
     public int m_ContentIndex;
     // Start is called before the first frame update
 
-
     private void Awake()
     {
 
@@ -26,8 +25,6 @@ public class ContentButton : MonoBehaviour
             OnItemClicked();
         });
     }
-
-
 
     public void SetData(int moduleNo, Sprite img, int index) {
 

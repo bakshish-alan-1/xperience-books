@@ -233,20 +233,44 @@ namespace Ecommerce
         #endregion
 
         public void AddToCart(bool callFromBuyNowBtn) {
-            Reset();
 
-            color.ResetObject();
-            color.sizeAttribute.SetActive(false);
-            CartProduct product = new CartProduct();
+            if (OnCheckItemQuantity(m_ProductDetails.id, int.Parse(m_ProductDetails.qty)))
+            {
+                Reset();
 
-            product.m_product = m_ProductDetails;
-            product.m_SelectedAttributes.Add(SelectedColor);
-            product.m_SelectedAttributes.Add(SelectedSize);
-            product.m_TotalQty = 1;
+                color.ResetObject();
+                color.sizeAttribute.SetActive(false);
+                CartProduct product = new CartProduct();
 
-            product.m_FinalPrice = FinalPrice;
-            Debug.Log("AddToCart product: " + product.ToString());
-            ECommerceManager.Instance.AddToCart(product, callFromBuyNowBtn);
+                product.m_product = m_ProductDetails;
+                product.m_SelectedAttributes.Add(SelectedColor);
+                product.m_SelectedAttributes.Add(SelectedSize);
+                product.m_TotalQty = 1;
+
+                product.m_FinalPrice = FinalPrice;
+                Debug.Log("AddToCart product: " + product.ToString());
+                ECommerceManager.Instance.AddToCart(product, callFromBuyNowBtn);
+            }
+            else
+            {
+                ApiManager.Instance.errorWindow.SetErrorMessage("", "Currently unavailable.", "OKAY", ErrorWindow.ResponseData.JustClose, false);
+            }
+        }
+
+        private bool OnCheckItemQuantity(int id, int maxQty)
+        {
+            bool available = true;
+            int qty = 0;
+            for (int i = 0; i < CartController.Instance.m_FinalCart.Count; i++)
+            {
+                if (id == CartController.Instance.m_FinalCart[i].m_product.id)
+                    qty += 1;
+            }
+
+            if (qty >= maxQty)
+                available = false;
+
+            return available;
         }
     }
 }

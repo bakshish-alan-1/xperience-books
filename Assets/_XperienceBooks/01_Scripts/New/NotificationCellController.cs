@@ -9,14 +9,21 @@ public class NotificationCellController : MonoBehaviour
     [SerializeField] Image Icon;
     [SerializeField] Image NextBtnIcon;
 
-    public void SetData(string titleName)
+    int notificationId;
+    string scanInfo = "";
+
+    public void SetData(int id, string titleName, string info)
     {
         setTheme();
+        notificationId = id;
+        scanInfo = info;// this message shown on QRScan page
         title.text = titleName;
     }
 
     public void onNextBtnClick()
     {
+        ApiManager.Instance.SetNotificationView(notificationId);
+        QRScanController.Instance.OnsetScanQRInfo(scanInfo);
         WindowManager.Instance.OpenPanel("QRScan");
         QRScanController.Instance.Play();
     }

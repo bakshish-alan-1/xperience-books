@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class CaptureAndShare : MonoBehaviour
@@ -10,17 +12,16 @@ public class CaptureAndShare : MonoBehaviour
     public GameObject previewUI;
     public Image previewImage;
     public GameObject needToHide, backBtnUI;
+    public GameObject watermark;
     public bool ssInProgress = false;
 
     public RectTransform container;
-
+    Image watermarkIcon;
     Texture2D tempTexture;
 
     private void Awake()
     {
-        Debug.Log(Screen.width / 1.3f + "   " + Screen.height / 1.3f);
         container.sizeDelta = new Vector2(Screen.width / 1.2f, Screen.height / 1.2f);
-
     }
 
     private void Start()
@@ -42,13 +43,14 @@ public class CaptureAndShare : MonoBehaviour
         needToHide.SetActive(false);
         if (backBtnUI != null)
             backBtnUI.SetActive(false);
+        if (watermark != null)
+            watermark.SetActive(true);
+
         yield return new WaitForEndOfFrame();
 
         tempTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
         tempTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
         tempTexture.Apply();
-
-
 
         //  previewImage.texture = tempTexture;
         previewImage.sprite = Utility.Texture2DToSprite(tempTexture);
@@ -58,6 +60,8 @@ public class CaptureAndShare : MonoBehaviour
         needToHide.SetActive(true);
         if (backBtnUI != null)
             backBtnUI.SetActive(true);
+        //if (watermark != null)
+        //    watermark.SetActive(false);
     }
 
     public void ShareSS() {
@@ -66,7 +70,7 @@ public class CaptureAndShare : MonoBehaviour
         File.WriteAllBytes(filePath, tempTexture.EncodeToPNG());
         new NativeShare()
             .AddFile(filePath)
-            .SetSubject("Continuum Multimedia").SetText("#WorldofAGARTHA")
+            .SetSubject("Continuum Multimedia").SetText("")
             .Share();
 
         //SaveSS();
@@ -85,5 +89,38 @@ public class CaptureAndShare : MonoBehaviour
         }
         previewUI.SetActive(false);
         ssInProgress = false;
+    }
+
+    public void setWatermark(string url, int direction)
+    {
+        Debug.Log("watermark url: " + url + ", position: " + direction);
+        for (int i = 0; i < watermark.transform.childCount; i++)
+        {
+            watermark.transform.GetChild(i).gameObject.SetActive(false);
+            if ((i + 1) == direction)// because direction come from api started 1 instead of 0
+            {
+                watermark.transform.GetChild(i).gameObject.SetActive(true);
+                watermarkIcon = watermark.transform.GetChild(i).gameObject.GetComponent<Image>();
+                OnDownloadWatermark(url);
+            }
+        }
+    }
+
+    private async void OnDownloadWatermark(string url)
+    {
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+        var operation = request.SendWebRequest();
+        while (!operation.isDone)
+            await Task.Yield();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("watermark download error: " + request.error);
+        }
+        else
+        {
+            Texture2D texture2D = DownloadHandlerTexture.GetContent(request);
+            watermarkIcon.sprite = GameManager.Instance.Texture2DToSprite(texture2D);
+        }
     }
 }

@@ -3,6 +3,8 @@ using UnityEngine.UI;
 
 public class LoadThemeImage : MonoBehaviour
 {
+    // used in arscene for provides info about hashtag data
+
     [Header("Set Theme")]
     public Image DialogBox;
     public Image DialogButton;
@@ -14,10 +16,10 @@ public class LoadThemeImage : MonoBehaviour
     {
         string path = GameManager.Instance.GetThemePath();
         if (DialogBox != null)
-            ThemeManager.Instance.OnLoadImage(path, StaticKeywords.DialogBox, DialogBox);
+            DialogBox.sprite = ThemeManager.Instance.dialoguebox;
 
         if (DialogButton != null)
-            ThemeManager.Instance.OnLoadImage(path, StaticKeywords.DialogBoxBtn, DialogButton);
+            DialogButton.sprite = ThemeManager.Instance.commonBtn;
 
         if (GameManager.Instance.TitleFont != null)
         {

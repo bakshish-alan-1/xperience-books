@@ -21,7 +21,7 @@ public class SeriesData : MonoBehaviour
         seriesName.text = name;
         url = imgURL;
         if (url != "")
-            setImage(url);//StartCoroutine(setImage(url));
+            setImage(url);
     }
 
     public void OnSeriesSelected()
@@ -35,8 +35,6 @@ public class SeriesData : MonoBehaviour
             if (Directory.Exists(GameManager.Instance.LocalStoragePath + "Theme/" + GameManager.Instance.selectedSeries.theme.id))
                 Directory.Delete(GameManager.Instance.LocalStoragePath + "Theme/" + GameManager.Instance.selectedSeries.theme.id + "/", true);
         }
-        if (url != null)
-            GameManager.Instance.SeriesImageTexture = texture;
 
         FileHandler.SaveSeriesData(GameManager.Instance.selectedSeries);
         ApiManager.Instance.GetSeriesDetails(GameManager.Instance.m_Series[index].id);

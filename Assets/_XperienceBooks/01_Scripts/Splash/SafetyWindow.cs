@@ -43,8 +43,8 @@ public class SafetyWindow : MonoBehaviour
 
     private void setTheme()
     {
-        ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBox, DialogBox);
-        ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.DialogBoxBtn, DialogBoxBtn);
+        DialogBox.sprite = (ThemeManager.Instance.dialoguebox);
+        DialogBoxBtn.sprite = (ThemeManager.Instance.commonBtn);
 
         Color newCol;
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.color_code) && ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))

@@ -62,7 +62,7 @@ namespace Intellify.core
 
              request.SendWebRequest().completed += _ =>
              {
-                 if (request.error != null)
+                 if (request.isNetworkError)
                  {
                      ApiManager.Instance.RaycastUnblock();
                      action(false);

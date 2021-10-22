@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a99d7a77d0214e80ab4de49344c1498, type: 3}
   m_Name: Properties
   m_EditorClassIdentifier: 
-  m_CurrentEnvirnment: 1
-  TestingBaseURL: https://arbooks.theintellify.net/api/
-  Staging: https://arbooks-test.theintellify.net/api/
+  m_CurrentEnvirnment: 0
+  TestingBaseURL: https://arbooks-test.theintellify.net/api/
+  Staging: https://arbooks-stage.theintellify.net/api/
   ProductionBaseURL: https://admin.continuummultimedia.com/api/
   LoginAPI: login
   Register: register
@@ -37,3 +37,6 @@ MonoBehaviour:
   UpdateAddress: address/update/v1
   Order: order
   OrderUpdate: order/update
+  sendToken: notif-devices
+  GetNotification: new-notification
+  NotificationViewed: new-notification/

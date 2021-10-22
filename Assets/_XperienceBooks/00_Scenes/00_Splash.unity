@@ -2209,6 +2209,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 723007108}
   m_CullTransparentMesh: 0
+--- !u!1 &748600297
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 748600298}
+  m_Layer: 0
+  m_Name: --------Access Permission---------
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &748600298
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748600297}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 2112874437}
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &783227971
 GameObject:
   m_ObjectHideFlags: 0
@@ -3343,7 +3374,7 @@ Transform:
   m_Children:
   - {fileID: 1390485068}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1224923385
 GameObject:
@@ -4003,6 +4034,7 @@ GameObject:
   - component: {fileID: 1463931696}
   - component: {fileID: 1463931697}
   - component: {fileID: 1463931698}
+  - component: {fileID: 1463931699}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -4021,10 +4053,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 2112874437}
   - {fileID: 2039178179}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1463931695
 MonoBehaviour:
@@ -4127,6 +4158,9 @@ MonoBehaviour:
       fan_art_img_glry: 
       color_code: 
       notif_icon: 
+      notif_thumbnail: 
+      notif_next: 
+      notif_tile: 
       background_image: 
       scan_button: 
       back_button: 
@@ -4165,8 +4199,6 @@ MonoBehaviour:
     author_id: 0
   isNewThemeDownload: 0
   m_LocalPath: 
-  SeriesImageTexture: {fileID: 0}
-  SeriesLogoTexture: {fileID: 0}
   isSafetyWindowOpen: 0
   safetyWindow: {fileID: 1662502277}
   confrimWindowAnimator: {fileID: 1987612751}
@@ -4184,6 +4216,8 @@ MonoBehaviour:
   message: {fileID: 1599513349}
   closeBtnText: {fileID: 635039105}
   websiteBtnText: {fileID: 1194090456}
+  firebase: {fileID: 1463931699}
+  FirebaseToken: 
 --- !u!114 &1463931697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4210,6 +4244,36 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e6a6703856454ee9a53344539baf0a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  background: {fileID: 0}
+  scanBackground: {fileID: 0}
+  seriesLogo: {fileID: 0}
+  seriesIcon: {fileID: 0}
+  dialoguebox: {fileID: 0}
+  commonBtn: {fileID: 0}
+  backBtn: {fileID: 0}
+  profileIcon: {fileID: 0}
+  newIcon: {fileID: 0}
+  fanArtHeaderBg: {fileID: 0}
+  facebook: {fileID: 0}
+  insta: {fileID: 0}
+  youtube: {fileID: 0}
+  website: {fileID: 0}
+  twitter: {fileID: 0}
+  notificationNextBtn: {fileID: 0}
+  notificationIcon: {fileID: 0}
+  notificationTill: {fileID: 0}
+--- !u!114 &1463931699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463931693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f81a691a054f24726985f466b81fbe71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1588097098
@@ -5147,7 +5211,7 @@ RectTransform:
   - {fileID: 1987612750}
   - {fileID: 1698487621}
   m_Father: {fileID: 1463931694}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -5254,7 +5318,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1463931694}
+  m_Father: {fileID: 748600298}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2128479752

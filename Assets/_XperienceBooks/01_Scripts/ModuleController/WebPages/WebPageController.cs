@@ -27,9 +27,8 @@ public class WebPageController : MonoBehaviour
         }
        
         scrollview.verticalNormalizedPosition = 1;
-
-        ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.BGTheme, Bg);
-        ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.LogoTheme, seriesLogo);
+        Bg.sprite = ThemeManager.Instance.background;
+        seriesLogo.sprite = ThemeManager.Instance.seriesLogo;
     }
 
 

@@ -201,14 +201,12 @@ public class WindowManager : MonoBehaviour
 
     public void LogOut()
     {
-
+        string str = PlayerPrefs.GetString("UserEmailID");
         //ToDo : Clear all playerPref
         PlayerPrefs.DeleteAll();
 
         //Clear all user Data
-
-
-
+        PlayerPrefs.SetString("UserEmailID", str);
         PlayerPrefs.SetInt(StaticKeywords.Login, 0);
         OpenPanel("Login");
     }

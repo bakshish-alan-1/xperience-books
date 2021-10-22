@@ -22,13 +22,13 @@ public class Properties : ScriptableObject
     public DevEnvironment m_CurrentEnvirnment;
 
     [Header("Testing Server")]
-    public string TestingBaseURL = "https://arbooks.theintellify.net/api/";
+    public string TestingBaseURL = "https://arbooks-test.theintellify.net/api/";
 
     [Header("Staging")]
-    public string Staging = "https://arbooks-test.theintellify.net/api/";
+    public string Staging = "https://arbooks-stage.theintellify.net/api/";
 
     [Header("Client Server")]
-    public string ProductionBaseURL = "https://admin.continuummultimedia.com/api/";  //"https://arbooks-prod.theintellify.net/api/";
+    public string ProductionBaseURL = "https://admin.continuummultimedia.com/api/";
 
     [Space(15)]
     [Header("API List")]
@@ -84,17 +84,25 @@ public class Properties : ScriptableObject
     [Tooltip("14) Update Address ")]
     public string UpdateAddress = "address/update/v1";
 
-
     [Space(15)]
     [Header("Purchase Order API")]
     [Space(15)]
-
 
     [Tooltip("15) Post purchased order detail by user")]
     public string Order = "order";
     [Tooltip("16) Post order update with payment status")]
     public string OrderUpdate = "order/update";
 
+    [Space(15)]
+    [Header("Firebase Notification API")]
+    [Space(15)]
+
+    [Tooltip("17) send token of firebase init")]
+    public string sendToken = "notif-devices";
+    [Tooltip("18) Get notification list from server")]
+    public string GetNotification = "new-notification";
+    [Tooltip("19) Set notification view bool")]
+    public string NotificationViewed = "new-notification/";
 
     #endregion
 }

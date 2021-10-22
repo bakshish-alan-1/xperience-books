@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Ecommerce;
 using Ecommerce.checkout;
 using Intellify.core;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UI;
 
 public enum Method
 {
@@ -64,7 +64,6 @@ public class BookDetails
 [Serializable]
 public class MapModuleData {
     public Book book_details;
-    public string clipboard_data;
     public List<ARModulesData> mapped_data;
 }
 
@@ -175,7 +174,7 @@ public class Skin
 {
     public int id;
     public string name, dialog_box, dialog_box_btn, scan_qr_bg, fan_art_img_glry;
-    public string color_code, notif_icon;
+    public string color_code, notif_icon, notif_thumbnail, notif_next, notif_tile;
     public string background_image, scan_button, back_button;
     public string logo, facebook_icon, twitter_icon, youtube_icon, instagram_icon, website_icon, profile_icon;
     public string module_1, module_2, module_3, module_4, module_5, module_6, module_7, module_8, module_9, module_10, module_11, module_12;
@@ -216,6 +215,33 @@ public class SeriesDetailsList
 
 #endregion
 
+#region New
+[Serializable]
+public class NewToken
+{
+    public string firebase_token;
+    public string device_token;
+}
+
+[Serializable]
+public class Notification
+{
+    public bool success;
+    public int code;
+    public List<NotificationData> data;
+}
+
+[Serializable]
+public class NotificationData
+{
+    public int id;
+    public int book_id;
+    public string sc_qr_title;
+    public string body;
+    public string title;
+}
+#endregion
+
 public class ApiManager : MonoBehaviour
 {
     public static ApiManager Instance;
@@ -238,13 +264,13 @@ public class ApiManager : MonoBehaviour
 
     public void Start()
     {
-        StartCoroutine(CheckInternetConnection(isConnected =>
+        /*StartCoroutine(CheckInternetConnection(isConnected =>
         {
             if (isConnected)
             {
                 RaycastUnblock();
             }
-        }));
+        }));*/
     }
 
     public void APIResponseFailPopup(long statusCode, string errorTitle, string responseData, bool defaultTheme)
@@ -276,10 +302,11 @@ public class ApiManager : MonoBehaviour
     {
         RayCastBlock();
 
-        UnityWebRequest request = new UnityWebRequest("http://google.com");
+        UnityWebRequest request = new UnityWebRequest("https://google.com");
         yield return request.SendWebRequest();
-        if (request.error != null)
+        if (request.isNetworkError)
         {
+            Debug.Log("net error: " + request.error);
             errorWindow.SetErrorMessage("Internet Connection Failed !", "Please, Check you internet connection and try again.", "TRY AGAIN",ErrorWindow.ResponseData.InternetIssue, true);
             RaycastUnblock();
             action(false);
@@ -301,7 +328,6 @@ public class ApiManager : MonoBehaviour
         {
             if (isConnected)
             {
-
                 Debug.Log(properties.LoginAPI);
                 APIClient.CallWebAPI(Method.POST.ToString(),properties.LoginAPI,JsonUtility.ToJson(user),string.Empty,LoginUser);
             }
@@ -331,6 +357,11 @@ public class ApiManager : MonoBehaviour
                 GameManager.Instance.OpenMarkerDetailsWindow();
                 WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel); // Redirect to Home Panel
             }
+
+            if (PlayerPrefs.GetInt("firebaseTokenSaved") == 0 && GameManager.Instance.FirebaseToken != "")
+            {
+                SetNotificationToken(GameManager.Instance.FirebaseToken);
+            }
         }
         else {
 
@@ -354,7 +385,7 @@ public class ApiManager : MonoBehaviour
 
                 ErrorMessage.Clear();
                 ErrorMessage.Add(error.message);
-                errorWindow.SetErrorMessage("Something Went Wrong", Validator.GetValidateErrorMessage(ErrorMessage), "CLOSE", ErrorWindow.ResponseData.JustClose, false);
+                errorWindow.SetErrorMessage("Something Went Wrong", Validator.GetValidateErrorMessage(ErrorMessage), "CLOSE", ErrorWindow.ResponseData.JustClose, true);
             }
         }
     }
@@ -442,17 +473,7 @@ public class ApiManager : MonoBehaviour
         if (success)
         {
             ARMappedModuleList response = JsonUtility.FromJson<ARMappedModuleList>(data.ToString());
-            // set clipboard data received from api depending on chapter scaned
-            if (response.data.clipboard_data != "" && response.data.clipboard_data != null)
-            {
-                TextEditor te = new TextEditor();
-                te.text = response.data.clipboard_data;
-                te.SelectAll();
-                te.Copy();
-
-                Debug.Log("Clipboard data: " + te.text);
-            }
-
+            
             List<int> mappedModules = new List<int>();
             for (int i = 0; i < response.data.mapped_data.Count; i++)
             {
@@ -537,7 +558,18 @@ public class ApiManager : MonoBehaviour
         if (success)
         {
             ModuleContent response = JsonUtility.FromJson<ModuleContent>(data.ToString());
-            GameManager.Instance.SetModuleData(response.data, response.data[0].ar_module_id+1);
+
+            // set clipboard data received from api depending on chapter scaned
+            if (response.data[0].clipboard_data != "" && response.data[0].clipboard_data != null)
+            {
+                TextEditor te = new TextEditor();
+                te.text = response.data[0].clipboard_data;
+                te.SelectAll();
+                te.Copy();
+
+                Debug.Log("Clipboard data: " + te.text);
+            }
+            GameManager.Instance.SetModuleData(response.data, response.data[0].ar_module_id + 1);
         }
         else {
             APIResponseFailPopup(statusCode, "Something Went Wrong", data.ToString(), false);
@@ -798,6 +830,94 @@ public class ApiManager : MonoBehaviour
             APIResponseFailPopup(statusCode, "Something Went Wrong", data.ToString(), true);
         }
         RaycastUnblock();
+    }
+
+    #endregion
+
+    #region Notification
+    public void SetNotificationToken(string myToken)
+    {
+        callNotification(myToken);
+    }
+
+    public async void callNotification(string myToken)
+    {
+        Debug.Log("inside callNotification: " + myToken);
+        PlayerPrefs.SetInt("firebaseTokenSaved", 1);
+        UnityWebRequest request = new UnityWebRequest("https://google.com");
+        var operation = request.SendWebRequest();
+        while (!operation.isDone)
+            await Task.Yield();
+
+        if (request.isNetworkError)
+        {
+            Debug.Log("callNotification: " + request.error);
+        }
+        else
+        {
+            NewToken token = new NewToken();
+            token.firebase_token = myToken;
+            RaycastUnblock();
+            Debug.Log("token: " + myToken);
+            APIClient.CallWebAPI(Method.POST.ToString(), properties.sendToken, JsonUtility.ToJson(token), GameManager.Instance.m_UserData.token, OnTokenSet);
+
+        }
+    }
+
+    private void OnTokenSet(bool success, object data, long statusCode)
+    {
+        Debug.Log("OnTokenSet: " + data.ToString());
+        if (success)
+            Debug.Log("Notification token set successfully: "+ statusCode);
+        else
+            Debug.Log("Notification token set fail: " + statusCode);
+    }
+
+    public void GetNotificationList()
+    {
+        StartCoroutine(CheckInternetConnection(isConnected =>
+        {
+            if (isConnected)
+            {
+                APIClient.CallWebAPI(Method.GET.ToString(), properties.GetNotification, string.Empty, GameManager.Instance.m_UserData.token, OnNotificationList);
+            }
+        }));
+    }
+
+    private void OnNotificationList(bool success, object data, long statusCode)
+    {
+        if (success)
+        {
+            NotificationPanel.Instance.OnReleaseData();
+            Notification response = JsonUtility.FromJson<Notification>(data.ToString());
+            NotificationPanel.Instance.setNotificationData(response.data);
+        }
+        else
+        {
+            APIResponseFailPopup(statusCode, "Something Went Wrong", data.ToString(), true);
+        }
+        RaycastUnblock();
+    }
+
+    public void SetNotificationView(int id)
+    {
+        StartCoroutine(CheckInternetConnection(isConnected =>
+        {
+            if (isConnected)
+            {
+                RaycastUnblock();
+                string url = properties.NotificationViewed + id + "/view";
+                APIClient.CallWebAPI(Method.POST.ToString(), url, string.Empty, GameManager.Instance.m_UserData.token, OnViewSuccess);
+            }
+        }));
+    }
+
+    private void OnViewSuccess(bool success, object data, long statusCode)
+    {
+        if (success)
+            Debug.Log("Notification viewed successfully.");
+        else
+            Debug.Log("Notification viewed fail.");
     }
 
     #endregion
