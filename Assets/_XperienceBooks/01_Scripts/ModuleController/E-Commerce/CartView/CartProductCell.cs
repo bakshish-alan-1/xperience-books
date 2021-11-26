@@ -9,7 +9,6 @@ using UnityEngine.UI;
 
 public class CartProductCell : MonoBehaviour
 {
-
     public int index;
     public TextMeshProUGUI title;
     public TextMeshProUGUI m_Discription;
@@ -25,7 +24,6 @@ public class CartProductCell : MonoBehaviour
 
     public float finalPrice; 
 
-
     public void SetData(CartProduct data, int index) {
 
         this.index = index;
@@ -39,7 +37,6 @@ public class CartProductCell : MonoBehaviour
         // if color selected by user for product
         if (data.m_SelectedAttributes[0] >= 0)
         {
-
             disc.Append("Color : " + data.m_product.attributes[data.m_SelectedAttributes[0]].color_name);
 
             if (data.m_SelectedAttributes[1] >= 0)
@@ -52,23 +49,15 @@ public class CartProductCell : MonoBehaviour
         {
             StartCoroutine(LoadRemoteImage(data.m_product.image[0]));
         }
-
-
         m_Discription.text = disc.ToString();
 
-      
         qty = data.m_TotalQty;
         price = data.m_FinalPrice;
 
         UpdatePrice();
-
-
-
-        
-
     }
 
-    public IEnumerator LoadRemoteImage(string path)
+   public IEnumerator LoadRemoteImage(string path)
     {
 
         Texture2D texture = null;
@@ -103,35 +92,28 @@ public class CartProductCell : MonoBehaviour
         }
     }
 
-
    void  ClearImage() {
 
         cellImage.sprite = Utility.Texture2DToSprite(defaultTexture);
         cellImage.preserveAspect = true;
-
     }
-
-
 
     public void IncresedQty() {
 
-        if (qty >= totalQtyAvailable)
+        if (!CartController.Instance.OnCheckItemQuantity(cartProduct.m_product.id, totalQtyAvailable))
             return;
        
         qty++;
         UpdatePrice();
     }
 
-
     public void DecreasedQty() {
 
         if (qty <= 1) 
             return;
         
-
         qty--;
         UpdatePrice();
-
     }
 
     public void UpdatePrice() {
@@ -145,9 +127,7 @@ public class CartProductCell : MonoBehaviour
         cartProduct.m_FinalPrice = finalPrice;
 
         CartController.Instance.UpdateFinalPrice();
-
     }
-
 
     public void RemoveFromList() {
         gameObject.SetActive(false);

@@ -142,7 +142,7 @@ namespace Ecommerce
         {
            ApiManager.Instance.RayCastBlock();
 
-            UnityWebRequest request = new UnityWebRequest("http://google.com");
+            UnityWebRequest request = new UnityWebRequest("https://google.com");
             yield return request.SendWebRequest();
             if (request.isNetworkError)
             {

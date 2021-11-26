@@ -72,8 +72,7 @@ public class GameManager : MonoBehaviour
     /// Store local storage path
     /// </summary>
     [SerializeField] string m_LocalPath;
-    //public Texture2D SeriesImageTexture; // hold selected series Image texture
-    //public Texture2D SeriesLogoTexture; // hold selected series Logo texture
+    public string WatermarkURL;
 
     /// <summary>
     /// Store warning window info

@@ -28,6 +28,16 @@ public class CaptureAndShare : MonoBehaviour
     {
         if (Instance == null)
             Instance = this;
+
+        if (watermark != null)
+            watermarkIcon = watermark.GetComponent<Image>();
+
+        if (!string.IsNullOrEmpty(GameManager.Instance.WatermarkURL))
+        {
+            OnDownloadWatermark(GameManager.Instance.WatermarkURL);
+        }
+        else
+            watermark.SetActive(false);
     }
 
     public void TakeScreenshot() {
@@ -43,8 +53,6 @@ public class CaptureAndShare : MonoBehaviour
         needToHide.SetActive(false);
         if (backBtnUI != null)
             backBtnUI.SetActive(false);
-        if (watermark != null)
-            watermark.SetActive(true);
 
         yield return new WaitForEndOfFrame();
 
@@ -60,8 +68,6 @@ public class CaptureAndShare : MonoBehaviour
         needToHide.SetActive(true);
         if (backBtnUI != null)
             backBtnUI.SetActive(true);
-        //if (watermark != null)
-        //    watermark.SetActive(false);
     }
 
     public void ShareSS() {
@@ -91,21 +97,6 @@ public class CaptureAndShare : MonoBehaviour
         ssInProgress = false;
     }
 
-    public void setWatermark(string url, int direction)
-    {
-        Debug.Log("watermark url: " + url + ", position: " + direction);
-        for (int i = 0; i < watermark.transform.childCount; i++)
-        {
-            watermark.transform.GetChild(i).gameObject.SetActive(false);
-            if ((i + 1) == direction)// because direction come from api started 1 instead of 0
-            {
-                watermark.transform.GetChild(i).gameObject.SetActive(true);
-                watermarkIcon = watermark.transform.GetChild(i).gameObject.GetComponent<Image>();
-                OnDownloadWatermark(url);
-            }
-        }
-    }
-
     private async void OnDownloadWatermark(string url)
     {
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
@@ -119,6 +110,7 @@ public class CaptureAndShare : MonoBehaviour
         }
         else
         {
+            watermark.SetActive(true);
             Texture2D texture2D = DownloadHandlerTexture.GetContent(request);
             watermarkIcon.sprite = GameManager.Instance.Texture2DToSprite(texture2D);
         }

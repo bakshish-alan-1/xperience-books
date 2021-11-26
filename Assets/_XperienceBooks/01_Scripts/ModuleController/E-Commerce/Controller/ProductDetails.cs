@@ -234,7 +234,7 @@ namespace Ecommerce
 
         public void AddToCart(bool callFromBuyNowBtn) {
 
-            if (OnCheckItemQuantity(m_ProductDetails.id, int.Parse(m_ProductDetails.qty)))
+            if (CartController.Instance.OnCheckItemQuantity(m_ProductDetails.id, int.Parse(m_ProductDetails.qty)))
             {
                 Reset();
 
@@ -261,12 +261,16 @@ namespace Ecommerce
         {
             bool available = true;
             int qty = 0;
-            for (int i = 0; i < CartController.Instance.m_FinalCart.Count; i++)
+            for (int i = 0; i < CartController.Instance.container.transform.childCount; i++)
             {
-                if (id == CartController.Instance.m_FinalCart[i].m_product.id)
-                    qty += 1;
+                if (CartController.Instance.container.transform.GetChild(i).GetComponent<CartProductCell>().cartProduct.isActive)
+                {
+                    if (id == CartController.Instance.container.transform.GetChild(i).GetComponent<CartProductCell>().cartProduct.m_product.id)
+                        qty += CartController.Instance.container.transform.GetChild(i).GetComponent<CartProductCell>().qty;
+                }
             }
 
+            Debug.Log("Qty: " + qty + ", " + maxQty);
             if (qty >= maxQty)
                 available = false;
 

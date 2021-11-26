@@ -569,6 +569,12 @@ public class ApiManager : MonoBehaviour
 
                 Debug.Log("Clipboard data: " + te.text);
             }
+
+            if (!string.IsNullOrEmpty(response.data[0].watermark))
+            {
+                GameManager.Instance.WatermarkURL = response.data[0].watermark;
+            }
+
             GameManager.Instance.SetModuleData(response.data, response.data[0].ar_module_id + 1);
         }
         else {

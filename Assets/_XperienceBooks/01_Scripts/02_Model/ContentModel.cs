@@ -48,6 +48,7 @@ public class ContentModel
     public string author_name;
     public string series_name;
     public string clipboard_data;
+    public string watermark;
     public builder_position position;
     public builder_rotation rotation;
     public builder_scale scale;

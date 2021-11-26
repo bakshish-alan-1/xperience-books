@@ -53,7 +53,7 @@ namespace Intellify.core
         #region Connection check
          private void CheckConnection(Action<bool> action)
          {
-             UnityWebRequest request = new UnityWebRequest("http://google.com", "GET");
+             UnityWebRequest request = new UnityWebRequest("https://google.com", "GET");
 
              request.SetRequestHeader("Accept", "application/json");
              request.SetRequestHeader("Accept-Language", "en_US");
