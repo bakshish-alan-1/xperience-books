@@ -203,7 +203,7 @@ public class ThemeManager : MonoBehaviour
 
     public void LoadTheme()
     {
-        SceneLoader.LoadScene(1);
+        Debug.Log("ThemeManager LoadTheme");
         string theme = GameManager.Instance.GetThemePath();
 
         if (!File.Exists(theme + "/" + StaticKeywords.BGTheme))
@@ -296,5 +296,6 @@ public class ThemeManager : MonoBehaviour
         else
             notificationTill = getTexture(theme, StaticKeywords.NotificationCellBG);
 
+        SceneLoader.LoadScene(1);
     }
 }

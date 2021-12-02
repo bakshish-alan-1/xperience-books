@@ -117,7 +117,6 @@ public class FacePropertyController : MonoBehaviour
     {
         Debug.Log("Model Loading Start");
         m_ModelDownloader.StartLoadObject(finalPath, isLocalFile, ModelLoaded, OnMaterialsLoad);
-
         GameManager.Instance.safetyWindow.OpenWindow();// call Safetywindow popup
     }
 

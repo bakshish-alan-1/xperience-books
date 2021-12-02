@@ -31,6 +31,14 @@ public class SeriesController : MonoBehaviour
         if (File.Exists(GameManager.Instance.LocalStoragePath + "Theme/BooksData.json"))
             File.Delete(GameManager.Instance.LocalStoragePath + "Theme/BooksData.json");
 
+        string seriesPath = GameManager.Instance.LocalStoragePath + "Theme/" + GameManager.Instance.selectedSeries.theme.id;
+        if (PlayerPrefs.GetString("IsThemeSaved").Equals("false"))
+        {
+            Debug.Log("IsThemeSaved: false, so delete skin folder to get new skin");
+            if (Directory.Exists(seriesPath))
+                Directory.Delete(seriesPath, true);// delete previous series skin downloaded theme folder
+        }
+
         for (int i = 0; i < GameManager.Instance.m_Series.Count; i++)
         {
             GameObject obj = Instantiate(seriesObj, parent.transform);

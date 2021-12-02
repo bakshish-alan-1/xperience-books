@@ -40,6 +40,8 @@ public class HomeScreen : MonoBehaviour
     {
         if (Instance == null)
             Instance = this;
+
+        Debug.Log("IsThemeSaved: "+ PlayerPrefs.GetString("IsThemeSaved"));
     }
 
     public void OnScanBtnHit()

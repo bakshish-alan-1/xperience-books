@@ -30,6 +30,7 @@ public class BookData : MonoBehaviour
         Debug.Log("Index: " + index);
         if (Directory.Exists(seriesPath))
         {
+            Debug.Log("Skin Path exists");
             if (GameManager.Instance.m_Series.Count != 0 && index <= GameManager.Instance.m_Series.Count)
             {
                 if (GameManager.Instance.selectedSeries.theme.updated_at_timestamp != GameManager.Instance.m_Series[index].theme.updated_at_timestamp)
@@ -48,7 +49,10 @@ public class BookData : MonoBehaviour
         FileHandler.SaveBooksData(GameManager.Instance.selectedBooks);
         // if theme is not available then save new theme and set
         if (!Directory.Exists(GameManager.Instance.GetThemePath()))
+        {
+            PlayerPrefs.SetString("IsThemeSaved", "false");
             ThemeManager.Instance.SaveSeriesTheame();
+        }
         else
         {
             ThemeManager.Instance.LoadTheme();// already theme available then direct set to the home panel

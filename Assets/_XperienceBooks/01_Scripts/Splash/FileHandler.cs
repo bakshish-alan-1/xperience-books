@@ -115,6 +115,7 @@ public class FileHandler
 
     public static void SaveBooksData(SeriesBooks books)
     {
+        Debug.Log("FileHandler SaveBooksData");
         File.WriteAllText(GameManager.Instance.LocalStoragePath + "Theme/BooksData.json", JsonUtility.ToJson(books));
     }
 
