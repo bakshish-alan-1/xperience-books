@@ -10,7 +10,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
-
 namespace TriLibCore.Samples
 {
     /// <summary>Represents a TriLib sample which allows the user to load models and HDR skyboxes from the local file-system.</summary>
@@ -118,7 +117,15 @@ namespace TriLibCore.Samples
         /// </summary>
         private Animation _animation;
 
+        /// <summary>
+        /// Stop Watch used to track the model loading time.
+        /// </summary>
         private Stopwatch _stopwatch;
+
+        /// <summary>
+        /// Represents the memory used by the Unity Player when the scene is loaded.
+        /// </summary>
+        private long _initialMemory;
 
         /// <summary>Gets the playing Animation State.</summary>
         private AnimationState CurrentAnimationState
@@ -297,6 +304,9 @@ namespace TriLibCore.Samples
             AssetLoaderOptions = AssetLoader.CreateDefaultLoaderOptions();
             AssetLoaderOptions.Timeout = 180;
             AssetLoaderOptions.ShowLoadingWarnings = true;
+#if TRILIB_SHOW_MEMORY_USAGE
+            _initialMemory = RuntimeProcessUtils.GetProcessMemory();
+#endif
             ClearSkybox();
         }
 
@@ -321,23 +331,23 @@ namespace TriLibCore.Samples
         {
             if (!EventSystem.current.IsPointerOverGameObject())
             {
-                if (Input.GetMouseButton(0))
+                if (GetMouseButton(0))
                 {
-                    if (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt))
+                    if (GetKey(KeyCode.LeftAlt) || GetKey(KeyCode.RightAlt))
                     {
-                        _lightAngle.x = Mathf.Repeat(_lightAngle.x + Input.GetAxis("Mouse X"), 360f);
-                        _lightAngle.y = Mathf.Clamp(_lightAngle.y + Input.GetAxis("Mouse Y"), -MaxPitch, MaxPitch);
+                        _lightAngle.x = Mathf.Repeat(_lightAngle.x + GetAxis("Mouse X"), 360f);
+                        _lightAngle.y = Mathf.Clamp(_lightAngle.y + GetAxis("Mouse Y"), -MaxPitch, MaxPitch);
                     }
                     else
                     {
                         UpdateCamera();
                     }
                 }
-                if (Input.GetMouseButton(2))
+                if (GetMouseButton(2))
                 {
-                    CameraPivot -= cameraTransform.up * Input.GetAxis("Mouse Y") * InputMultiplier + cameraTransform.right * Input.GetAxis("Mouse X") * InputMultiplier;
+                    CameraPivot -= cameraTransform.up * GetAxis("Mouse Y") * InputMultiplier + cameraTransform.right * GetAxis("Mouse X") * InputMultiplier;
                 }
-                CameraDistance = Mathf.Min(CameraDistance - Input.mouseScrollDelta.y * InputMultiplier, InputMultiplier * (1f / InputMultiplierRatio) * MaxCameraDistanceRatio);
+                CameraDistance = Mathf.Min(CameraDistance - GetMouseScrollDelta().y * InputMultiplier, InputMultiplier * (1f / InputMultiplierRatio) * MaxCameraDistanceRatio);
                 if (CameraDistance < 0f)
                 {
                     CameraPivot += cameraTransform.forward * -CameraDistance;
@@ -373,7 +383,7 @@ namespace TriLibCore.Samples
             else
             {
                 Play.gameObject.SetActive(true);
-                Stop.gameObject.SetActive(false); 
+                Stop.gameObject.SetActive(false);
                 PlaybackSlider.value = 0f;
             }
         }
@@ -474,9 +484,14 @@ namespace TriLibCore.Samples
         {
             base.OnMaterialsLoad(assetLoaderContext);
             _stopwatch.Stop();
+#if TRILIB_SHOW_MEMORY_USAG
+            var loadedText = $"Loaded in: {_stopwatch.Elapsed.Minutes:00}:{_stopwatch.Elapsed.Seconds:00} Peak Memory Usage: {ProcessUtils.SizeSuffix(RuntimeProcessUtils.GetProcessMemory() - _initialMemory)}";
+#else
             var loadedText = $"Loaded in: {_stopwatch.Elapsed.Minutes:00}:{_stopwatch.Elapsed.Seconds:00}";
+#endif
             _loadingTimeText.text = loadedText;
             Debug.Log(loadedText);
+            ModelTransformChanged();
         }
     }
 }

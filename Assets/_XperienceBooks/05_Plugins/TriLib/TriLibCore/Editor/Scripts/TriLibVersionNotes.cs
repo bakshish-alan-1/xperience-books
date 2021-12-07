@@ -17,12 +17,12 @@ namespace TriLibCore.Editor
             public static readonly GUIStyle ButtonStyle = new GUIStyle("button") { margin = new RectOffset(10, 10, 5, 5) };
         }
 
-        private const string SkipVersionInfoKey = "TriLibSkipVersionInfo";
-
         private string _text;
         private bool _loaded;
         private Vector2 _changeLogScrollPosition;
         private Vector2 _notesScrollPosition;
+
+        public const string SkipVersionInfoKey = "TriLibSkipVersionInfo";
 
         private static TriLibVersionNotes Instance
         {
@@ -32,15 +32,6 @@ namespace TriLibCore.Editor
                 window.titleContent = new GUIContent("TriLib Version Notes");
                 window.minSize = new Vector2(Styles.WindowWidth, Styles.WindowHeight);
                 return window;
-            }
-        }
-
-        [InitializeOnLoadMethod]
-        public static void Initialize()
-        {
-            if (!EditorPrefs.GetBool(SkipVersionInfoKey))
-            {
-                ShowWindow();
             }
         }
 

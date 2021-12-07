@@ -3,7 +3,7 @@
 namespace TriLibCore.Samples
 {
     /// <summary>Represents a class used to control an avatar on TriLib samples.</summary>
-    public class AvatarController : MonoBehaviour
+    public class AvatarController : AbstractInputSystem
     {
         /// <summary>The Avatar Controller Singleton instance.</summary>
         public static AvatarController Instance { get; private set; }
@@ -75,7 +75,7 @@ namespace TriLibCore.Samples
         /// <summary>Handles input (controls the Camera and moves the Avatar character).</summary>
         private void Update()
         {
-            var input = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
+            var input = new Vector3(GetAxis("Horizontal"), 0f, GetAxis("Vertical"));
             var direction = Camera.main.transform.TransformDirection(input);
             direction.y = 0f;
             direction.Normalize();

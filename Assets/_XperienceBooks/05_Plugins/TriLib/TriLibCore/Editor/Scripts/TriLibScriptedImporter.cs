@@ -33,12 +33,14 @@ namespace TriLibCore.Editor
             {
                 assetImportContext.AddObjectToAsset("Main", assetLoaderContext.RootGameObject);
                 assetImportContext.SetMainObject(assetLoaderContext.RootGameObject);
-                foreach (var allocation in assetLoaderContext.Allocations)
+                for (var i = 0; i < assetLoaderContext.Allocations.Count; i++)
                 {
+                    var allocation = assetLoaderContext.Allocations[i];
                     if (string.IsNullOrWhiteSpace(allocation.name))
                     {
                         allocation.name = allocation.GetType().Name;
                     }
+
                     assetImportContext.AddObjectToAsset(allocation.name, allocation);
                 }
             }

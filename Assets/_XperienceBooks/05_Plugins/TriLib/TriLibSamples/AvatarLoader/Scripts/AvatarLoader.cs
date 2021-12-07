@@ -69,7 +69,7 @@ namespace TriLibCore.Samples
         /// </summary>
         private void Update()
         {
-            if (Input.GetMouseButtonDown(1))
+            if (GetMouseButtonDown(1))
             {
                 Cursor.lockState = Cursor.lockState == CursorLockMode.None ? CursorLockMode.Locked : CursorLockMode.None;
             }

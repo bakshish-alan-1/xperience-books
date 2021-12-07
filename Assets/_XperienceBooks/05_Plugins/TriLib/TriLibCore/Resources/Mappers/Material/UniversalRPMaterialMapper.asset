@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ed833c6c9f63a84898a700a7da36fea, type: 3}
+  m_Script: {fileID: 11500000, guid: 5b30576dc492f8a42b7ee8cf24587bac, type: 3}
   m_Name: UniversalRPMaterialMapper
   m_EditorClassIdentifier: 
   ForceStandardMaterial: 0

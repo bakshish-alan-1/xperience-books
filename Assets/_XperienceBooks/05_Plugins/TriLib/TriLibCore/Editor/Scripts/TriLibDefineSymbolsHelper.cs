@@ -8,14 +8,16 @@ namespace TriLibCore.Editor
         {
             var defineSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
             var defineSymbolsArray = defineSymbols.Split(';');
-            foreach (var defineSymbol in defineSymbolsArray)
+            for (var i = 0; i < defineSymbolsArray.Length; i++)
             {
+                var defineSymbol = defineSymbolsArray[i];
                 var trimmedDefineSymbol = defineSymbol.Trim();
                 if (trimmedDefineSymbol == targetDefineSymbol)
                 {
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -25,8 +27,9 @@ namespace TriLibCore.Editor
             var defineSymbolsArray = defineSymbols.Split(';');
             var newDefineSymbols = string.Empty;
             var isDefined = false;
-            foreach (var defineSymbol in defineSymbolsArray)
+            for (var i = 0; i < defineSymbolsArray.Length; i++)
             {
+                var defineSymbol = defineSymbolsArray[i];
                 var trimmedDefineSymbol = defineSymbol.Trim();
                 if (trimmedDefineSymbol == targetDefineSymbol)
                 {
@@ -34,10 +37,13 @@ namespace TriLibCore.Editor
                     {
                         continue;
                     }
+
                     isDefined = true;
                 }
+
                 newDefineSymbols += string.Format("{0};", trimmedDefineSymbol);
             }
+
             if (value && !isDefined)
             {
                 newDefineSymbols += string.Format("{0};", targetDefineSymbol);

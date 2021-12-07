@@ -127,11 +127,13 @@ namespace TriLibCore
             var extensions = Readers.Extensions;
             var extensionFilters = new List<ExtensionFilter>();
             var subExtensions = new List<string>();
-            foreach (var extension in extensions)
+            for (var i = 0; i < extensions.Count; i++)
             {
+                var extension = extensions[i];
                 extensionFilters.Add(new ExtensionFilter(null, extension));
                 subExtensions.Add(extension);
             }
+
             subExtensions.Add("zip");
             extensionFilters.Add(new ExtensionFilter(null, new[] { "zip" }));
             extensionFilters.Add(new ExtensionFilter("All Files", new[] { "*" }));
@@ -146,18 +148,21 @@ namespace TriLibCore
                 return _items.First();
             }
             var extensions = Readers.Extensions;
-            foreach (var item in _items)
+            for (var i = 0; i < _items.Count; i++)
             {
+                var item = _items[i];
                 if (item.Name == null)
                 {
                     continue;
                 }
+
                 var extension = FileUtils.GetFileExtension(item.Name, false);
                 if (extensions.Contains(extension))
                 {
                     return item;
                 }
             }
+
             return null;
         }
 		

@@ -32,7 +32,7 @@ namespace TriLibCore.Samples
                 Debug.Log($"Found texture at: {finalPath}");
                 return textureLoadingContext;
             }
-            throw new Exception($"Texture {texture.Filename} not found.");
+            throw new Exception($"Texture [{texture.Filename}] not found.");
         }
     }
 }

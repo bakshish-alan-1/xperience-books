@@ -1,15 +1,38 @@
-﻿2.1.1
+﻿2.1.3
 Changelog:
--Added the PivotPosition Asset Loader Option.
--Added option to disable in editor file-formats importing.
--Fixed iOS StandaloneFileBrowser bug.
--Fixed bug where OBJ geometry groups were not created correctly.
--Fixed PLY big-endian loading issue.
--Fixed glTF Draco loader.
--Fixed glTF Quantitized loading.
--Fixed OBJ reader NaN parsing.
--Fixed FBX bug where a single layer was referenced by more than one animation stack.
--Fixed textures compression issue.
--Fixed alpha materials creation issue. TriLib was creating an alpha material even for meshes that don't use transparent textures or alpha values.
--Fixed mip-maps generation bug.
--Fixed misc. bugs.
+-Fixed Non-Power-Of-Two Textures creation.
+-Fixed FBX pivot issues.
+-Fixed FBX empty mesh bug.
+-Fixed FBX animation pivots bug.
+-Fixed FBX double Textures assignment bug.
+-Fixed FBX/gLTF2 material color assignment bug (Colors are only set when there isn't a texture for their slot or the texture could not be loaded).
+-Fixed OBJ duplicated material names in material library bug.
+-Fixed gLTF2 skinning bug.
+-Fixed OBJ, PLY, and STL invalid Quaternion bug.
+-Fixed UniversalRPMaterialMapper Emission Texture bug.
+-Fixed ValidTRS assertion bug.
+-Fixed Blend Shapes Normal calculation.
+-Fixed PivotPosition Asset Loader Option bug.
+-Fixed Pointer_stringify WebGL bug.
+-Misc. fixes.
+-Changed default Material Mappers creation mode to avoid serialization issues.
+-Changed Settings ScriptableObject to avoid serialization issues. *Note: You might need to re-configure your TriLib Settings in the Project Settings area.
+-Changed the FBXReader.PivotMode static field value to FBXPivotMode.PreserveRotationPivot. If you have any pivot issues loading your model, please switch it back to FBXPivotMode.Legacy.
+-Improved memory usage.
+-Improved OBJ, PLY, and STL async loading speed by reducing progress handling callback frequency.
+-Added support for the Input Manager Package on TriLib samples.
+-Added LeftContainsRight and RightContainsLeft String comparison modes.
+-Added AutomaticallyPlayLegacyAnimations Asset Loader Option, used to play Legacy Animation Clips automatically upon loading.
+-Added DoubleSidedMaterials Asset Loader Option, used to create double-sided Materials when loading the Models.
+-Added EnforceAnimatorWithLegacyAnimations Asset Loader Option, used to add an Animator when the AnimationType is set to Legacy.
+-Added TRILIB_ENABLE_UWP_THREADS compiler directive. Enable this on the Edit->Project Settings->TriLib menu. Enabling this will enable threaded loading in UWP platforms.
+-Added LoadMaterialsProgressively Asset Loader Option, used to load Materials progressively when loading using the async method.
+-Added CalculateBlendShapeNormals Asset Loader Option, used to define if Blend Shape Normals will be calculated.
+-Deprecated MarkTexturesNoLongerReadable Asset Loader Option. To reduce allocated resources, all TriLib Textures CPU data is released after the Texture is loaded, turning the Texture non-readable.
+-Deprecated MaterialMapper.LoadTextureCallback field. Now Textures are loaded using an internal method.
+Version Notes:
+-Deprecated fields from AssetLoaderOptions have been removed (LoadedTextureGroups, BoneTransforms, RootBone, MaterialsProcessed, LoadedTexturesCount, and GeneratedTexturesNamesCount). You might need to update your code.
+-The Materials creation system has changed. Now Textures are pre-loaded and Materials are created all at once. To use the old behavior, turn on your AssetLoaderOptions LoadMaterialsProgressively field.
+-Changed Settings ScriptableObject to avoid serialization issues. *Note: You might need to re-configure your TriLib Settings in the Project Settings area.
+-Changed the FBXReader.PivotMode static field value to FBXPivotMode.PreserveRotationPivot. If you have any pivot issues loading your model, please switch it back to FBXPivotMode.Legacy.
+-Added TRILIB_ENABLE_UWP_THREADS compiler directive. Enable this on the Edit->Project Settings->TriLib menu. Enabling this will enable threaded loading in UWP platforms.

@@ -11,21 +11,32 @@ namespace TriLibCore.Samples
         private void Start()
         {
             MaterialMapper materialMapper = null;
-            foreach (var materialMapperName in MaterialMapper.RegisteredMappers)
+            for (var i = 0; i < MaterialMapper.RegisteredMappers.Count; i++)
             {
+                var materialMapperName = MaterialMapper.RegisteredMappers[i];
                 if (TriLibSettings.GetBool(materialMapperName))
                 {
-                    materialMapper = (MaterialMapper)ScriptableObject.CreateInstance(materialMapperName);
+                    try
+                    {
+                        materialMapper = ScriptableObject.CreateInstance(materialMapperName) as MaterialMapper;
+                    }
+                    catch
+                    {
+                        materialMapper = null;
+                    }
+
                     break;
                 }
             }
+
             if (materialMapper == null)
             {
                 return;
             }
             var meshRenderers = GetComponentsInChildren<MeshRenderer>();
-            foreach (var meshRenderer in meshRenderers)
+            for (var j = 0; j < meshRenderers.Length; j++)
             {
+                var meshRenderer = meshRenderers[j];
                 var materials = meshRenderer.materials;
                 for (var i = 0; i < materials.Length; i++)
                 {
@@ -33,11 +44,14 @@ namespace TriLibCore.Samples
                     materials[i] = Instantiate(materialMapper.MaterialPreset);
                     materials[i].color = color;
                 }
+
                 meshRenderer.materials = materials;
             }
+
             var skinnedMeshRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
-            foreach (var skinnedMeshRenderer in skinnedMeshRenderers)
+            for (var j = 0; j < skinnedMeshRenderers.Length; j++)
             {
+                var skinnedMeshRenderer = skinnedMeshRenderers[j];
                 var materials = skinnedMeshRenderer.materials;
                 for (var i = 0; i < materials.Length; i++)
                 {
@@ -45,8 +59,10 @@ namespace TriLibCore.Samples
                     materials[i] = Instantiate(materialMapper.MaterialPreset);
                     materials[i].color = color;
                 }
+
                 skinnedMeshRenderer.materials = materials;
             }
+
             Destroy(materialMapper);
         }
     }

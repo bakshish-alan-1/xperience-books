@@ -14,6 +14,7 @@ namespace TriLibCore
         public delegate void DownloadFinished(UnityWebRequest request);//Akash
         public static event DownloadFinished OnDownloadFinished;//Akash
 
+
         /// <summary>
         /// Unity web request instance used on this script.
         /// </summary>
@@ -47,6 +48,7 @@ namespace TriLibCore
             _onProgress = onProgress;
             DownloadHandlerBuffer dH = new DownloadHandlerBuffer();
             _unityWebRequest.downloadHandler = dH;
+
             yield return unityWebRequest.SendWebRequest();
             try
             {
@@ -76,6 +78,7 @@ namespace TriLibCore
                         _assetLoaderContext = AssetLoader.LoadModelFromStream(memoryStream, null, fileExtension, onLoad, onMaterialsLoad, delegate (AssetLoaderContext assetLoaderContext, float progress) { onProgress?.Invoke(assetLoaderContext, 0.5f + progress * 0.5f); }, onError, wrapperGameObject, assetLoaderOptions, uriLoadCustomContextData);
                     }
                     OnDownloadFinished(_unityWebRequest);
+
                 }
                 else
                 {

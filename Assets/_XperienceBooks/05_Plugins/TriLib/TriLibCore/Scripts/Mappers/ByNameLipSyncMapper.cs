@@ -34,8 +34,9 @@ namespace TriLibCore.Mappers
                 var visemeCandidate = VisemeCandidates[i];
                 if (visemeCandidate.Viseme == viseme)
                 {
-                    foreach (var candidateName in visemeCandidate.CandidateNames)
+                    for (var k = 0; k < visemeCandidate.CandidateNames.Count; k++)
                     {
+                        var candidateName = visemeCandidate.CandidateNames[k];
                         for (var j = 0; j < geometryGroup.BlendShapeKeys.Count; j++)
                         {
                             var blendShapeGeometryBinding = geometryGroup.BlendShapeKeys[j];

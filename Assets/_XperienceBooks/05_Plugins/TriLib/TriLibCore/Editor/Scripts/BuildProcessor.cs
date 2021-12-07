@@ -14,22 +14,25 @@ namespace TriLibCore.Editor
             var waitingMappers = false;
             string materialMapper = null;
             var arguments = Environment.GetCommandLineArgs();
-            foreach (var argument in arguments)
+            for (var i = 0; i < arguments.Length; i++)
             {
+                var argument = arguments[i];
                 if (waitingMappers)
                 {
                     materialMapper = argument;
                     continue;
                 }
+
                 switch (argument)
                 {
                     case "-trilib_mappers":
-                        {
-                            waitingMappers = true;
-                            break;
-                        }
+                    {
+                        waitingMappers = true;
+                        break;
+                    }
                 }
             }
+
             if (materialMapper != null)
             {
                 Debug.Log($"Using the given material mapper:{materialMapper}.");

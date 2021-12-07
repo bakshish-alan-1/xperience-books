@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79e6f08091ccb5743bf34d6c9244c8a2, type: 3}
+  m_Script: {fileID: 11500000, guid: 09e91867e63346c408b6a9e5c98cd665, type: 3}
   m_Name: HDRPMaterialMapper
   m_EditorClassIdentifier: 
   ForceStandardMaterial: 0

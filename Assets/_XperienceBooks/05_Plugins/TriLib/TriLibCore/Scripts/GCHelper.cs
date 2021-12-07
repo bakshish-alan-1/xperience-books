@@ -12,7 +12,7 @@ namespace TriLibCore
         /// <summary>
         /// The interval to do the GC Collection.
         /// </summary>
-        public float Interval = 1f;
+        public float Interval = 0.5f;
 
         private int _loadingCount;
 
@@ -74,7 +74,7 @@ namespace TriLibCore
         private IEnumerator RemoveInstanceInternal(float interval)
         {
             yield return new WaitForSeconds(interval);
-            _loadingCount = Mathf.Max(0, _loadingCount-1);
+            _loadingCount = Mathf.Max(0, _loadingCount - 1);
         }
 
         /// <summary>

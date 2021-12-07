@@ -1,18 +1,17 @@
-var StandaloneFileBrowserWebGLPlugin = {
+var TriLibStandaloneFileBrowserWebGLPlugin = {
   oldGameObjectName: '',
-  // Open file.
   // gameObjectNamePtr: Unique GameObject name. Required for calling back unity with SendMessage.
   // methodNamePtr: Callback method name on given GameObject.
-  // filter: Filter files. Example filters:
+  // filterPtr: Filter files. Example filters:
   //     Match all image files: "image/*"
   //     Match all video files: "video/*"
   //     Match all audio files: "audio/*"
   //     Custom: ".plist, .xml, .yaml"
   // multiselect: Allows multiple file selection
   UploadFile: function(gameObjectNamePtr, methodNamePtr, filterPtr, multiselect) {
-    gameObjectName = Pointer_stringify(gameObjectNamePtr);
-    methodName = Pointer_stringify(methodNamePtr);
-    filter = Pointer_stringify(filterPtr);
+    var gameObjectName = UTF8ToString(gameObjectNamePtr);
+    var methodName = UTF8ToString(methodNamePtr);
+    var filter = UTF8ToString(filterPtr);
     var fileInput = document.getElementById(this.oldGameObjectName);
     if (fileInput) {
       document.body.removeChild(fileInput);
@@ -49,7 +48,6 @@ var StandaloneFileBrowserWebGLPlugin = {
     this.oldGameObjectName = gameObjectName;
   },
 
-  // Save file
   // DownloadFile method does not open SaveFileDialog like standalone builds, its just allows user to download file
   // gameObjectNamePtr: Unique GameObject name. Required for calling back unity with SendMessage.
   // methodNamePtr: Callback method name on given GameObject.
@@ -57,9 +55,9 @@ var StandaloneFileBrowserWebGLPlugin = {
   // byteArray: byte[]
   // byteArraySize: byte[].Length
   DownloadFile: function(gameObjectNamePtr, methodNamePtr, filenamePtr, byteArray, byteArraySize) {
-    gameObjectName = Pointer_stringify(gameObjectNamePtr);
-    methodName = Pointer_stringify(methodNamePtr);
-    filename = Pointer_stringify(filenamePtr);
+    var gameObjectName = UTF8ToString(gameObjectNamePtr);
+    var methodName = UTF8ToString(methodNamePtr);
+    var filename = UTF8ToString(filenamePtr);
     var bytes = new Uint8Array(byteArraySize);
     for (var i = 0; i < byteArraySize; i++) {
       bytes[i] = HEAPU8[byteArray + i];
@@ -79,4 +77,4 @@ var StandaloneFileBrowserWebGLPlugin = {
     };
   }
 };
-mergeInto(LibraryManager.library, StandaloneFileBrowserWebGLPlugin);
+mergeInto(LibraryManager.library, TriLibStandaloneFileBrowserWebGLPlugin);

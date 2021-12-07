@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace TriLibCore.Samples
 {
     /// <summary>Represents a base class used in TriLib samples.</summary>
-    public class AssetViewerBase : MonoBehaviour
+    public class AssetViewerBase : AbstractInputSystem
     {
         /// <summary>Gets the Asset Viewer Singleton instance.</summary>
         public static AssetViewerBase Instance { get; private set; }
@@ -104,8 +104,8 @@ namespace TriLibCore.Samples
         /// <summary>Updates the Camera based on mouse Input.</summary>
         protected void UpdateCamera()
         {
-            CameraAngle.x = Mathf.Repeat(CameraAngle.x + Input.GetAxis("Mouse X"), 360f);
-            CameraAngle.y = Mathf.Clamp(CameraAngle.y + Input.GetAxis("Mouse Y"), -MaxPitch, MaxPitch);
+            CameraAngle.x = Mathf.Repeat(CameraAngle.x + GetAxis("Mouse X"), 360f);
+            CameraAngle.y = Mathf.Clamp(CameraAngle.y + GetAxis("Mouse Y"), -MaxPitch, MaxPitch);
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace TriLibCore.Samples
                 var button = selectables[i];
                 button.interactable = !value;
             }
-#if UNITY_WSA || UNITY_WEBGL || TRILIB_FORCE_SYNC
+#if UNITY_WSAX || UNITY_WEBGL || TRILIB_FORCE_SYNC
             _loadingWrapper.gameObject.SetActive(value);
 #else
             _loadingBar.gameObject.SetActive(value);

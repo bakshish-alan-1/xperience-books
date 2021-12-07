@@ -1,6 +1,5 @@
 - TriLib is not a Model exporter.
 - FBX Importer does not import multiple texture layers yet.  
-- Some FBX files may present incompatibilities. Some FBX polygons may have tesselation issues.  
 - Lights and Cameras are not supported yet.
 - 3MF Beam Lattice format is not supported yet.
 - 3MF PBR Specular materials are not supported yet.

@@ -46,13 +46,15 @@ namespace TriLibCore.Mappers
 
         private Transform FindDeepChild(IList<Transform> transforms, string right)
         {
-            foreach (var transform in transforms)
+            for (var i = 0; i < transforms.Count; i++)
             {
+                var transform = transforms[i];
                 if (StringComparer.Matches(StringComparisonMode, CaseInsensitive, transform.name, right))
                 {
                     return transform;
                 }
             }
+
             return null;
         }
     }

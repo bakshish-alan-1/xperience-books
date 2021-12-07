@@ -89,7 +89,13 @@ namespace TriLibCore.Editor
                         {
                             EditorGUILayout.Slider(serializedObject.FindProperty("SmoothingAngle"), 0f, 180f, new GUIContent("Smoothing Angle", "Normals calculation smoothing angle."));
                         }
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("ImportBlendShapes"), new GUIContent("Import Blend Shapes", "Turn on this field to import Mesh Blend Shapes."));
+                        var importBlendShapesProperty = serializedObject.FindProperty("ImportBlendShapes");
+                        EditorGUILayout.PropertyField(importBlendShapesProperty, new GUIContent("Import Blend Shapes", "Turn on this field to import Mesh Blend Shapes."));
+                        if (importBlendShapesProperty.boolValue)
+                        {
+                            EditorGUILayout.PropertyField(serializedObject.FindProperty("ImportBlendShapeNormals"), new GUIContent("Import Blend Shape Normals", "Turn on this field to import Mesh Blend Shape normals."));
+                            EditorGUILayout.PropertyField(serializedObject.FindProperty("CalculateBlendShapeNormals"), new GUIContent("Calculate Blend Shape Normals", "Turn on this field to calculate Mesh Blend Shape normals when none can be imported."));
+                        }
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("ImportColors"), new GUIContent("Import Colors", "Turn on this field to import Mesh Colors."));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("ImportTangents"), new GUIContent("Import Tangents", "Turn on this field to import Mesh tangents. If not enabled, tangents will be calculated instead."));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("SwapUVs"), new GUIContent("Swap UVs", "Turn on this field to swap Mesh UVs. (uv1 into uv2)"));
@@ -113,7 +119,7 @@ namespace TriLibCore.Editor
                                 case AvatarDefinitionType.CreateFromThisModel:
                                     if (animationType == AnimationType.Humanoid)
                                     {
-                                        EditorGUILayout.PropertyField(serializedObject.FindProperty("HumanDescription"), new GUIContent("Human Description", "HHuman Description used to create the humanoid Avatar, when the humanoid rigging type is selected."));
+                                        EditorGUILayout.PropertyField(serializedObject.FindProperty("HumanDescription"), new GUIContent("Human Description", "Human Description used to create the humanoid Avatar, when the humanoid rigging type is selected."));
                                         EditorGUILayout.PropertyField(serializedObject.FindProperty("SampleBindPose"), new GUIContent("Sample Bind Pose", "Turn on this field to enforce the loaded Model to the bind-pose when rigging."));
                                         EditorGUILayout.PropertyField(serializedObject.FindProperty("EnforceTPose"), new GUIContent("Enforce T-Pose", "Turn on this field to enforce the loaded Model to the t-pose when rigging."));
                                         EditorGUILayout.PropertyField(serializedObject.FindProperty("HumanoidAvatarMapper"), new GUIContent("Humanoid Avatar Mapper", "Mapper used to map the humanoid Avatar, when the humanoid rigging type is selected."));
@@ -124,12 +130,15 @@ namespace TriLibCore.Editor
                                     break;
                             }
                             break;
+                        case AnimationType.Legacy:
+                            EditorGUILayout.PropertyField(serializedObject.FindProperty("AutomaticallyPlayLegacyAnimations"), new GUIContent("Automatically Play Legacy Animations", "Turn on this field to play Legacy Animation Clips automatically (The first available Clip will be played)."));
+                            EditorGUILayout.PropertyField(serializedObject.FindProperty("EnforceAnimatorWithLegacyAnimations"), new GUIContent("Enforce Animator with Legacy Animations", "Turn on this field to add an Animator when the AnimationType is set to Legacy."));
+                            break;
                     }
                     if (animationType != AnimationType.None)
                     {
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("RootBoneMapper"), new GUIContent("Root Bone Mapper", "Mapper used to find the Model root bone."));
                     }
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("LimitBoneWeights"), new GUIContent("Limit Bone Weights", "Turn on this field to limit bones weight to 4 weights per bone."));
                     break;
                 case 2:
                     animationTypeProperty = serializedObject.FindProperty("AnimationType");
@@ -152,7 +161,8 @@ namespace TriLibCore.Editor
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("UseMaterialKeywords"), new GUIContent("Use Material Keywords", "Turn on this field to enable/disable created Material Keywords based on the source native Materials."));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("AlphaMaterialMode"), new GUIContent("Alpha Material Mode", "Chooses the way TriLib creates alpha materials."));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("MaterialMappers"), new GUIContent("Material Mappers", "Mappers used to create suitable Unity Materials from original Materials."));
-                        //EditorGUILayout.PropertyField(serializedObject.FindProperty("UseAutodeskInteractiveMaterials"), new GUIContent("Use Autodesk Interactive Materials", "Turn on this field to use Autodesk Interactive Materials when possible."));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("DoubleSidedMaterials"), new GUIContent("Double Sided Materials", "Turn on this field to create double-sided Materials (TriLib does that by duplicating the original Meshes)."));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("LoadMaterialsProgressively"), new GUIContent("Load Materials Progressively", "Turn on this field to load Materials progressively when loading using the async method."));
                     }
                     break;
                 case 4:
@@ -164,7 +174,6 @@ namespace TriLibCore.Editor
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("TextureCompressionQuality"), new GUIContent("Texture Compression Quality", "Texture compression to apply on loaded Textures."));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("GenerateMipmaps"), new GUIContent("Generate Mipmaps", "Turn on this field to enable Textures mip-map generation."));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("FixNormalMaps"), new GUIContent("Fix Normal Maps", "Turn on this field to change normal map channels order to ABBR instead of RGBA."));
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("MarkTexturesNoLongerReadable"), new GUIContent("Mark Textures no longer readable", "Turn on this field to set textures as no longer readable and release memory resources."));
                         var alphaMaterialModeProperty = serializedObject.FindProperty("AlphaMaterialMode");
                         if (alphaMaterialModeProperty.enumValueIndex > 0)
                         {
@@ -173,6 +182,8 @@ namespace TriLibCore.Editor
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("LoadTexturesAsSRGB"), new GUIContent("Load Textures as sRGB", "Turn off this field to load textures as linear, instead of sRGB."));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("ApplyTexturesOffsetAndScaling"), new GUIContent("Apply Textures Offset and Scaling", "Turn on this field to apply Textures offset and scaling."));
                         EditorGUILayout.PropertyField(serializedObject.FindProperty("DiscardUnusedTextures"), new GUIContent("Discard Unused Textures", "Turn off this field to keep unused Textures."));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("ForcePowerOfTwoTextures"), new GUIContent("Force Power of Two Textures", "Turn on this field to enforce power of two resolution when loading textures (needed for texture compression and in some platforms)."));
+                        EditorGUILayout.PropertyField(serializedObject.FindProperty("UseUnityNativeTextureLoader"), new GUIContent("Use Unity Native Texture Loader", " Turn on this field to use Unity builtin Texture loader instead of stb_image."));
                     }
                     break;
                 case 5:

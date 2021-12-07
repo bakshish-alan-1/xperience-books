@@ -10,17 +10,22 @@ namespace TriLibCore
 {
     /// <summary>
     /// Represents the TriLib project settings provider.
-    /// You can override this behavior to store the settings in other places, in case you don't want to use Unity built-in PlayerPrefs.
+    /// You can override this behavior to store the settings in other places.
     /// </summary>
     public class TriLibSettings : ScriptableObject, ISerializationCallbackReceiver
     {
+        private const int MaxSettings = 64;
+
         private Dictionary<string, bool> _boolPreferences;
         [SerializeField]
         [HideInInspector]
-        private List<string> _boolKeys;
+        private string[] _dictionaryBoolKeys = new string[MaxSettings];
         [SerializeField]
         [HideInInspector]
-        private List<bool> _boolValues;
+        private bool[] _dictionaryBoolValues = new bool[MaxSettings];
+        [SerializeField]
+        [HideInInspector]
+        private int _settingsCount;
 
         private static TriLibSettings GetTriLibPreferences()
         {
@@ -89,34 +94,27 @@ namespace TriLibCore
             {
                 return;
             }
-            if (_boolKeys == null || _boolValues == null)
-            {
-                _boolKeys = new List<string>();
-                _boolValues = new List<bool>();
-            }
-            _boolKeys.Clear();
-            _boolValues.Clear();
+            _settingsCount = 0;
+            Array.Clear(_dictionaryBoolKeys, 0, MaxSettings);
+            Array.Clear(_dictionaryBoolValues, 0, MaxSettings);
             foreach (var kvp in _boolPreferences)
             {
-                _boolKeys.Add(kvp.Key);
-                _boolValues.Add(kvp.Value);
+                _dictionaryBoolKeys[_settingsCount] = kvp.Key;
+                _dictionaryBoolValues[_settingsCount] = kvp.Value;
+                _settingsCount++;
             }
         }
 
         public void OnAfterDeserialize()
         {
-            if (_boolKeys == null || _boolValues == null)
-            {
-                return;
-            }
             if (_boolPreferences == null)
             {
-                _boolPreferences = new Dictionary<string, bool>();
+                _boolPreferences = new Dictionary<string, bool>(_settingsCount);
             }
             _boolPreferences.Clear();
-            for (var i = 0; i < _boolKeys.Count; i++)
+            for (var i = 0; i < _settingsCount; i++)
             {
-                _boolPreferences.Add(_boolKeys[i], _boolValues[i]);
+                _boolPreferences.Add(_dictionaryBoolKeys[i], _dictionaryBoolValues[i]);
             }
         }
     }

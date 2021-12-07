@@ -56,14 +56,17 @@ namespace TriLibCore
             {
                 if (--value <= 0)
                 {
-                    foreach (var allocation in Allocations)
+                    for (var i = 0; i < Allocations.Count; i++)
                     {
+                        var allocation = Allocations[i];
                         if (allocation == null)
                         {
                             continue;
                         }
+
                         Destroy(allocation);
                     }
+
                     AssetUnloaders.Remove(_id);
                 }
                 else

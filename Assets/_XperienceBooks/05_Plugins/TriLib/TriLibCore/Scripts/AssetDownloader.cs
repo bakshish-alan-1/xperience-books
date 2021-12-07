@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using TriLibCore.General;
 using UnityEngine;
 using UnityEngine.Networking;
 
