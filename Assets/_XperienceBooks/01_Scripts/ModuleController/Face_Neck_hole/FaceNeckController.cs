@@ -38,7 +38,9 @@ public class FaceNeckController : MonoBehaviour
         }
 
         GameManager.Instance.safetyWindow.OpenWindow();// call Safetywindow popup
-        //LoadData();//change
+                                                       //LoadData();//change
+
+        GameManager.Instance.OnCheckToUnlockModule(6);
     }
 
     public void OnInfoBtnHite(bool value)

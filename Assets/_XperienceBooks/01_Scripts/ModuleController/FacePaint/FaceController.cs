@@ -147,6 +147,7 @@ public class FaceController : MonoBehaviour
         scrollView.SelectCell(0);
         //SwapFaces(0);
         loadingUI.SetActive(false);
+        GameManager.Instance.OnCheckToUnlockModule(7);
     }
 
     IEnumerator LoadTexture(string AssetURI) {

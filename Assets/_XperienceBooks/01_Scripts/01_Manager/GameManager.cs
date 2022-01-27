@@ -28,6 +28,8 @@ public class Book
             path.Append(book_name);
             path.Append("/");
             path.Append(chapter_name);
+            path.Append("/");
+            path.Append(qr_code_id);
 
         return path.ToString();
     }
@@ -57,6 +59,11 @@ public class GameManager : MonoBehaviour
     /// Book Details That will used in all Project
     /// </summary>
     public Book currentBook;
+
+    /// <summary>
+    /// Details of inventory
+    /// </summary>
+    public InventoryList m_Inventory = new InventoryList();
 
     /// <summary>
     /// Hold Last selected module data
@@ -92,6 +99,10 @@ public class GameManager : MonoBehaviour
     public TMPro.TMP_FontAsset DefaultFont;
     public TMPro.TMP_FontAsset TitleFont;
     public TMPro.TMP_FontAsset DetailFont;
+
+    [Header("Toast Message Details")]
+    [SerializeField] GameObject toastObj;
+    [SerializeField] TMPro.TMP_Text toastMsg;
 
     [Header("ARMarker Info")]
     public bool isMarkerDetailInfoOpen = false;
@@ -162,6 +173,7 @@ public class GameManager : MonoBehaviour
 
     public void UpdateMappedModuleList() {
         ModuleList.Instance.ActivateModules(currentBook.b_MapModules);
+        ApiManager.Instance.GetInventoryList(currentBook.chapter_id, currentBook.qr_code_id);// call for get inventory list
     }
 
     public void RestartScene() {
@@ -178,7 +190,6 @@ public class GameManager : MonoBehaviour
         }
         else {
             ApiManager.Instance.GetModuleData(currentBook.chapter_id, moduleID);
-            //ApiManager.Instance.GetModuleData(selectedBooks.id, moduleID);
         }
 
     }
@@ -345,5 +356,31 @@ public class GameManager : MonoBehaviour
             Destroy(this.gameObject);
         }
 
+    }
+
+    // call from all modules to unlock their inventory
+    public void OnCheckToUnlockModule(int moduleID)
+    {
+        for (int i = 0; i < m_Inventory.data.Count; i++)
+        {
+            int id = m_Inventory.data[i].armodule_id;
+            if ((id + 1) == moduleID && m_Inventory.data[i].unlocked == 0)
+            {
+                ApiManager.Instance.UnlockInventory(m_Inventory.data[i].id);// call api for unlock inventory
+                break;
+            }
+        }
+    }
+
+    public void ShowToastPanel(string msg)
+    {
+        toastObj.SetActive(true);
+        toastMsg.text = msg;
+        Invoke("HideToastPanel", 3f);
+    }
+
+    void HideToastPanel()
+    {
+        toastObj.SetActive(false);
     }
 }

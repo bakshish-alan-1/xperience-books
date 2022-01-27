@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using TriLibCore;
@@ -231,7 +230,10 @@ public class FacePropertyController : MonoBehaviour
 #endif
 
         if (FaceFound())
+        {
             m_ScreenShotCameraBtn.SetActive(true);
+            GameManager.Instance.OnCheckToUnlockModule(2);
+        }
         else
             m_ScreenShotCameraBtn.SetActive(false);
     }

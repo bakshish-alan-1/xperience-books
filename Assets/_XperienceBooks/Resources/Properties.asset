@@ -40,3 +40,6 @@ MonoBehaviour:
   sendToken: notif-devices
   GetNotification: new-notification
   NotificationViewed: new-notification/
+  Inventory: inventory?chapter_id={0}&qr_code_id={1}
+  UnlockInventory: inventory-unlock
+  OpenInventory: inventory-viewed

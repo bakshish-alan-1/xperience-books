@@ -29,6 +29,7 @@ public class WebPageController : MonoBehaviour
         scrollview.verticalNormalizedPosition = 1;
         Bg.sprite = ThemeManager.Instance.background;
         seriesLogo.sprite = ThemeManager.Instance.seriesLogo;
+        GameManager.Instance.OnCheckToUnlockModule(11);
     }
 
 

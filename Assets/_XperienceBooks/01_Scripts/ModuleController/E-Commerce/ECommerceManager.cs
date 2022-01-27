@@ -263,6 +263,7 @@ namespace Ecommerce
         }
         public void SetCategoryList(bool success, object data, long statusCode) {
 
+            GameManager.Instance.OnCheckToUnlockModule(5);
             if (success)
             {
                 Debug.Log("inside SetCategoryList");

@@ -104,5 +104,16 @@ public class Properties : ScriptableObject
     [Tooltip("19) Set notification view bool")]
     public string NotificationViewed = "new-notification/";
 
+    [Space(15)]
+    [Header("Inventory API")]
+    [Space(15)]
+
+    [Tooltip("20) Get inventory List")]
+    public string Inventory = "inventory?chapter_id={0}&qr_code_id={1}";
+    [Tooltip("21) Unlock Inventory")]
+    public string UnlockInventory = "inventory-unlock";
+    [Tooltip("22) Open Inventory")]
+    public string OpenInventory = "inventory-viewed";
+
     #endregion
 }

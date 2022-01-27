@@ -126,6 +126,7 @@ public class ARPortalController : MonoBehaviour
             }
         }
         controller.UpdatePlacementState();
+        GameManager.Instance.OnCheckToUnlockModule(10);
     }
 
     private void OnMaterialsLoad(AssetLoaderContext assetLoaderContext)

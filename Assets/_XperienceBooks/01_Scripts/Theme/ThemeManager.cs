@@ -13,7 +13,7 @@ public class ThemeManager : MonoBehaviour
     public static ThemeManager Instance = null;
 
     public Sprite background, scanBackground, seriesLogo, seriesIcon;
-    public Sprite dialoguebox, commonBtn, backBtn, profileIcon, newIcon, fanArtHeaderBg;
+    public Sprite dialoguebox, commonBtn, backBtn, profileIcon, newIcon, inventoryIcon, fanArtHeaderBg;
     public Sprite facebook, insta, youtube, website, twitter;
     public Sprite notificationNextBtn, notificationIcon, notificationTill;
     
@@ -72,6 +72,8 @@ public class ThemeManager : MonoBehaviour
         { urls.Add(GameManager.Instance.selectedSeries.theme.back_button); name.Add(theme + "/" + StaticKeywords.BackBtnTheme); }
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.profile_icon))
         { urls.Add(GameManager.Instance.selectedSeries.theme.profile_icon); name.Add(theme + "/" + StaticKeywords.ProfileTheme); }
+        if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.inventory_icon))
+        { urls.Add(GameManager.Instance.selectedSeries.theme.inventory_icon); name.Add(theme + "/" + StaticKeywords.InventoryTheme); }
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.notif_icon))
         { urls.Add(GameManager.Instance.selectedSeries.theme.notif_icon); name.Add(theme + "/" + StaticKeywords.NotificationTheme); }
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.notif_thumbnail))
@@ -255,6 +257,11 @@ public class ThemeManager : MonoBehaviour
             newIcon = Resources.Load<Sprite>("Notification");
         else
             newIcon = getTexture(theme, StaticKeywords.NotificationTheme);
+
+        if (!File.Exists(theme + "/" + StaticKeywords.InventoryTheme))
+            inventoryIcon = Resources.Load<Sprite>("Inventory");
+        else
+            inventoryIcon = getTexture(theme, StaticKeywords.InventoryTheme);
 
         if (!File.Exists(theme + "/" + StaticKeywords.FacebookTheme))
             facebook = Resources.Load<Sprite>("Facebook");

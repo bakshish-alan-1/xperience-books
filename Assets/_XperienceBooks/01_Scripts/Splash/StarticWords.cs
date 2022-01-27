@@ -27,6 +27,7 @@ public class StaticKeywords
     public static string WebsiteTheme = "website_icon.png";
     public static string BackBtnTheme = "back_button.png";
     public static string ProfileTheme = "profile_icon.png";
+    public static string InventoryTheme = "profile_icon.png";
     public static string NotificationTheme = "notify_icon.png";// notification icon used in home screen
     public static string NotificationNextBtn = "notify_cell_next.png";// next btn for notification cell
     public static string NotificationCellIcon = "notify_cell_icon.png";// icon for notification cell

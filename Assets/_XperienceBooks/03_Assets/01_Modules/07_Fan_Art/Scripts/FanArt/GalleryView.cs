@@ -150,6 +150,11 @@ public class GalleryView : MonoBehaviour
 
                 cell.GetComponent<GalleryCell>().SetGalleryTexture(isLocalFile, AssetURI, localPath, fileName, data);
             }
+            if (isFanART)
+                GameManager.Instance.OnCheckToUnlockModule(8);
+            else
+                GameManager.Instance.OnCheckToUnlockModule(9);
+
         }
         catch (Exception ex) {
 

@@ -90,6 +90,7 @@ public class PlacementController : MonoBehaviour
 								if (m_SpawnObject != null)
 									m_SpawnObject.SetActive(true);
 							}
+							GameManager.Instance.OnCheckToUnlockModule(4);
 						}
 					}
 					break;

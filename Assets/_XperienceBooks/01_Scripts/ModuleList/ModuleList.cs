@@ -33,6 +33,7 @@ public class ModuleList : MonoBehaviour
     [SerializeField] Image BG;
     [SerializeField] Image BackIcon;
     [SerializeField] Image SeriesLogo;
+    [SerializeField] Image InventoryIcon;
 
     bool isThemeSet = false;
     void OnSetThem()
@@ -43,6 +44,8 @@ public class ModuleList : MonoBehaviour
             BG.sprite = (ThemeManager.Instance.background);
             BackIcon.sprite = (ThemeManager.Instance.backBtn);
             SeriesLogo.sprite = (ThemeManager.Instance.seriesLogo);
+            InventoryIcon.sprite = (ThemeManager.Instance.inventoryIcon);
+            InventoryManager.Instance.OnSetThem();
         }
     }
 

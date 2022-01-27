@@ -323,6 +323,8 @@ public class ImageTrackingController : MonoBehaviour
                 {
                     n = 1;
                     builderTransform.setTransform(Builder_Position, Builder_Rotation, Builder_Scale);
+
+                    GameManager.Instance.OnCheckToUnlockModule(3);
                 }
 
                 rootObject.gameObject.SetActive(true);

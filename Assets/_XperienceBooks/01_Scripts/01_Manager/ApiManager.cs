@@ -176,7 +176,7 @@ public class Skin
     public string name, dialog_box, dialog_box_btn, scan_qr_bg, fan_art_img_glry;
     public string color_code, notif_icon, notif_thumbnail, notif_next, notif_tile;
     public string background_image, scan_button, back_button;
-    public string logo, facebook_icon, twitter_icon, youtube_icon, instagram_icon, website_icon, profile_icon;
+    public string logo, facebook_icon, twitter_icon, youtube_icon, instagram_icon, website_icon, profile_icon, inventory_icon;
     public string module_1, module_2, module_3, module_4, module_5, module_6, module_7, module_8, module_9, module_10, module_11, module_12;
     public string font_h1, font_h2, font_h3, font_h4;
     public int created_at_timestamp, updated_at_timestamp;
@@ -239,6 +239,50 @@ public class NotificationData
     public string sc_qr_title;
     public string body;
     public string title;
+}
+#endregion
+
+#region Inventory
+[Serializable]
+public class InventoryList
+{
+    public int code;
+    public bool success;
+    public string message;
+    public List<InventoryDetails> data;
+}
+
+[Serializable]
+public class InventoryDetails
+{
+    public int id;
+    public int qrcode_id;
+    public int armodule_id;
+    public int inventory_id;
+    public int unlocked;
+    public int viewed;
+    public Inventory inventory;
+}
+
+[Serializable]
+public class Inventory
+{
+    public int id;
+    public string title;
+    public string description;
+    public string image_url; 
+}
+
+[Serializable]
+public class UnlockInventoryData
+{
+    public int inv_map_id;
+}
+
+[Serializable]
+public class OpenInventoryData
+{
+    public int inv_map_id;
 }
 #endregion
 
@@ -926,6 +970,91 @@ public class ApiManager : MonoBehaviour
             Debug.Log("Notification viewed fail.");
     }
 
+    #endregion
+
+    // Inventory Apis
+    #region Inventory
+    public void GetInventoryList(int chapter_id, int qrCode_id)
+    {
+        string method = string.Format(properties.Inventory, chapter_id, qrCode_id);
+
+        StartCoroutine(CheckInternetConnection(isConnected =>
+        {
+            if (isConnected)
+            {
+                APIClient.CallWebAPI(Method.GET.ToString(), method, string.Empty, GameManager.Instance.m_UserData.token, OnInventoryList);
+            }
+        }));
+    }
+
+    private void OnInventoryList(bool success, object data, long statusCode)
+    {
+        if (success)
+        {
+            InventoryList response = JsonUtility.FromJson<InventoryList>(data.ToString());
+            InventoryManager.Instance.OnSetInventory(response);
+        }
+        else
+        {
+            APIResponseFailPopup(statusCode, "Something Went Wrong", data.ToString(), true);
+        }
+        RaycastUnblock();
+    }
+
+    public void UnlockInventory(int mapID)
+    {
+        UnlockInventoryData data = new UnlockInventoryData();
+        data.inv_map_id = mapID;
+
+        StartCoroutine(CheckInternetConnection(isConnected =>
+        {
+            if (isConnected)
+            {
+                APIClient.CallWebAPI(Method.POST.ToString(), properties.UnlockInventory, JsonUtility.ToJson(data), GameManager.Instance.m_UserData.token, UnlockInventoryDone);
+            }
+        }));
+    }
+
+    private void UnlockInventoryDone(bool success, object data, long statusCode)
+    {
+        if (success)
+        {
+            // call notification panel for inform user to unlock inventory
+            GameManager.Instance.ShowToastPanel("Congratulations!\nNew Inventory item unlocked.");
+        }
+        else
+        {
+            APIResponseFailPopup(statusCode, "Something Went Wrong", data.ToString(), true);
+        }
+        RaycastUnblock();
+    }
+
+    public void OpenInventory(int mapID)
+    {
+        OpenInventoryData data = new OpenInventoryData();
+        data.inv_map_id = mapID;
+
+        StartCoroutine(CheckInternetConnection(isConnected =>
+        {
+            if (isConnected)
+            {
+                APIClient.CallWebAPI(Method.POST.ToString(), properties.OpenInventory, JsonUtility.ToJson(data), GameManager.Instance.m_UserData.token, OpenInventoryDone);
+            }
+        }));
+    }
+
+    private void OpenInventoryDone(bool success, object data, long statusCode)
+    {
+        if (success)
+        {
+
+        }
+        else
+        {
+            APIResponseFailPopup(statusCode, "Something Went Wrong", data.ToString(), true);
+        }
+        RaycastUnblock();
+    }
     #endregion
 
     public void RayCastBlock() {

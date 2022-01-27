@@ -83,17 +83,13 @@ public class ObjectAndMeController : MonoBehaviour
                 m_RawImage.preserveAspect = true;
                 m_RawImage.enabled = true;
 
-
-
                 if (!isLocalFile)
                 {
                     Debug.Log("Save At : " + localPath);
                     FileHandler.SaveFile(localPath, fileName, uwr.downloadHandler.data);
                 }
-
-
             }
-
         }
+        GameManager.Instance.OnCheckToUnlockModule(12);
     }
 }
