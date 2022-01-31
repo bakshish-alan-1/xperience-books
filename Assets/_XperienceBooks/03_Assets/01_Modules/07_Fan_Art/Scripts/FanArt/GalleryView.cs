@@ -42,6 +42,8 @@ public class GalleryView : MonoBehaviour
     //[SerializeField] Button sendEmailBtn;
     //[SerializeField] Toggle agreeBtn;
 
+    bool isInventoryApiCall = false;
+
     private void Awake()
     {
         if (Instance == null) {
@@ -150,10 +152,16 @@ public class GalleryView : MonoBehaviour
 
                 cell.GetComponent<GalleryCell>().SetGalleryTexture(isLocalFile, AssetURI, localPath, fileName, data);
             }
-            if (isFanART)
-                GameManager.Instance.OnCheckToUnlockModule(8);
-            else
-                GameManager.Instance.OnCheckToUnlockModule(9);
+
+            if (!isInventoryApiCall)
+            {
+                isInventoryApiCall = true;
+
+                if (isFanART)
+                    GameManager.Instance.OnCheckToUnlockModule(8);
+                else
+                    GameManager.Instance.OnCheckToUnlockModule(9);
+            }
 
         }
         catch (Exception ex) {

@@ -25,7 +25,10 @@ public class PlacementController : MonoBehaviour
 
 	public GameObject m_Preloader, m_ScreenSpaceUI;
 
-    private void Awake()
+	bool isInventoryApiCall = false;
+
+
+	private void Awake()
     {
         m_FocusSquare = GetComponent<FocusSquare>();
     }
@@ -90,7 +93,9 @@ public class PlacementController : MonoBehaviour
 								if (m_SpawnObject != null)
 									m_SpawnObject.SetActive(true);
 							}
-							GameManager.Instance.OnCheckToUnlockModule(4);
+
+							if (!isInventoryApiCall)
+							{ isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(4); }
 						}
 					}
 					break;

@@ -7794,9 +7794,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1051252436}
-        m_MethodName: OpenPanel
-        m_Mode: 5
+      - m_Target: {fileID: 1582362112}
+        m_MethodName: OnInventoryOpen
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -29630,9 +29630,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1051252436}
-        m_MethodName: OpenPanel
-        m_Mode: 5
+      - m_Target: {fileID: 1954234546}
+        m_MethodName: OnBack
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

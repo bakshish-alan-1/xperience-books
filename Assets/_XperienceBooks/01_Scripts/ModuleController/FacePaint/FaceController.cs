@@ -24,6 +24,7 @@ public class FaceController : MonoBehaviour
     public bool isFaceFound = false;
 
     private int swapCounter = 0;
+    bool isInventoryApiCall = false;
 
     public Material FaceMaterial;
 
@@ -147,7 +148,8 @@ public class FaceController : MonoBehaviour
         scrollView.SelectCell(0);
         //SwapFaces(0);
         loadingUI.SetActive(false);
-        GameManager.Instance.OnCheckToUnlockModule(7);
+        if (!isInventoryApiCall)
+        { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(7); }
     }
 
     IEnumerator LoadTexture(string AssetURI) {

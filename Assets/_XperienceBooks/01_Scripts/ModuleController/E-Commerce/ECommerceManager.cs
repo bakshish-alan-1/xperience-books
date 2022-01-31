@@ -126,6 +126,8 @@ namespace Ecommerce
 
         public bool isAddressApiCall = false;
 
+        bool isInventoryApiCall = false;
+
         private void Awake()
         {
             if (Instance == null)
@@ -263,7 +265,8 @@ namespace Ecommerce
         }
         public void SetCategoryList(bool success, object data, long statusCode) {
 
-            GameManager.Instance.OnCheckToUnlockModule(5);
+            if (!isInventoryApiCall)
+            { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(5); }
             if (success)
             {
                 Debug.Log("inside SetCategoryList");

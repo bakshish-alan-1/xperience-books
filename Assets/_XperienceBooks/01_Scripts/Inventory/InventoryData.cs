@@ -22,13 +22,14 @@ public class InventoryData : MonoBehaviour
         url = data.inventory.image_url;
         title = data.inventory.title;
         description = data.inventory.description;
-        if (!string.IsNullOrEmpty(url))
-            setImage(url);
 
         if (data.unlocked == 0)
-            setimageBlocker(true);
+            inventoryImg.sprite = ThemeManager.Instance.inventoryPlaceholder;
         else
-            setimageBlocker(false);
+        {
+            if (!string.IsNullOrEmpty(url))
+                setImage(url);
+        }
 
         if (data.viewed == 0)
             isOpen = false;

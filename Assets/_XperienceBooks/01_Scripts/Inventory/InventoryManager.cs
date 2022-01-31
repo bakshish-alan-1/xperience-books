@@ -46,6 +46,15 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    public void OnBack()
+    {
+        for (int i = 0; i < parent.transform.childCount; i++)
+        {
+            Destroy(parent.transform.GetChild(i).transform.gameObject);
+        }
+        WindowManager.Instance.OpenPanel("ContentList");
+    }
+
     // on show detailes of selected inventory, call from inventoryData 
     public void OnShowDetails(Texture2D texture, string title, string description)
     {

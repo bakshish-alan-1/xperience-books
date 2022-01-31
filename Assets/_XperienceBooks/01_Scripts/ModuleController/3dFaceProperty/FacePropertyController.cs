@@ -11,8 +11,9 @@ public class FacePropertyController : MonoBehaviour
 {
     public static FacePropertyController Instance = null;
     private ARFaceManager faceManager;
-    private bool faceTrackingOn = true;             
+    private bool faceTrackingOn = true;
 
+    bool isInventoryApiCall = false;
     bool isLocalFile = false;
     string filePath;
     string fileName;
@@ -232,7 +233,8 @@ public class FacePropertyController : MonoBehaviour
         if (FaceFound())
         {
             m_ScreenShotCameraBtn.SetActive(true);
-            GameManager.Instance.OnCheckToUnlockModule(2);
+            if (!isInventoryApiCall)
+            { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(2); }
         }
         else
             m_ScreenShotCameraBtn.SetActive(false);

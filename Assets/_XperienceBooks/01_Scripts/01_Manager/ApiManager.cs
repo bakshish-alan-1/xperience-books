@@ -175,7 +175,7 @@ public class Skin
     public int id;
     public string name, dialog_box, dialog_box_btn, scan_qr_bg, fan_art_img_glry;
     public string color_code, notif_icon, notif_thumbnail, notif_next, notif_tile;
-    public string background_image, scan_button, back_button;
+    public string background_image, scan_button, back_button, inventory_placeholder;
     public string logo, facebook_icon, twitter_icon, youtube_icon, instagram_icon, website_icon, profile_icon, inventory_icon;
     public string module_1, module_2, module_3, module_4, module_5, module_6, module_7, module_8, module_9, module_10, module_11, module_12;
     public string font_h1, font_h2, font_h3, font_h4;
@@ -580,11 +580,11 @@ public class ApiManager : MonoBehaviour
 
         if (moduleID == 2)
         {
-            method = string.Format(properties.GetMarkerImages, chapterID, moduleID);
+            method = string.Format(properties.GetMarkerImages, chapterID, moduleID, GameManager.Instance.currentBook.qr_code_id);
         }
         else
         {
-            method = string.Format(properties.GetModuleContent, chapterID, moduleID);
+            method = string.Format(properties.GetModuleContent, chapterID, moduleID, GameManager.Instance.currentBook.qr_code_id);
         }
         
         StartCoroutine(CheckInternetConnection(isConnected =>

@@ -22,8 +22,8 @@ MonoBehaviour:
   ForgotPassword: forget-password
   UpdateParentEmail: user/parent-email/update
   GetMappModuleList: chapter/getarmoduleschapters?book_id={0}&chapter_id={1}&qr_code_id={2}&latitude={3}&longitude={4}
-  GetModuleContent: chapter/getchapterqrcodealldata?chapter_id={0}&ar_module_id={1}
-  GetMarkerImages: chapter/getchapterccodealldata?chapter_id={0}&ar_module_id={1}
+  GetModuleContent: chapter/getchapterqrcodealldata?chapter_id={0}&ar_module_id={1}&qr_code_id={2}
+  GetMarkerImages: chapter/getchapterccodealldata?chapter_id={0}&ar_module_id={1}&qr_code_id={2}
   UpdateUserProfile: profile/update
   UpdateUserPassword: change-password
   seriesList: series

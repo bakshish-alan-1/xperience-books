@@ -31,6 +31,7 @@ public class ARPortalController : MonoBehaviour
     public List<ContentModel> ModuleContent = new List<ContentModel>();
 
     bool loadingFinished = false;
+    bool isInventoryApiCall = false;
 
     private void Awake()
     {
@@ -126,7 +127,9 @@ public class ARPortalController : MonoBehaviour
             }
         }
         controller.UpdatePlacementState();
-        GameManager.Instance.OnCheckToUnlockModule(10);
+
+        if (!isInventoryApiCall)
+        { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(10); }
     }
 
     private void OnMaterialsLoad(AssetLoaderContext assetLoaderContext)

@@ -20,6 +20,7 @@ public class FaceNeckController : MonoBehaviour
     string AssetURI;
     public bool isTextureAvailable = false;
     bool isTextureSet = false;
+    bool isInventoryApiCall = false;
 
     private void Awake()
     {
@@ -40,7 +41,8 @@ public class FaceNeckController : MonoBehaviour
         GameManager.Instance.safetyWindow.OpenWindow();// call Safetywindow popup
                                                        //LoadData();//change
 
-        GameManager.Instance.OnCheckToUnlockModule(6);
+        if (!isInventoryApiCall)
+        { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(6); }
     }
 
     public void OnInfoBtnHite(bool value)

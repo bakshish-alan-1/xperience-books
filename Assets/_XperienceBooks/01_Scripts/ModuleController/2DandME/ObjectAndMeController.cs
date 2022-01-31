@@ -21,6 +21,8 @@ public class ObjectAndMeController : MonoBehaviour
 
     public List<ContentModel> ModuleContent = new List<ContentModel>();
 
+    bool isInventoryApiCall = false;
+
     public void Awake()
     {
         if (PlayerPrefs.GetInt("isTutorialOver") == 0)
@@ -90,6 +92,7 @@ public class ObjectAndMeController : MonoBehaviour
                 }
             }
         }
-        GameManager.Instance.OnCheckToUnlockModule(12);
+        if (!isInventoryApiCall)
+        { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(12); }
     }
 }

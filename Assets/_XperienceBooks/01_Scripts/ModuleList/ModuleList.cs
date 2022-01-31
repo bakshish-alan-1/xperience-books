@@ -56,6 +56,12 @@ public class ModuleList : MonoBehaviour
         }
     }
 
+    public void OnInventoryOpen()
+    {
+        ApiManager.Instance.GetInventoryList(GameManager.Instance.currentBook.chapter_id, GameManager.Instance.currentBook.qr_code_id);// call for get inventory list
+        WindowManager.Instance.OpenPanel("Inventory");
+    }
+
     GameObject m_CurrentActiveModule;
 
     public void ActivateModules(List<int> modules) {

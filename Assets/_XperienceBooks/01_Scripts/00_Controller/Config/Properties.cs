@@ -48,10 +48,10 @@ public class Properties : ScriptableObject
     public string GetMappModuleList = "chapter/getarmoduleschapters?book_id={0}&chapter_id={1}&qr_code_id={2}&latitude={3}&longitude={4}";
 
     [Tooltip("4) Get Selected Module Data")]
-    public string GetModuleContent = "chapter/getchapterqrcodealldata?chapter_id={0}&ar_module_id={1}";
+    public string GetModuleContent = "chapter/getchapterqrcodealldata?chapter_id={0}&ar_module_id={1}&qr_code_id={2}";
 
     [Tooltip("5) Get Image Target List :- Module 2")]
-    public string GetMarkerImages = "chapter/getchapterccodealldata?chapter_id={0}&ar_module_id={1}";
+    public string GetMarkerImages = "chapter/getchapterccodealldata?chapter_id={0}&ar_module_id={1}&qr_code_id={2}";
 
     [Tooltip("6) Update User Profile")]
     public string UpdateUserProfile = "profile/update";

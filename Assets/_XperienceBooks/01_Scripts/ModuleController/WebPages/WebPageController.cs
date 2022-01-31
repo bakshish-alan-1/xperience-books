@@ -12,6 +12,7 @@ public class WebPageController : MonoBehaviour
     public Image seriesLogo, Bg;
     public List<ContentModel> ModuleContent = new List<ContentModel>();
 
+    bool isInventoryApiCall = false;
     private void Awake()
     {
         ModuleContent.AddRange(GameManager.Instance.GetModuleData());
@@ -29,7 +30,9 @@ public class WebPageController : MonoBehaviour
         scrollview.verticalNormalizedPosition = 1;
         Bg.sprite = ThemeManager.Instance.background;
         seriesLogo.sprite = ThemeManager.Instance.seriesLogo;
-        GameManager.Instance.OnCheckToUnlockModule(11);
+
+        if (!isInventoryApiCall)
+        { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(11); }
     }
 
 

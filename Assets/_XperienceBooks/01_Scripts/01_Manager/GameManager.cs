@@ -173,7 +173,6 @@ public class GameManager : MonoBehaviour
 
     public void UpdateMappedModuleList() {
         ModuleList.Instance.ActivateModules(currentBook.b_MapModules);
-        ApiManager.Instance.GetInventoryList(currentBook.chapter_id, currentBook.qr_code_id);// call for get inventory list
     }
 
     public void RestartScene() {
