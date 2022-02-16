@@ -12,7 +12,7 @@ public class ThemeManager : MonoBehaviour
 {
     public static ThemeManager Instance = null;
 
-    public Sprite background, scanBackground, seriesLogo, seriesIcon;
+    public Sprite background, scanBackground, scanBtn, seriesLogo, seriesIcon;
     public Sprite dialoguebox, commonBtn, backBtn, profileIcon, newIcon, inventoryIcon, inventoryPlaceholder, fanArtHeaderBg;
     public Sprite facebook, insta, youtube, website, twitter;
     public Sprite notificationNextBtn, notificationIcon, notificationTill;
@@ -29,6 +29,7 @@ public class ThemeManager : MonoBehaviour
     // Download theame of the selected series if not avialable
     public void SaveSeriesTheame()
     {
+        no = 0;
         urls.Clear();
         name.Clear();
         string theme = GameManager.Instance.GetThemePath();
@@ -160,8 +161,9 @@ public class ThemeManager : MonoBehaviour
                     onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font2Theme, GameManager.Instance.DetailFont);
 
                 PlayerPrefs.SetString("IsThemeSaved", "true");
-                LoadTheme();
-                HomeScreen.Instance.OnSetHomePanelData();
+                Debug.Log("Call LoadSkinTheme from OnDownloadTheme");
+                LoadSkinTheme();
+                //HomeScreen.Instance.OnSetHomePanelData();
             }
             else
                 no += 1;
@@ -182,6 +184,7 @@ public class ThemeManager : MonoBehaviour
             textFont = TMP_FontAsset.CreateFontAsset(new Font(myFontPath));
     }
 
+    // call from contentButton and NotificationCellControkker scripts
     public async void OnLoadImage(string path, string name, Image image)
     {
         if (!File.Exists(path + "/" + name))
@@ -208,7 +211,8 @@ public class ThemeManager : MonoBehaviour
         return GameManager.Instance.Texture2DToSprite(thisTexture);
     }
 
-    public void LoadTheme()
+    // call from loadMainScene, BookData script and current script as well
+    public void LoadSkinTheme()
     {
         Debug.Log("ThemeManager LoadTheme");
         string theme = GameManager.Instance.GetThemePath();
@@ -222,6 +226,11 @@ public class ThemeManager : MonoBehaviour
             scanBackground = Resources.Load<Sprite>("MainBG_New");
         else
             scanBackground = getTexture(theme, StaticKeywords.Scan_BGTheme);
+
+        if (!File.Exists(theme + "/" + StaticKeywords.ScanTheme))
+            scanBtn = Resources.Load<Sprite>("scan_button");
+        else
+            scanBtn = getTexture(theme, StaticKeywords.ScanTheme);
 
         if (!File.Exists(theme + "/" + StaticKeywords.LogoTheme))
             seriesLogo = Resources.Load<Sprite>("transparentImage");

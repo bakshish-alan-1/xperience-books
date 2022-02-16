@@ -24,7 +24,7 @@ public class WebPageController : MonoBehaviour
 
         for (int i = 0; i < ModuleContent.Count; i++)
         {
-            GenratePrefab(i, ModuleContent[i].webpagelink);
+            GenratePrefab(i, ModuleContent[i].webpagetitle, ModuleContent[i].webpagelink);
         }
        
         scrollview.verticalNormalizedPosition = 1;
@@ -36,11 +36,11 @@ public class WebPageController : MonoBehaviour
     }
 
 
-    public void GenratePrefab(int index , string url) {
+    public void GenratePrefab(int index, string title , string url) {
 
         GameObject scrollItem = Instantiate(scrollItemPrefab);
         scrollItem.transform.SetParent(scrollContent.transform, false);
 
-        scrollItem.transform.GetComponent<WebPageData>().setData(index, url);
+        scrollItem.transform.GetComponent<WebPageData>().setData(index, title, url);
     }
 }

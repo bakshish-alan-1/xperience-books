@@ -141,8 +141,8 @@ public class HomeScreen : MonoBehaviour
         
         Title.text = "";
         OnSetHomeScreenSocialMediaObject();
-        setHomeTheameOfSeries();
-        GameManager.Instance.OpenMarkerDetailsWindow();
+        setHomeTheameOfSeries();// call to set home window images as per skin data received
+        GameManager.Instance.OpenMarkerDetailsWindow();// instruction window to provide details of marker images
 
         NotificationPanel.Instance.OnSetThem();// set downloaded theme for notification panel
         Profile.Instance.OnSetThem();// set theme for profile screen
@@ -154,7 +154,7 @@ public class HomeScreen : MonoBehaviour
         string theme = GameManager.Instance.GetThemePath();
 
         Bg.sprite = (ThemeManager.Instance.background);
-        scaneIcon.sprite = (ThemeManager.Instance.commonBtn);
+        scaneIcon.sprite = (ThemeManager.Instance.scanBtn);
         backIcon.sprite = (ThemeManager.Instance.backBtn);
         profileIcon.sprite = (ThemeManager.Instance.profileIcon);
         notificationIcon.sprite = (ThemeManager.Instance.newIcon);

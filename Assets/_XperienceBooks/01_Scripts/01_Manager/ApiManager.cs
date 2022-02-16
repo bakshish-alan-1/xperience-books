@@ -614,7 +614,7 @@ public class ApiManager : MonoBehaviour
                 Debug.Log("Clipboard data: " + te.text);
             }
 
-            if (!string.IsNullOrEmpty(response.data[0].watermark))
+            if (response.data.Count > 0)
             {
                 GameManager.Instance.WatermarkURL = response.data[0].watermark;
             }

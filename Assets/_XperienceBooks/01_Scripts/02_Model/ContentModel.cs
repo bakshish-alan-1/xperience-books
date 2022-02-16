@@ -34,6 +34,7 @@ public class ContentModel
     public bool audio_play_in_loop;
     public int c_code_image_id;
     public int ar_module_id;
+    public string webpagetitle;
     public string webpagelink;
     public string c_code_image;
     public string c_code_image_name;

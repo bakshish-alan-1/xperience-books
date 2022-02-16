@@ -55,7 +55,8 @@ public class BookData : MonoBehaviour
         }
         else
         {
-            ThemeManager.Instance.LoadTheme();// already theme available then direct set to the home panel
+            Debug.Log("Call LoadSkinTheme from BookData");
+            ThemeManager.Instance.LoadSkinTheme();// already theme available then direct set to the home panel
         }
     }
 
@@ -72,19 +73,8 @@ public class BookData : MonoBehaviour
         }
         else
         {
-            if (seriesImg)
+            if (seriesImg != null)
                 seriesImg.sprite = GameManager.Instance.Texture2DToSprite(((DownloadHandlerTexture)request.downloadHandler).texture);
         }
     }
-
-    /*IEnumerator setImage(string url)
-    {
-        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-        yield return request.SendWebRequest();
-
-        if (request.isNetworkError || request.isHttpError)
-            Debug.Log(request.error);
-        else
-            seriesImg.sprite = GameManager.Instance.Texture2DToSprite(((DownloadHandlerTexture)request.downloadHandler).texture);
-    }*/
 }

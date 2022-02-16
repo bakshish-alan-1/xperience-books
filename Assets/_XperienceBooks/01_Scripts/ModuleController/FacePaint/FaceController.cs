@@ -174,9 +174,11 @@ public class FaceController : MonoBehaviour
 
     }
 
+    // change face paint textures on click of sctollview call from DynamicTexture script
     public void SwapFaces(int index) 
     {
 
+        Debug.Log("SwapFaces");
         if (m_FacePaintTextures.Count <= 0)
             return;
         
@@ -192,6 +194,7 @@ public class FaceController : MonoBehaviour
             mats = renderer.materials;
 
             face.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", m_FacePaintTextures[index]);
+
         }
 
         materialName.text = $"Face Material ({m_FacePaintTextures[swapCounter]})";
@@ -271,6 +274,12 @@ public class FaceController : MonoBehaviour
             mats = renderer.materials;
 
             face.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", m_FacePaintTextures[currentMateria]);
+            Debug.Log("before: " + face.transform.eulerAngles);
+#if UNITY_ANDROID
+            face.transform.localScale = new Vector3(-1f, 1f, 1f);
+#endif
+
+            Debug.Log("after: " + face.transform.eulerAngles);
         }
     }
 

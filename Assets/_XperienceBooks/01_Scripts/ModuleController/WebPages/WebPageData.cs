@@ -39,9 +39,12 @@ public class WebPageData : MonoBehaviour
             text.color = newCol;
     }
 
-    public void setData(int index, string url) {
+    public void setData(int index, string titleName, string url) {
         setTheme();
-        text.text = "Link_" + (index + 1);
+        if (string.IsNullOrEmpty(titleName))
+            text.text = "Link_" + (index + 1);
+        else
+            text.text = titleName;
         URL = url;
     }
 }

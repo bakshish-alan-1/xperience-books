@@ -15,7 +15,8 @@ public class LoadMainScene : MonoBehaviour
 
         if (Directory.Exists(GameManager.Instance.GetThemePath()))
         {
-            ThemeManager.Instance.LoadTheme();
+            Debug.Log("Call LoadSkinTheme from LoadMainScene");
+            ThemeManager.Instance.LoadSkinTheme();
         }
         else
             SceneLoader.LoadScene(1);

@@ -9,9 +9,15 @@ using UnityEngine.XR.ARFoundation;
 public class FaceNeckController : MonoBehaviour
 {
     public static FaceNeckController Instance = null;
+
+    //Defining Delegate
+    public delegate void OnFaceNeckImageDownloaded(Texture2D texture, Vector3 pos);
+    public static OnFaceNeckImageDownloaded builerDataDownloaded;// implemented in face neck builder script
+
     public CanvasGroup CaptureBtnUI;
     public GameObject InfoBox, screenSpaceUI, cameraBtn, LoadingUI;
     public ARFaceManager arFaceManager;
+    [SerializeField] GameObject m_RootObject;
     public Text progressText;
     public Image progressBar;
 
@@ -22,12 +28,17 @@ public class FaceNeckController : MonoBehaviour
     bool isTextureSet = false;
     bool isInventoryApiCall = false;
 
+    public Vector3 builderPosition = Vector3.zero;
+
+    GameObject trackablesObj, FaceModelDummy;
+    
     private void Awake()
     {
         if (Instance == null)
             Instance = this;
 
         ModuleContent.AddRange(GameManager.Instance.GetModuleData());
+        trackablesObj = GameObject.Find("Trackables");
     }
 
     void Start()
@@ -39,7 +50,7 @@ public class FaceNeckController : MonoBehaviour
         }
 
         GameManager.Instance.safetyWindow.OpenWindow();// call Safetywindow popup
-                                                       //LoadData();//change
+        LoadData();//change
 
         if (!isInventoryApiCall)
         { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(6); }
@@ -76,6 +87,7 @@ public class FaceNeckController : MonoBehaviour
                     isLocalFile = false;
                     AssetURI = ModuleContent[i].ar_content;
                 }
+                builderPosition = new Vector3(ModuleContent[i].position.x, ModuleContent[i].position.y, ModuleContent[i].position.z);
                 StartCoroutine(LoadTexture(isLocalFile, AssetURI, localPath, fileName));
             }
         }
@@ -83,6 +95,11 @@ public class FaceNeckController : MonoBehaviour
         {
             Debug.LogError("FaceNeckHole : LoadData " + ex.Message);
         }
+    }
+
+    public Texture2D getBuilderTexture()
+    {
+        return webTexture;
     }
 
     Texture2D webTexture = null;
@@ -94,13 +111,16 @@ public class FaceNeckController : MonoBehaviour
             uwr.SendWebRequest();
             while (!uwr.isDone)
             {
-                Debug.Log(uwr.downloadProgress);
+                //Debug.Log(uwr.downloadProgress);
                 if (progressText != null)
                 {
                     float progress = uwr.downloadProgress;
                     progressBar.fillAmount = progress;
                     progressText.text = (progress * 100).ToString("00") + " %";
                 }
+                if (!isTextureAvailable && FaceFound())
+                    LoadingUI.SetActive(true);
+
                 yield return null;
             }
             
@@ -117,6 +137,8 @@ public class FaceNeckController : MonoBehaviour
                 {
                     FileHandler.SaveFile(localPath, fileName, uwr.downloadHandler.data);
                 }
+                if (builerDataDownloaded != null)
+                    builerDataDownloaded(webTexture, builderPosition);
             }
         }
     }
@@ -127,81 +149,78 @@ public class FaceNeckController : MonoBehaviour
         {
             screenSpaceUI.SetActive(false);
         }
-        /*
+
 #if UNITY_ANDROID
-        if (FaceFound() && isTextureAvailable == false)
-            LoadingUI.SetActive(true);
+        if (FaceFound())
+            cameraBtn.SetActive(true);
         else
-            LoadingUI.SetActive(false);
+            cameraBtn.SetActive(false);
 #endif
-        */ 
     }
 
     void OnEnable()
     {
-        arFaceManager.facesChanged += FaceUpdated;
+        //arFaceManager.facesChanged += FaceUpdated;
     }
 
     void OnDisable()
     {
-        arFaceManager.facesChanged -= FaceUpdated;
+        //arFaceManager.facesChanged -= FaceUpdated;
     }
 
     ARFace face;
     public void FaceUpdated(ARFacesChangedEventArgs fc)
     {
-        /*
+
 #if UNITY_ANDROID
-        if (webTexture != null && !isTextureSet)
+        if (FaceFound() && trackablesObj.transform.GetChild(0).GetComponent<ARFace>().trackableId != null)
         {
-            face = fc.added[0];
-            isTextureSet = true;
-            face.transform.GetChild(1).GetComponent<SpriteRenderer>().sprite = Utility.Texture2DToSprite(webTexture);
-            Debug.Log("SpriteRenderer set: " + isTextureSet);
-        }
-        else if (FaceFound() == false)
-        {
-            isTextureSet = false;
-        }
-#endif
-
-#if UNITY_IOS
-        if (fc.added.Count > 0 && webTexture != null)
-        {
-            face = fc.added[0];
-
-            if (isTextureAvailable)
+            if (FaceModelDummy == null)
             {
-                UpdateModel(face);
+                Debug.Log("moldel nulled : " + m_RootObject.transform.childCount);
+                GameObject face1 = null;
+                if (m_RootObject.transform.GetChild(0).childCount > 0)
+                {
+                    face1 = m_RootObject.transform.GetChild(0).gameObject;
+
+                    Debug.Log("face..1 : " + face1.transform.childCount);
+
+                    if (face1 != null && trackablesObj.transform.childCount > 0)
+                    {
+                        FaceModelDummy = Instantiate(face1, trackablesObj.transform.GetChild(0).gameObject.transform);
+                        FaceModelDummy.SetActive(true);
+                    }
+                }
+            }
+            else if (!FaceModelDummy.activeSelf)
+            {
+                FaceModelDummy.SetActive(false);
             }
         }
-        if (fc.updated.Count > 0)
+        else if (FaceFound() == false && FaceModelDummy != null)
         {
-            if (isTextureAvailable)
+            if (m_RootObject.transform.GetChild(0).childCount > 0)
             {
-                face = fc.updated[0];
-                UpdateModel(face);
+                FaceModelDummy.SetActive(false);
             }
         }
 #endif
-        */
-        if (FaceFound())
-            cameraBtn.SetActive(true);
-        else
-            cameraBtn.SetActive(false);
     }
 
     void UpdateModel(ARFace arFace)
     {
         try
         {
-            Debug.Log("UpdateModel: " + arFace.transform.childCount);
-            if (arFace.transform.childCount > 0 && !isTextureSet)
+            Debug.Log("UpdateModel: " + face.transform.childCount);
+            GameObject obj = face.transform.GetChild(0).gameObject;
+            if (obj != null)
             {
-                isTextureSet = true;
-                arFace.transform.GetChild(1).GetComponent<SpriteRenderer>().sprite = Utility.Texture2DToSprite(webTexture);
-                Debug.Log("SpriteRenderer set: " + isTextureSet);
+                m_RootObject.transform.SetParent(obj.transform, false);
+                ResetGameObject(m_RootObject);
+                m_RootObject.transform.GetChild(0).gameObject.SetActive(true);
             }
+            else
+                Debug.Log("Object not found");
         }
         catch (Exception ex)
         {

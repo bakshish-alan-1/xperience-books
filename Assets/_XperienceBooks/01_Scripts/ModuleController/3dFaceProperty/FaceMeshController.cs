@@ -6,6 +6,8 @@ public class FaceMeshController : MonoBehaviour
 {
     ARFace arFace;
 
+    bool isRotationFix = false;
+
     void OnEnable()
     {
 #if UNITY_IOS
@@ -46,11 +48,16 @@ public class FaceMeshController : MonoBehaviour
         {
             if (FaceNeckController.Instance.cameraBtn != null)
             {
-                if (arFace.transform.childCount > 1 && arFace.transform.GetChild(1).gameObject != null)
-                    arFace.transform.GetChild(1).gameObject.SetActive(visible);
-
-                //if (FaceNeckController.Instance.isTextureAvailable == false)
-                    //FaceNeckController.Instance.LoadingUI.SetActive(visible);
+                for (int i = 0; i < arFace.transform.childCount; i++)
+                {
+                    string str = arFace.transform.GetChild(i).gameObject.name;
+                    if (str.Equals("Plane"))
+                    {
+                        arFace.transform.GetChild(i).gameObject.SetActive(visible);
+                        //if (!isRotationFix)
+                        //{ arFace.transform.GetChild(i).gameObject.transform.eulerAngles = new Vector3(90f, 0f, 180f); isRotationFix = true; }
+                    }
+                }
 
                 FaceNeckController.Instance.cameraBtn.SetActive(visible);
             }

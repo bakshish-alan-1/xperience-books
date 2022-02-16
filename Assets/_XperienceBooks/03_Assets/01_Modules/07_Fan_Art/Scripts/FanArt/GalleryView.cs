@@ -91,7 +91,7 @@ public class GalleryView : MonoBehaviour
 
     public void OnSendEmailClick()
     {
-        string msg = "Add body message here.";
+        string msg = "Add body message and attach Fan Art to this email.";
         string emailTo = "submitfanart@" + GameManager.Instance.selectedSeries.domain;
         
         string email = emailTo;
