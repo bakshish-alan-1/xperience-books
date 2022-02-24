@@ -42,6 +42,8 @@ public class FaceController : MonoBehaviour
     List<ItemData> cellData = new List<ItemData>();
     [SerializeField] ScrollView scrollView = default;
 
+    bool isBackBtn = false;
+
     void Awake() 
     {
         Instance = this;
@@ -227,6 +229,9 @@ public class FaceController : MonoBehaviour
 
     private void Update()
     {
+        if (isBackBtn)
+            return;
+
         if (FaceFound())
         {   
             m_ScreenSpaceUI.SetActive(false);
@@ -255,8 +260,18 @@ public class FaceController : MonoBehaviour
         //SwapFaces(index);
     }
 
+    public void onBackBtnClick()
+    {
+        isBackBtn = true;
+        StopAllCoroutines();
+        CancelInvoke();
+    }
+
     public void setMaterial()
     {
+        if (this.isBackBtn)
+            return;
+
         Debug.Log("setMaterial currentMateria: " + currentMateria);
         if (currentMateria < 0)
             return;

@@ -26,7 +26,7 @@ public class PlacementController : MonoBehaviour
 	public GameObject m_Preloader, m_ScreenSpaceUI;
 
 	bool isInventoryApiCall = false;
-
+	bool isBackBtn = false;
 
 	private void Awake()
     {
@@ -50,6 +50,12 @@ public class PlacementController : MonoBehaviour
 		Placed
 	};
 
+	public void onBackBtn()
+    {
+		isBackBtn = true;
+		StopAllCoroutines();
+    }
+
 
 	private PlacementState m_objectPlacementState = PlacementState.NotAvailable;
 
@@ -67,6 +73,9 @@ public class PlacementController : MonoBehaviour
 
 	void FixedUpdate()
 	{
+		if (isBackBtn)
+			return;
+
 		if (m_FocusSquare.SquareState == FocusState.Found)
 		{
 			switch (m_objectPlacementState)
@@ -89,7 +98,9 @@ public class PlacementController : MonoBehaviour
 									audioSource.Play();
 								}
 
-								m_Preloader.SetActive(false);
+								if (m_Preloader)
+									m_Preloader.SetActive(false);
+
 								if (m_SpawnObject != null)
 									m_SpawnObject.SetActive(true);
 							}

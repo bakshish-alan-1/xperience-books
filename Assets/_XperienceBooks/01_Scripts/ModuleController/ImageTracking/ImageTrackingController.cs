@@ -65,6 +65,7 @@ public class ImageTrackingController : MonoBehaviour
     [SerializeField] AudioSource audioSource;
 
     bool isInventoryApiCall = false;
+    bool isBackBtnClick = false;
 
     string audioPath = "";
     void Start()
@@ -386,6 +387,9 @@ public class ImageTrackingController : MonoBehaviour
 
     private void Update()
     {
+        if (isBackBtnClick)
+            return;
+
         if (ImageFound() && !isModelAvailable)
         {
             if (!m_Preloader.gameObject.activeInHierarchy)
@@ -410,6 +414,9 @@ public class ImageTrackingController : MonoBehaviour
 
     private void OnMaterialsLoad(AssetLoaderContext assetLoaderContext)
     {
+        if (isBackBtnClick)
+            return;
+
         Debug.Log("Materials loaded. Model fully loaded.");
         isModelAvailable = true;
 
@@ -432,6 +439,16 @@ public class ImageTrackingController : MonoBehaviour
         obj.transform.localPosition = Vector3.zero;
         obj.transform.localRotation = Quaternion.Euler(Vector3.zero);
         obj.transform.localScale = Vector3.one;
+    }
+
+    public void onBackBtnClick()
+    {
+        isBackBtnClick = true;
+        AssetDownloaderBehaviour.OnDownloadFinished -= ModelLoadFinished;
+        StopAllCoroutines();
+        CancelInvoke();
+        if (audioSource.isPlaying)
+            audioSource.Stop();
     }
 
     #region PlayAudio
@@ -467,6 +484,7 @@ public class ImageTrackingController : MonoBehaviour
                     audioSource.Play();
             }
         }
+        Destroy(temp);
     }
     #endregion
 }

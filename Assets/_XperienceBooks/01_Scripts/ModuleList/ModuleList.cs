@@ -7,7 +7,7 @@ public class ModuleList : MonoBehaviour
 {
     public static ModuleList Instance;
    
-    public Sprite[] m_ButtonSprite;
+    [SerializeField] Texture2D[] moduleIcon;
     public GameObject[] m_DynamicModules;
 
     public List<int> m_ActiveModules = new List<int>();
@@ -75,11 +75,9 @@ public class ModuleList : MonoBehaviour
         m_CurrentActiveModule = m_DynamicModules[m_TotalActivatedModule];
         m_CurrentActiveModule.SetActive(true);
 
-        int i = 0;
-        foreach (Transform child in m_CurrentActiveModule.transform)
+        for(int i =0;i< m_CurrentActiveModule.transform.childCount;i++)//foreach (Transform child in m_CurrentActiveModule.transform)
         {
-            child.GetComponent<ContentButton>().SetData(m_ActiveModules[i]-1, m_ButtonSprite[m_ActiveModules[i] - 1], m_ActiveModules[i]);
-             i++;
+            _ = m_CurrentActiveModule.transform.GetChild(i).transform.GetComponent<ContentButton>().SetDataAsync(m_ActiveModules[i] - 1, moduleIcon[m_ActiveModules[i] - 1], m_ActiveModules[i]);
         }
     }
 }

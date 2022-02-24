@@ -32,6 +32,7 @@ public class ARPortalController : MonoBehaviour
 
     bool loadingFinished = false;
     bool isInventoryApiCall = false;
+    bool isBackBtn = false;
 
     private void Awake()
     {
@@ -41,6 +42,16 @@ public class ARPortalController : MonoBehaviour
     void Start()
     {
         StartCoroutine(LoadTexture());
+    }
+
+    public void onBackBtnClick()
+    {
+        isBackBtn = true;
+        OnDisable();
+        StopAllCoroutines();
+        CancelInvoke();
+        if (m_PortalAudioSource.isPlaying)
+            m_PortalAudioSource.Stop();
     }
 
     private void OnEnable()
@@ -139,6 +150,8 @@ public class ARPortalController : MonoBehaviour
 
     public void ModelLoaded(AssetLoaderContext assetLoaderContext)
     {
+        if (isBackBtn)
+            return;
         Debug.Log("ModelLoaded: ");
         doorRootObject.transform.GetChild(0).GetComponent<Animation>().playAutomatically = false;
         doorRootObject.transform.GetChild(0).GetComponent<Animation>().wrapMode = WrapMode.Once;
@@ -167,6 +180,8 @@ public class ARPortalController : MonoBehaviour
 
     private void Update()
     {
+        if (isBackBtn)
+            return;
         if (loadingFinished && Portal360.activeSelf == false)
         {
             if (controller.isTapHitByUser() == true)

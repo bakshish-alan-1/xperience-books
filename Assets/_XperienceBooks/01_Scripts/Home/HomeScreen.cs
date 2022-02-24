@@ -133,12 +133,6 @@ public class HomeScreen : MonoBehaviour
             return;
         }
 
-        if (GameManager.Instance.TitleFont == null)
-            ThemeManager.Instance.onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font1Theme, GameManager.Instance.TitleFont);
-
-        if (GameManager.Instance.DetailFont == null)
-            ThemeManager.Instance.onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font2Theme, GameManager.Instance.DetailFont);
-        
         Title.text = "";
         OnSetHomeScreenSocialMediaObject();
         setHomeTheameOfSeries();// call to set home window images as per skin data received

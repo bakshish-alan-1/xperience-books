@@ -185,7 +185,7 @@ public class Extras : MonoBehaviour
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(urls[cnt]);
         yield return request.SendWebRequest();
 
-        if (request.isNetworkError || request.isHttpError)
+        if (request.result == UnityWebRequest.Result.ConnectionError)
             Debug.Log("Download Fail: " + request.error);
         else
         {

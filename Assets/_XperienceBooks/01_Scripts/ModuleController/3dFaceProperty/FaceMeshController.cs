@@ -46,6 +46,9 @@ public class FaceMeshController : MonoBehaviour
     {
         if(SceneManager.GetActiveScene().buildIndex == 6) // Face neck hole scene
         {
+            if (FaceNeckController.Instance.isBackBtn)
+                return;
+
             if (FaceNeckController.Instance.cameraBtn != null)
             {
                 for (int i = 0; i < arFace.transform.childCount; i++)
@@ -54,8 +57,6 @@ public class FaceMeshController : MonoBehaviour
                     if (str.Equals("Plane"))
                     {
                         arFace.transform.GetChild(i).gameObject.SetActive(visible);
-                        //if (!isRotationFix)
-                        //{ arFace.transform.GetChild(i).gameObject.transform.eulerAngles = new Vector3(90f, 0f, 180f); isRotationFix = true; }
                     }
                 }
 

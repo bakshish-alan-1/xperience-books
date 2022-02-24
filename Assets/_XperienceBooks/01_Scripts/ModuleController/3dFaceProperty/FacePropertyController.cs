@@ -43,6 +43,7 @@ public class FacePropertyController : MonoBehaviour
     bool isModelAvailable = false;
     bool isModelSet = false;
     ARFace face;
+    bool isBackBtn = false;
 
     // Start is called before the first frame update
     void Awake()
@@ -58,6 +59,8 @@ public class FacePropertyController : MonoBehaviour
 
     private void Update()
     {
+        if (isBackBtn)
+            return;
         if (FaceFound() && !isModelAvailable)
         {
             if (!m_Preloader.activeSelf)
@@ -72,6 +75,14 @@ public class FacePropertyController : MonoBehaviour
         if (FaceFound() && m_ScreenSpaceUI.activeSelf)
             m_ScreenSpaceUI.SetActive(false);
 #endif
+    }
+
+    public void onBackBtnClick()
+    {
+        isBackBtn = true;
+        StopAllCoroutines();
+        OnDisable();
+        CancelInvoke();
     }
 
     void OnEnable()
@@ -122,14 +133,17 @@ public class FacePropertyController : MonoBehaviour
 
     private void OnMaterialsLoad(AssetLoaderContext assetLoaderContext)
     {
+        if (isBackBtn)
+            return;
         Debug.Log("Materials loaded. Model fully loaded.");
         LoadModelOnFace();
     }
 
     private void ModelLoadFinished(UnityWebRequest request)
     {
+        if (isBackBtn)
+            return;
         Debug.Log("Model Finished loading");
-        //LoadModelOnFace();
         if (isLocalFile)
         {
             return;
@@ -166,6 +180,8 @@ public class FacePropertyController : MonoBehaviour
     
     public void FaceUpdated(ARFacesChangedEventArgs fc)
     {
+        if (isBackBtn)
+            return;
 #if UNITY_ANDROID
         if (isModelAvailable && FaceFound() && Facemodel == null && go.transform.GetChild(0).GetComponent<ARFace>().trackableId != null)
         {

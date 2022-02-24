@@ -43,6 +43,7 @@ public class GalleryView : MonoBehaviour
     //[SerializeField] Toggle agreeBtn;
 
     bool isInventoryApiCall = false;
+    bool isBackBtn = false;
 
     private void Awake()
     {
@@ -56,6 +57,12 @@ public class GalleryView : MonoBehaviour
     private void Start()
     {
         LoadData();
+    }
+
+    public void onBackBtnClick()
+    {
+        isBackBtn = true;
+        StopAllCoroutines();
     }
 
     void loadTheme()

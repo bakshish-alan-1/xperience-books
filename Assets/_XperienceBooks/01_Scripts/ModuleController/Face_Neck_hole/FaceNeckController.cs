@@ -31,7 +31,9 @@ public class FaceNeckController : MonoBehaviour
     public Vector3 builderPosition = Vector3.zero;
 
     GameObject trackablesObj, FaceModelDummy;
-    
+    Texture2D webTexture = null;
+    public bool isBackBtn = false;
+
     private void Awake()
     {
         if (Instance == null)
@@ -54,6 +56,13 @@ public class FaceNeckController : MonoBehaviour
 
         if (!isInventoryApiCall)
         { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(6); }
+    }
+
+    public void onBackBtnClick()
+    {
+        isBackBtn = true;
+        StopAllCoroutines();
+        CancelInvoke();
     }
 
     public void OnInfoBtnHite(bool value)
@@ -99,10 +108,12 @@ public class FaceNeckController : MonoBehaviour
 
     public Texture2D getBuilderTexture()
     {
-        return webTexture;
+        if (isTextureAvailable)
+            return webTexture;
+        else
+            return null;
     }
 
-    Texture2D webTexture = null;
     IEnumerator LoadTexture(bool isLocalFile, string URL, string localPath, string fileName)
     {
         Debug.Log("FaceNeckHole Img URL: " + URL);
@@ -145,6 +156,9 @@ public class FaceNeckController : MonoBehaviour
 
     private void Update()
     {
+        if (isBackBtn)
+            return;
+
         if (CaptureBtnUI.alpha == 1)
         {
             screenSpaceUI.SetActive(false);
@@ -156,76 +170,6 @@ public class FaceNeckController : MonoBehaviour
         else
             cameraBtn.SetActive(false);
 #endif
-    }
-
-    void OnEnable()
-    {
-        //arFaceManager.facesChanged += FaceUpdated;
-    }
-
-    void OnDisable()
-    {
-        //arFaceManager.facesChanged -= FaceUpdated;
-    }
-
-    ARFace face;
-    public void FaceUpdated(ARFacesChangedEventArgs fc)
-    {
-
-#if UNITY_ANDROID
-        if (FaceFound() && trackablesObj.transform.GetChild(0).GetComponent<ARFace>().trackableId != null)
-        {
-            if (FaceModelDummy == null)
-            {
-                Debug.Log("moldel nulled : " + m_RootObject.transform.childCount);
-                GameObject face1 = null;
-                if (m_RootObject.transform.GetChild(0).childCount > 0)
-                {
-                    face1 = m_RootObject.transform.GetChild(0).gameObject;
-
-                    Debug.Log("face..1 : " + face1.transform.childCount);
-
-                    if (face1 != null && trackablesObj.transform.childCount > 0)
-                    {
-                        FaceModelDummy = Instantiate(face1, trackablesObj.transform.GetChild(0).gameObject.transform);
-                        FaceModelDummy.SetActive(true);
-                    }
-                }
-            }
-            else if (!FaceModelDummy.activeSelf)
-            {
-                FaceModelDummy.SetActive(false);
-            }
-        }
-        else if (FaceFound() == false && FaceModelDummy != null)
-        {
-            if (m_RootObject.transform.GetChild(0).childCount > 0)
-            {
-                FaceModelDummy.SetActive(false);
-            }
-        }
-#endif
-    }
-
-    void UpdateModel(ARFace arFace)
-    {
-        try
-        {
-            Debug.Log("UpdateModel: " + face.transform.childCount);
-            GameObject obj = face.transform.GetChild(0).gameObject;
-            if (obj != null)
-            {
-                m_RootObject.transform.SetParent(obj.transform, false);
-                ResetGameObject(m_RootObject);
-                m_RootObject.transform.GetChild(0).gameObject.SetActive(true);
-            }
-            else
-                Debug.Log("Object not found");
-        }
-        catch (Exception ex)
-        {
-            Debug.Log("AR Face issue : " + ex);
-        }
     }
 
     public void ResetGameObject(GameObject obj)

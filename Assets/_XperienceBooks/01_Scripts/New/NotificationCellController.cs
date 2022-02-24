@@ -30,9 +30,10 @@ public class NotificationCellController : MonoBehaviour
 
     private void setTheme()
     {
-        ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.NotificationCellBG, BG);
-        ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.NotificationCellIcon, Icon);
-        ThemeManager.Instance.OnLoadImage(GameManager.Instance.GetThemePath(), StaticKeywords.NotificationNextBtn, NextBtnIcon);
+        BG.sprite = ThemeManager.Instance.notificationTill;
+        Icon.sprite = ThemeManager.Instance.notificationIcon;
+        NextBtnIcon.sprite = ThemeManager.Instance.notificationNextBtn;
+
         if (GameManager.Instance.TitleFont != null)
         {
             title.font = GameManager.Instance.TitleFont;

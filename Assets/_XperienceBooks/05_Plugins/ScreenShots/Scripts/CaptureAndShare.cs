@@ -104,7 +104,7 @@ public class CaptureAndShare : MonoBehaviour
         while (!operation.isDone)
             await Task.Yield();
 
-        if (request.isNetworkError || request.isHttpError)
+        if (request.result == UnityWebRequest.Result.ConnectionError)
         {
             Debug.Log("watermark download error: " + request.error);
         }

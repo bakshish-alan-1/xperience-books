@@ -47,7 +47,7 @@ public class SeriesData : MonoBehaviour
         while (!operation.isDone)
             await Task.Yield();
 
-        if (request.isNetworkError || request.isHttpError)
+        if (request.result == UnityWebRequest.Result.ConnectionError)
         {
             Debug.Log(request.error);
         }
@@ -64,7 +64,7 @@ public class SeriesData : MonoBehaviour
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
         yield return request.SendWebRequest();
 
-        if (request.isNetworkError || request.isHttpError)
+        if (request.result == UnityWebRequest.Result.ConnectionError)
             Debug.Log(request.error);
         else
         {

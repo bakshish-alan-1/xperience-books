@@ -62,13 +62,14 @@ public class InventoryData : MonoBehaviour
         while (!operation.isDone)
             await Task.Yield();
 
-        if (request.isNetworkError || request.isHttpError)
+        if (request.result == UnityWebRequest.Result.ConnectionError)
         {
             Debug.Log(request.error);
         }
         else
         {
             texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+
             if (inventoryImg)
                 inventoryImg.sprite = GameManager.Instance.Texture2DToSprite(texture);
         }

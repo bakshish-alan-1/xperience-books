@@ -7,8 +7,7 @@ using UnityEngine.UI;
 public class GalleryCell : MonoBehaviour
 {
 
-    [SerializeField]
-    RawImage image;
+    [SerializeField] RawImage image;
     Texture2D webTexture;
     public GalleryViewData m_CellData;
 
@@ -20,22 +19,28 @@ public class GalleryCell : MonoBehaviour
         StartCoroutine(LoadTexture(isLocalFile, URL, localPath, fileName));
     }
 
+    private void OnDisable()
+    {
+        Destroy(webTexture);
+        Destroy(button);
+    }
+
 
     IEnumerator LoadTexture(bool isLocalFile, string URL , string localPath ,string fileName) {
 
         using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(URL))
         {
             button.interactable = false;
-            // www.downloadHandler = new DownloadHandlerBuffer();
+
             yield return uwr.SendWebRequest();
 
-            if (uwr.isNetworkError || uwr.isHttpError)
+            if (uwr.result == UnityWebRequest.Result.ConnectionError)
             {
                 Debug.Log("Error:- " + uwr.error);
             }
             else
             {
-                webTexture = DownloadHandlerTexture.GetContent(uwr); //((DownloadHandlerTexture)www.downloadHandler).texture as Texture2D;
+                webTexture = DownloadHandlerTexture.GetContent(uwr);
 
                 image.texture = webTexture;
 
@@ -50,7 +55,7 @@ public class GalleryCell : MonoBehaviour
                     button.interactable = true;
             }
         }
-}
+    }
 
     public void OnClickImage() {
         Debug.Log("GalleryCell OnClickImage");

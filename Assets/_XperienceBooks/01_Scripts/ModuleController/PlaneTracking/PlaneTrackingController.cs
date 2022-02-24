@@ -29,6 +29,8 @@ public class PlaneTrackingController : MonoBehaviour
     [Header("Audio Player")]
     [SerializeField] AudioSource audioSource;
 
+    bool isBackBtnClick = false;
+
     private void Awake()
     {
         // Chnage value if need to chanhe runtime multiple list
@@ -51,14 +53,13 @@ public class PlaneTrackingController : MonoBehaviour
         PlaneTrackingData.AddRange(GameManager.Instance.GetModuleData());
 
         //passing index 0 because there is only 1 file in plane tracking model , if multiple then need to pass acordingly value
-        filePath = GameManager.Instance.GetLocalPath(StaticKeywords.PlaneTracking);//ContentManager.Instance.LocalPath(currentIndex, StaticKeywords.PlaneTracking);
-        fileName = PlaneTrackingData[currentIndex].filename; //ContentManager.Instance.FileName(currentIndex);
+        filePath = GameManager.Instance.GetLocalPath(StaticKeywords.PlaneTracking);
+        fileName = PlaneTrackingData[currentIndex].filename;
 
         FileHandler.ValidateFolderStructure(filePath); // Create folder if not exist. 
 
         if (FileHandler.ValidateFile(filePath + fileName)){
             isLocalFile = true;
-            //finalPath = GetFBXModelPath(filePath);
             finalPath = FileHandler.FinalPath(filePath, fileName);
         }
         else{
@@ -84,8 +85,22 @@ public class PlaneTrackingController : MonoBehaviour
         GameManager.Instance.safetyWindow.OpenWindow();// call Safetywindow popup
     }
 
+    public void onBackBtnClick()
+    {
+        isBackBtnClick = true;
+        AssetDownloaderBehaviour.OnDownloadFinished -= ModelLoadFinished;
+        StopAllCoroutines();
+        CancelInvoke();
+        if (audioSource.isPlaying)
+            audioSource.Stop();
+
+    }
+
     private void OnMaterialsLoad(AssetLoaderContext assetLoaderContext)
     {
+        if (isBackBtnClick)
+            return;
+
         Debug.Log("Materials loaded. Model fully loaded: ");
         isMaterialLoaded = true;
 
@@ -103,7 +118,11 @@ public class PlaneTrackingController : MonoBehaviour
 
     private void ModelLoadFinished(UnityWebRequest request)
     {
-        Debug.Log("Model Finished loading"); if (isLocalFile)
+        if (isBackBtnClick)
+            return;
+
+        Debug.Log("Model Finished loading");
+        if (isLocalFile)
         {
             PlacementController.Instance.UpdatePlacementState();
             return;
@@ -119,6 +138,9 @@ public class PlaneTrackingController : MonoBehaviour
 
     public void ModelLoaded(AssetLoaderContext assetLoaderContext)
     {
+        if (isBackBtnClick)
+            return;
+
         Debug.Log("ModelLoaded: ");
         PlacementController.Instance.UpdatePlacementState();
     }
@@ -189,6 +211,7 @@ public class PlaneTrackingController : MonoBehaviour
                 }
             }
         }
+        Destroy(temp);
     }
     #endregion
 }

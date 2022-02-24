@@ -1,8 +1,6 @@
-﻿using UnityEngine.UI;
-using UnityEngine;
+﻿using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
-using System.Collections;
 using UnityEngine.Networking;
 using TMPro;
 using System.Threading.Tasks;
@@ -12,20 +10,26 @@ public class ThemeManager : MonoBehaviour
 {
     public static ThemeManager Instance = null;
 
+    [SerializeField] TMP_Text progressText;
     public Sprite background, scanBackground, scanBtn, seriesLogo, seriesIcon;
     public Sprite dialoguebox, commonBtn, backBtn, profileIcon, newIcon, inventoryIcon, inventoryPlaceholder, fanArtHeaderBg;
     public Sprite facebook, insta, youtube, website, twitter;
     public Sprite notificationNextBtn, notificationIcon, notificationTill;
-    
+
+    Sprite textureToSprite = null;
+
     private void Start()
     {
         if (Instance == null)
             Instance = this;
+
     }
 
     List<string> urls = new List<string>();
     List<string> name = new List<string>();
     int no = 0;
+    float per = 0f;
+
     // Download theame of the selected series if not avialable
     public void SaveSeriesTheame()
     {
@@ -33,6 +37,10 @@ public class ThemeManager : MonoBehaviour
         urls.Clear();
         name.Clear();
         string theme = GameManager.Instance.GetThemePath();
+        progressText.text = "0 %";
+        GameManager.Instance.TitleFont = null;
+        GameManager.Instance.DetailFont = null;
+
         Debug.Log("Download theme: "+ theme);
         // create directory
         if (!Directory.Exists(theme))
@@ -120,6 +128,7 @@ public class ThemeManager : MonoBehaviour
         if (urls.Count > 0)
         {
             Debug.Log(urls.Count);
+            per = 100 / urls.Count;
             GameManager.Instance.isNewThemeDownload = true;
             GameManager.Instance.OpenPrepareThemWindow(true);
 
@@ -133,6 +142,7 @@ public class ThemeManager : MonoBehaviour
         }
     }
 
+    //Texture2D texture;
     public async void OnDownloadTheme(string url, string imageName)
     {
         Debug.Log("url: " + url + ", name: " + imageName);
@@ -142,7 +152,7 @@ public class ThemeManager : MonoBehaviour
         while (!operation.isDone)
             await Task.Yield();
 
-        if (request.isNetworkError || request.isHttpError)
+        if (request.result == UnityWebRequest.Result.ConnectionError)
         {
             Debug.Log(request.error);
             GameManager.Instance.OpenPrepareThemWindow(false);
@@ -151,64 +161,56 @@ public class ThemeManager : MonoBehaviour
         else
         {
             File.WriteAllBytes(imageName, request.downloadHandler.data);
-
+            // Destroy the current texture instance
+            /*if (texture)
+            {
+                Destroy(texture);
+            }
+            texture = DownloadHandlerTexture.GetContent(request);
+            */
             if ((no + 1) >= urls.Count)
             {
-                if (imageName.Equals(StaticKeywords.Font1Theme))
-                    onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font1Theme, GameManager.Instance.TitleFont);
-
-                if (imageName.Equals(StaticKeywords.Font2Theme))
-                    onCreateFontAsset(GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font2Theme, GameManager.Instance.DetailFont);
-
                 PlayerPrefs.SetString("IsThemeSaved", "true");
-                Debug.Log("Call LoadSkinTheme from OnDownloadTheme");
                 LoadSkinTheme();
-                //HomeScreen.Instance.OnSetHomePanelData();
             }
             else
+            {
                 no += 1;
+                progressText.text = (no * per) + " %";
+            }
         }
     }
-    
-    // return TMP_FontAsset object for TextMesh pro text
-    public async void onCreateFontAsset(string myFontPath, TMP_FontAsset textFont)
+
+    private void Update()
     {
-        if (!File.Exists(myFontPath))
-            return;
-
-        var data = TMP_FontAsset.CreateFontAsset(new Font(myFontPath));
-        while (!data)
-            await Task.Yield();
-
-        if (textFont)
-            textFont = TMP_FontAsset.CreateFontAsset(new Font(myFontPath));
-    }
-
-    // call from contentButton and NotificationCellControkker scripts
-    public async void OnLoadImage(string path, string name, Image image)
-    {
-        if (!File.Exists(path + "/" + name))
-            return;
-
-        Texture2D thisTexture = new Texture2D(100, 100);
-        byte[] bytes = File.ReadAllBytes(path +"/" + name);
-        //thisTexture.LoadImage(bytes);
-        while (!thisTexture.LoadImage(bytes))
-            await Task.Yield();
-
-        if (image != null)
+        if (GameManager.Instance.TitleFont == null)
         {
-            image.sprite = GameManager.Instance.Texture2DToSprite(thisTexture);
+            string myFontPath = GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font1Theme;
+            if (!File.Exists(myFontPath))
+                return;
+
+            GameManager.Instance.TitleFont = TMP_FontAsset.CreateFontAsset(new Font(myFontPath));
+        }
+
+        if (GameManager.Instance.DetailFont == null)
+        {
+            string myFontPath1 = GameManager.Instance.GetThemePath() + "/" + StaticKeywords.Font2Theme;
+            if (!File.Exists(myFontPath1))
+                return;
+
+            GameManager.Instance.DetailFont = TMP_FontAsset.CreateFontAsset(new Font(myFontPath1));
         }
     }
 
     Sprite getTexture(string path, string name)
     {
-        Texture2D thisTexture = new Texture2D(100, 100);
-        byte[] bytes = File.ReadAllBytes(path + "/" + name);
-        thisTexture.LoadImage(bytes);
+        Texture2D t = new Texture2D(100, 100);
+        byte[] b = File.ReadAllBytes(path + "/" + name);
+        t.LoadImage(b);
 
-        return GameManager.Instance.Texture2DToSprite(thisTexture);
+        textureToSprite = Sprite.Create(t, new Rect(0, 0, t.width, t.height), new Vector2(0.5f, 0.5f), 100.0f);
+
+        return textureToSprite;
     }
 
     // call from loadMainScene, BookData script and current script as well
@@ -321,6 +323,7 @@ public class ThemeManager : MonoBehaviour
             notificationTill = Resources.Load<Sprite>("StoneBack");
         else
             notificationTill = getTexture(theme, StaticKeywords.NotificationCellBG);
+
 
         SceneLoader.LoadScene(1);
     }

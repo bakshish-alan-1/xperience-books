@@ -22,6 +22,7 @@ public class ObjectAndMeController : MonoBehaviour
     public List<ContentModel> ModuleContent = new List<ContentModel>();
 
     bool isInventoryApiCall = false;
+    bool isBackBtn = false;
 
     public void Awake()
     {
@@ -42,6 +43,12 @@ public class ObjectAndMeController : MonoBehaviour
     {
         GameManager.Instance.safetyWindow.OpenWindow();// call Safetywindow popup
         StartCoroutine(LoadTexture());
+    }
+
+    public void onBackBtnClick()
+    {
+        isBackBtn = true;
+        StopAllCoroutines();
     }
 
     public void OnInfoBtnHite(bool value)

@@ -37,7 +37,14 @@ public class InventoryManager : MonoBehaviour
             if (GameManager.Instance.TitleFont != null)
             {
                 title.font = GameManager.Instance.TitleFont;
+                titleTxt.font = GameManager.Instance.TitleFont;
             }
+
+            if (GameManager.Instance.DetailFont != null)
+            {
+                descptionTxt.font = GameManager.Instance.DetailFont;
+            }
+
             Color newCol;
             if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
             {
