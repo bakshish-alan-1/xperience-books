@@ -93,8 +93,10 @@ public class CaptureAndShare : MonoBehaviour
         if (destroy) {
 
         }
+        StopAllCoroutines();
         previewUI.SetActive(false);
         ssInProgress = false;
+        Destroy(tempTexture);
     }
 
     private async void OnDownloadWatermark(string url)

@@ -13,7 +13,10 @@ namespace KetosGames.SceneTransition.Example
         {
             Debug.Log("GoToNextScene: " + ToScene);
 
-            try
+
+            SceneManager.LoadScene(ToScene);
+
+            /*try
             {
                 LoaderUtility.Deinitialize();   // deinitialize arsession subsystem (https://docs.unity3d.com/Packages/com.unity.xr.arfoundation@4.1/api/UnityEngine.XR.ARFoundation.LoaderUtility.html)
             }
@@ -21,13 +24,13 @@ namespace KetosGames.SceneTransition.Example
             {
                 Debug.Log("GoToNextScene catch: " + e.ToString());
             }
-            Invoke("callScene", 1f);
+            Invoke("callScene", 1f);*/
         }
 
         void callScene()
         {
-            //SceneManager.LoadScene(ToScene);
-            SceneLoader.LoadScene(ToScene);
+            SceneManager.LoadScene(ToScene);
+            //SceneLoader.LoadScene(ToScene);
         }
     }
 }

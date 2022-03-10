@@ -17,6 +17,7 @@ public class ThemeManager : MonoBehaviour
     public Sprite notificationNextBtn, notificationIcon, notificationTill;
 
     Sprite textureToSprite = null;
+    string theme = "";
 
     private void Start()
     {
@@ -36,7 +37,7 @@ public class ThemeManager : MonoBehaviour
         no = 0;
         urls.Clear();
         name.Clear();
-        string theme = GameManager.Instance.GetThemePath();
+        theme = GameManager.Instance.GetThemePath();
         progressText.text = "0 %";
         GameManager.Instance.TitleFont = null;
         GameManager.Instance.DetailFont = null;
@@ -161,13 +162,7 @@ public class ThemeManager : MonoBehaviour
         else
         {
             File.WriteAllBytes(imageName, request.downloadHandler.data);
-            // Destroy the current texture instance
-            /*if (texture)
-            {
-                Destroy(texture);
-            }
-            texture = DownloadHandlerTexture.GetContent(request);
-            */
+            
             if ((no + 1) >= urls.Count)
             {
                 PlayerPrefs.SetString("IsThemeSaved", "true");
@@ -217,7 +212,7 @@ public class ThemeManager : MonoBehaviour
     public void LoadSkinTheme()
     {
         Debug.Log("ThemeManager LoadTheme");
-        string theme = GameManager.Instance.GetThemePath();
+        theme = GameManager.Instance.GetThemePath();
 
         if (!File.Exists(theme + "/" + StaticKeywords.BGTheme))
             background = Resources.Load<Sprite>("Main_BG");
@@ -280,7 +275,7 @@ public class ThemeManager : MonoBehaviour
             inventoryIcon = getTexture(theme, StaticKeywords.InventoryTheme);
 
         if (!File.Exists(theme + "/" + StaticKeywords.InventoryPlaceholderImage))
-            inventoryPlaceholder = Resources.Load<Sprite>("Inventory");
+            inventoryPlaceholder = Resources.Load<Sprite>("InventoryPlaceHolder");
         else
             inventoryPlaceholder = getTexture(theme, StaticKeywords.InventoryPlaceholderImage);
 
@@ -324,7 +319,10 @@ public class ThemeManager : MonoBehaviour
         else
             notificationTill = getTexture(theme, StaticKeywords.NotificationCellBG);
 
+        progressText.text = "100 %";
 
+        urls.Clear();
+        name.Clear();
         SceneLoader.LoadScene(1);
     }
 }

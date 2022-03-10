@@ -146,7 +146,7 @@ public class QRScanController : MonoBehaviour
                 int bookID = int.Parse(matches[1].Groups[1].Value);
                 int chapterID = int.Parse(matches[1].Groups[2].Value);
                 int qrCodeID = int.Parse(matches[1].Groups[3].Value);
-                Debug.Log(latitude.ToString() + " , " + longitude.ToString());
+                Debug.Log("QRScanController: " + latitude.ToString() + " , " + longitude.ToString());
                 StopQRCode();
 
                 GameManager.Instance.FanArtEmailSubject = "Fan Art Submission for " + GameManager.Instance.selectedBooks.name + " (Chapter-" + chapterID + " - QR Code-" + qrCodeID + ")";

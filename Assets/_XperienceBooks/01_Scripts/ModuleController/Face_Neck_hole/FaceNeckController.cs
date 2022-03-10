@@ -63,6 +63,8 @@ public class FaceNeckController : MonoBehaviour
         isBackBtn = true;
         StopAllCoroutines();
         CancelInvoke();
+        ModuleContent.Clear();
+        webTexture = null;
     }
 
     public void OnInfoBtnHite(bool value)
@@ -151,6 +153,7 @@ public class FaceNeckController : MonoBehaviour
                 if (builerDataDownloaded != null)
                     builerDataDownloaded(webTexture, builderPosition);
             }
+            uwr.Dispose();
         }
     }
 

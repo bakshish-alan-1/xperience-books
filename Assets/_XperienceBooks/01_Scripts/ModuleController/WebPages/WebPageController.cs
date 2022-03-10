@@ -35,6 +35,11 @@ public class WebPageController : MonoBehaviour
         { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(11); }
     }
 
+    private void OnDisable()
+    {
+        ModuleContent.Clear();
+    }
+
 
     public void GenratePrefab(int index, string title , string url) {
 

@@ -38,6 +38,7 @@ public class FaceController : MonoBehaviour
     public List<Texture2D> m_FacePaintTextures = new List<Texture2D>();
 
     private int currentMateria = -1;
+    int visibleMaterial = -1;
     int totalFileCount = 0;
     List<ItemData> cellData = new List<ItemData>();
     [SerializeField] ScrollView scrollView = default;
@@ -67,16 +68,20 @@ public class FaceController : MonoBehaviour
 
         if (GameManager.Instance._ModuleData.Count <= 0) return;
 
-        foreach (ContentModel model in GameManager.Instance._ModuleData) {
+        for (int i = 0; i < GameManager.Instance._ModuleData.Count; i++)
+        {
+            StartCoroutine(LoadContent(GameManager.Instance._ModuleData[i]));
+        }
+        /*foreach (ContentModel model in GameManager.Instance._ModuleData) {
 
             StartCoroutine(LoadContent(model));
-        }
+        }*/
     }
 
     bool isLocalFile = false;
     public IEnumerator LoadContent(ContentModel data) {
 
-         string localPath = GameManager.Instance.GetLocalPath(StaticKeywords.FacePaint);  //data.series_name + "/" + data.book_name + "/" + data.chapter_name +"/" + StaticKeywords.FacePaint + "/";
+         string localPath = GameManager.Instance.GetLocalPath(StaticKeywords.FacePaint);
          string fileName = data.filename;
 
         if (FileHandler.ValidateFile(localPath + fileName))
@@ -100,6 +105,7 @@ public class FaceController : MonoBehaviour
                         FileHandler.SaveFile(localPath, fileName, uwr.downloadHandler.data,true);
                     }
                 }
+                uwr.Dispose();
             }
         }
 
@@ -124,8 +130,7 @@ public class FaceController : MonoBehaviour
         totalFileCount = fileNames.Length;
 
          foreach (FileInfo info in fileNames) {
-            Debug.Log(info.FullName);
-            ItemData data = new ItemData(); //new ItemData($"Cell {i}", m_FacePaintTextures[i]);
+            ItemData data = new ItemData();
             cellData.Add(data);
         }
         scrollView.UpdateData(cellData);
@@ -152,6 +157,9 @@ public class FaceController : MonoBehaviour
         loadingUI.SetActive(false);
         if (!isInventoryApiCall)
         { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(7); }
+
+        dirInfo = null;
+        m_FileInfo = null;
     }
 
     IEnumerator LoadTexture(string AssetURI) {
@@ -167,11 +175,10 @@ public class FaceController : MonoBehaviour
             }
             else
             {
-                Texture2D webTexture = DownloadHandlerTexture.GetContent(uwr); //((DownloadHandlerTexture)www.downloadHandler).texture as Texture2D;
+                Texture2D webTexture = DownloadHandlerTexture.GetContent(uwr);
                 m_FacePaintTextures.Add(webTexture);
-               // scroll.Add(webTexture);
             }
-
+            uwr.Dispose();
         }
 
     }
@@ -235,7 +242,7 @@ public class FaceController : MonoBehaviour
         if (FaceFound())
         {   
             m_ScreenSpaceUI.SetActive(false);
-            if (m_additionalUI != null)
+            if (m_additionalUI != null && m_additionalUI.interactable != true)
             {
                 m_additionalUI.alpha = 1;
                 m_additionalUI.interactable = true;
@@ -265,6 +272,8 @@ public class FaceController : MonoBehaviour
         isBackBtn = true;
         StopAllCoroutines();
         CancelInvoke();
+        m_FacePaintTextures.Clear();
+        cellData.Clear();
     }
 
     public void setMaterial()
@@ -272,10 +281,10 @@ public class FaceController : MonoBehaviour
         if (this.isBackBtn)
             return;
 
-        Debug.Log("setMaterial currentMateria: " + currentMateria);
-        if (currentMateria < 0)
+        if (currentMateria < 0 || currentMateria == visibleMaterial)
             return;
 
+        Debug.Log("setMaterial currentMateria: " + currentMateria);
         foreach (ARFace face in arFaceManager.trackables)
         {
 
@@ -293,7 +302,7 @@ public class FaceController : MonoBehaviour
 #if UNITY_ANDROID
             face.transform.localScale = new Vector3(-1f, 1f, 1f);
 #endif
-
+            visibleMaterial = currentMateria;
             Debug.Log("after: " + face.transform.eulerAngles);
         }
     }

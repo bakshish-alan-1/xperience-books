@@ -28,6 +28,9 @@ public class SeriesData : MonoBehaviour
     {
         GameManager.Instance.selectedSeries = GameManager.Instance.m_Series[index];
 
+        GameManager.Instance.TitleFont = null;
+        GameManager.Instance.DetailFont = null;
+
         string theme = GameManager.Instance.GetThemePath();
         // create directory, remove different time stamp theme save on same series
         if (!Directory.Exists(theme))

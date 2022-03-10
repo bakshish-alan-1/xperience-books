@@ -30,6 +30,7 @@ public class PlaneTrackingController : MonoBehaviour
     [SerializeField] AudioSource audioSource;
 
     bool isBackBtnClick = false;
+    AudioClip temp = null;
 
     private void Awake()
     {
@@ -91,9 +92,11 @@ public class PlaneTrackingController : MonoBehaviour
         AssetDownloaderBehaviour.OnDownloadFinished -= ModelLoadFinished;
         StopAllCoroutines();
         CancelInvoke();
+        m_ModelDownloader.onStopDownload();
         if (audioSource.isPlaying)
             audioSource.Stop();
 
+        Destroy(temp);
     }
 
     private void OnMaterialsLoad(AssetLoaderContext assetLoaderContext)
@@ -163,12 +166,8 @@ public class PlaneTrackingController : MonoBehaviour
     #region PlayAudio
     string GetSubDirectory(string path)// Return first subdirectory path of extract directory from .zip file
     {
-        string[] dir = Directory.GetDirectories(path);
-        
-        if (dir.Length != 0)
-            return dir[0].ToString();
-        else
-            return "";
+        string dir = m_LocalURL.Substring(0, m_LocalURL.Length - 4);
+        return dir;
     }
 
     string GetAudioPath(string DirPath)// Return path of the audio file at given directory path
@@ -184,7 +183,6 @@ public class PlaneTrackingController : MonoBehaviour
     private IEnumerator LoadAudioFile(string fullpath)
     {
         Debug.Log("LOADING CLIP: " + fullpath);
-        AudioClip temp = null;
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fullpath, AudioType.MPEG))
         {
             yield return www.SendWebRequest();
@@ -211,7 +209,6 @@ public class PlaneTrackingController : MonoBehaviour
                 }
             }
         }
-        Destroy(temp);
     }
     #endregion
 }

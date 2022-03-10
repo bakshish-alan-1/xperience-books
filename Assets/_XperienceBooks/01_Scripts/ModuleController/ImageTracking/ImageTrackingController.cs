@@ -67,6 +67,7 @@ public class ImageTrackingController : MonoBehaviour
     bool isInventoryApiCall = false;
     bool isBackBtnClick = false;
 
+    //AudioClip temp = null;
     string audioPath = "";
     void Start()
     {
@@ -115,6 +116,8 @@ public class ImageTrackingController : MonoBehaviour
         {
             StartCoroutine(LoadContent(model));
         }
+
+        //StartCoroutine(LoadAudioFile(""));
     }
 
     Dictionary<string, ImageTargetData> m_TargetLib = new Dictionary<string, ImageTargetData>();
@@ -226,9 +229,8 @@ public class ImageTrackingController : MonoBehaviour
             {
                 Texture2D webTexture = DownloadHandlerTexture.GetContent(uwr); //((DownloadHandlerTexture)www.downloadHandler).texture as Texture2D;
                 m_ImageTargetTexture.Add(webTexture);
-                Debug.Log(webTexture.width + " " + webTexture.height);
+
                 webTexture.LoadImage(uwr.downloadHandler.data);
-                Debug.Log(webTexture.width + " " + webTexture.height);
 
                 AddImageJob(webTexture, name);
             }
@@ -344,6 +346,12 @@ public class ImageTrackingController : MonoBehaviour
                     m_Preloader.transform.position = image.transform.position;
                 }
 
+                if (audioSource.clip != null && !audioSource.isPlaying)
+                {
+                    audioSource.Stop();
+                    audioSource.Play();
+                }
+
                 m_ArObjectsToPlace.transform.SetPositionAndRotation(image.transform.position, image.transform.rotation);
             }
             else
@@ -447,14 +455,18 @@ public class ImageTrackingController : MonoBehaviour
         AssetDownloaderBehaviour.OnDownloadFinished -= ModelLoadFinished;
         StopAllCoroutines();
         CancelInvoke();
+        ModelLoader.onStopDownload();
         if (audioSource.isPlaying)
             audioSource.Stop();
+
+        //Destroy(temp);
     }
 
     #region PlayAudio
     string GetAudioPath()
     {
         // return path of the mp3 file directory
+        Debug.Log("inside GetAudioPath: " + audioPath);
         string[] dir = Directory.GetDirectories(audioPath);
         return dir[0];
     }
@@ -462,7 +474,6 @@ public class ImageTrackingController : MonoBehaviour
     private IEnumerator LoadAudioFile(string fullpath)
     {
         Debug.Log("LOADING CLIP: " + fullpath);
-        AudioClip temp = null;
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fullpath, AudioType.MPEG))
         {
             yield return www.SendWebRequest();
@@ -472,19 +483,27 @@ public class ImageTrackingController : MonoBehaviour
             }
             else
             {
-                temp = DownloadHandlerAudioClip.GetContent(www);
-                audioSource.clip = temp;
-
-                if (temp.length <= 0)
+                AudioClip tempClip = DownloadHandlerAudioClip.GetContent(www);
+                Debug.Log("Audio length: "+ tempClip.length);
+                if (tempClip.length <= 0)
                 {
                     string msg = "Unsupported file or audio format.";
                     ApiManager.Instance.errorWindow.SetErrorMessage("Something Went Wrong", msg, "OKAY", ErrorWindow.ResponseData.JustClose, false);
                 }
                 else
+                {
+                    audioSource.clip = tempClip;
+                    while (audioSource.clip.loadState != AudioDataLoadState.Loaded)
+                    {
+                        Debug.Log("Waiting for clip to ready");
+                    }
+                    Debug.Log("Clip loaded success");
+                    Debug.Log("Audio name: " + audioSource.clip.name);
+                    Debug.Log("Audio volume: " + audioSource.volume);
                     audioSource.Play();
+                }
             }
         }
-        Destroy(temp);
     }
     #endregion
 }

@@ -13,9 +13,17 @@ public class LoadModelFromURL : MonoBehaviour
     public Text progressText;
     public Image progressBar;
 
+    UnityWebRequest webRequest;
+
     public void DownloadFile(string _url, string localFilePath, System.Action<AssetLoaderContext> OnLoad, System.Action<AssetLoaderContext> OnMaterialsLoad)
     {
         StartCoroutine(LoadTexture(_url, localFilePath, OnLoad, OnMaterialsLoad));
+    }
+
+    public void onStopDownload()
+    {
+        StopAllCoroutines();
+        webRequest = null;
     }
 
     IEnumerator LoadTexture(string URL, string localFilePath, System.Action<AssetLoaderContext> OnLoad, System.Action<AssetLoaderContext> OnMaterialsLoad)
@@ -48,6 +56,7 @@ public class LoadModelFromURL : MonoBehaviour
 
                 StartLoadObject(localFilePath, true, OnLoad, OnMaterialsLoad);
             }
+            uwr.Dispose();
         }
     }
 
@@ -57,10 +66,10 @@ public class LoadModelFromURL : MonoBehaviour
             progressBar.fillAmount = 0f;
 
         Debug.Log("StartLoadObject path/url: " + _url);
-        var assetLoaderOptions = AssetLoader.CreateDefaultLoaderOptions();
-        assetLoaderOptions.PivotPosition = PivotPosition.Default;
+        //var assetLoaderOptions = AssetLoader.CreateDefaultLoaderOptions();
+        //assetLoaderOptions.PivotPosition = PivotPosition.Default;
         
-        var webRequest = AssetDownloader.CreateWebRequest(_url);
+        webRequest = AssetDownloader.CreateWebRequest(_url);
         if (isLocal)
             AssetDownloader.LoadModelFromZip(_url, OnLoad, OnMaterialsLoad, OnProgress, OnError, _RootObject);//, assetLoaderOptions
         else

@@ -27,11 +27,12 @@ public class BookController : MonoBehaviour
         else
             nodataFound.SetActive(false);
 
+        int seriesID = GameManager.Instance.selectedSeries.id;
         seriesName.text = GameManager.Instance.selectedSeries.name;
         for (int i = 0; i < GameManager.Instance.m_SeriesDetails.Count; i++)
         {
             GameObject obj = Instantiate(bookObj, parent.transform);
-            obj.GetComponent<BookData>().SetData(i, GameManager.Instance.m_SeriesDetails[i].name, GameManager.Instance.m_SeriesDetails[i].image);
+            obj.GetComponent<BookData>().SetData(seriesID, i, GameManager.Instance.m_SeriesDetails[i].name, GameManager.Instance.m_SeriesDetails[i].image);
         }
     }
 }

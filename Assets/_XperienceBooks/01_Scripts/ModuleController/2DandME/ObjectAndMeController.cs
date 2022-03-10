@@ -49,6 +49,8 @@ public class ObjectAndMeController : MonoBehaviour
     {
         isBackBtn = true;
         StopAllCoroutines();
+        ModuleContent.Clear();
+        Destroy(m_2DTexture);
     }
 
     public void OnInfoBtnHite(bool value)
@@ -98,6 +100,7 @@ public class ObjectAndMeController : MonoBehaviour
                     FileHandler.SaveFile(localPath, fileName, uwr.downloadHandler.data);
                 }
             }
+            uwr.Dispose();
         }
         if (!isInventoryApiCall)
         { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(12); }

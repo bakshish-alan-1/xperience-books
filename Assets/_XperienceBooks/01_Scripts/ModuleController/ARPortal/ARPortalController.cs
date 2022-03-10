@@ -33,6 +33,7 @@ public class ARPortalController : MonoBehaviour
     bool loadingFinished = false;
     bool isInventoryApiCall = false;
     bool isBackBtn = false;
+    AudioClip temp = null;
 
     private void Awake()
     {
@@ -52,6 +53,8 @@ public class ARPortalController : MonoBehaviour
         CancelInvoke();
         if (m_PortalAudioSource.isPlaying)
             m_PortalAudioSource.Stop();
+
+        Destroy(temp);
     }
 
     private void OnEnable()
@@ -193,7 +196,6 @@ public class ARPortalController : MonoBehaviour
     {
         Debug.Log("LOADING CLIP: " + fullpath);
 
-        AudioClip temp = null;
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fullpath, AudioType.MPEG))
         {
             yield return www.SendWebRequest();

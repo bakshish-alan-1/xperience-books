@@ -54,6 +54,7 @@ public class GalleryCell : MonoBehaviour
                 if (button)
                     button.interactable = true;
             }
+            uwr.Dispose();
         }
     }
 

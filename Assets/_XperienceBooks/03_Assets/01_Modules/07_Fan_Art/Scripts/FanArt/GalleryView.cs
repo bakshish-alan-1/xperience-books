@@ -63,6 +63,7 @@ public class GalleryView : MonoBehaviour
     {
         isBackBtn = true;
         StopAllCoroutines();
+        ModuleContent.Clear();
     }
 
     void loadTheme()

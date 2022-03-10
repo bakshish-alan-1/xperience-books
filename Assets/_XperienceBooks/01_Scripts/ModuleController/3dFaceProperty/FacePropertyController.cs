@@ -83,6 +83,7 @@ public class FacePropertyController : MonoBehaviour
         StopAllCoroutines();
         OnDisable();
         CancelInvoke();
+        m_ModelDownloader.onStopDownload();
     }
 
     void OnEnable()

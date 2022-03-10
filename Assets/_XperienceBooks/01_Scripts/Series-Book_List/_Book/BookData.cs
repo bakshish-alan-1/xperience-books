@@ -11,9 +11,11 @@ public class BookData : MonoBehaviour
     [SerializeField] Image seriesImg;
     [SerializeField] TMP_Text seriesName;
 
+    int selectedSeriesID = 0;
     int index = 0;
-    public void SetData(int no, string name, string imgURL)
+    public void SetData(int id, int no, string name, string imgURL)
     {
+        selectedSeriesID = id;
         index = no;
         seriesName.text = name;
         if (imgURL != "")
@@ -27,16 +29,23 @@ public class BookData : MonoBehaviour
             if both are different then delete that skin folder, that means need to download new updated skin
         */
         string seriesPath = GameManager.Instance.LocalStoragePath + "Theme/" + GameManager.Instance.selectedSeries.theme.id;
-        Debug.Log("Index: " + index);
+        Debug.Log("Index: " + selectedSeriesID);
         if (Directory.Exists(seriesPath))
         {
             Debug.Log("Skin Path exists");
-            if (GameManager.Instance.m_Series.Count != 0 && index <= GameManager.Instance.m_Series.Count)
+            if (GameManager.Instance.m_Series.Count != 0 && selectedSeriesID <= GameManager.Instance.m_Series.Count)
             {
-                if (GameManager.Instance.selectedSeries.theme.updated_at_timestamp != GameManager.Instance.m_Series[index].theme.updated_at_timestamp)
+                for (int i = 0; i < GameManager.Instance.m_Series.Count; i++)
                 {
-                    Debug.Log("Deleted Skin Folder: " + seriesPath);
-                    Directory.Delete(seriesPath, true);// delete previous series skin downloaded theme folder
+                    if(selectedSeriesID == GameManager.Instance.m_Series[i].id)
+                    {
+                        if (GameManager.Instance.selectedSeries.theme.updated_at_timestamp != GameManager.Instance.m_Series[i].theme.updated_at_timestamp)
+                        {
+                            Debug.Log("Deleted Skin Folder: " + seriesPath);
+                            Directory.Delete(seriesPath, true);// delete previous series skin downloaded theme folder
+                        }
+                        break;
+                    }
                 }
             }
         }

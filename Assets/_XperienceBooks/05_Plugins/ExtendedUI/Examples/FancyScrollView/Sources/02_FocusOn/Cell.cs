@@ -54,7 +54,6 @@ namespace UnityEngine.UI.Extensions.Examples.FancyScrollViewExample02
             
                 using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(url))
                 {
-                    // www.downloadHandler = new DownloadHandlerBuffer();
                     yield return uwr.SendWebRequest();
 
                     if (uwr.isNetworkError || uwr.isHttpError)
@@ -63,8 +62,7 @@ namespace UnityEngine.UI.Extensions.Examples.FancyScrollViewExample02
                     }
                     else
                     {
-                        Texture2D webTexture = DownloadHandlerTexture.GetContent(uwr); //((DownloadHandlerTexture)www.downloadHandler).texture as Texture2D;
-                        rawImage.texture = webTexture;
+                        rawImage.texture = DownloadHandlerTexture.GetContent(uwr);
                     }
                 }
         }

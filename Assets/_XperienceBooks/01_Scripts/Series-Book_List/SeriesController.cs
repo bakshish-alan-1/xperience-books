@@ -31,6 +31,7 @@ public class SeriesController : MonoBehaviour
         if (File.Exists(GameManager.Instance.LocalStoragePath + "Theme/BooksData.json"))
             File.Delete(GameManager.Instance.LocalStoragePath + "Theme/BooksData.json");
 
+
         string seriesPath = GameManager.Instance.LocalStoragePath + "Theme/" + GameManager.Instance.selectedSeries.theme.id;
         if (PlayerPrefs.GetString("IsThemeSaved").Equals("false"))
         {

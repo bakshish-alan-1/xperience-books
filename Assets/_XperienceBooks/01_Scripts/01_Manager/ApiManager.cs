@@ -548,7 +548,7 @@ public class ApiManager : MonoBehaviour
                 {
                     ErrorMessage.Add(token);
                 }
-
+                QRScanController.Instance.Play();
                 switch (error.code)
                 {
 
