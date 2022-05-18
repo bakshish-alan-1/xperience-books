@@ -4,7 +4,6 @@ using System.IO;
 using TriLibCore;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 
 public class FacePropertyController : MonoBehaviour
@@ -84,6 +83,8 @@ public class FacePropertyController : MonoBehaviour
         OnDisable();
         CancelInvoke();
         m_ModelDownloader.onStopDownload();
+        FacePropertyData.Clear();
+        FacePropertyData.TrimExcess();
     }
 
     void OnEnable()
@@ -132,6 +133,7 @@ public class FacePropertyController : MonoBehaviour
         GameManager.Instance.safetyWindow.OpenWindow();// call Safetywindow popup
     }
 
+    
     private void OnMaterialsLoad(AssetLoaderContext assetLoaderContext)
     {
         if (isBackBtn)
@@ -158,14 +160,14 @@ public class FacePropertyController : MonoBehaviour
         }
     }
 
-    public void OnInfoBtnHite(bool value)
-    {
-        InfoBox.SetActive(value);
-    }
-
     public void ModelLoaded(AssetLoaderContext assetLoaderContext)
     {
         Debug.Log("ModelLoaded: ");
+    }
+    
+    public void OnInfoBtnHite(bool value)
+    {
+        InfoBox.SetActive(value);
     }
     
     public void LoadModelOnFace() {

@@ -96,6 +96,8 @@ public class PlaneTrackingController : MonoBehaviour
         if (audioSource.isPlaying)
             audioSource.Stop();
 
+        PlaneTrackingData.Clear();
+        PlaneTrackingData.TrimExcess();
         Destroy(temp);
     }
 

@@ -5,7 +5,6 @@ using System.IO;
 using TriLibCore;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
@@ -67,7 +66,7 @@ public class ImageTrackingController : MonoBehaviour
     bool isInventoryApiCall = false;
     bool isBackBtnClick = false;
 
-    //AudioClip temp = null;
+    AudioClip tempClip = null;
     string audioPath = "";
     void Start()
     {
@@ -162,7 +161,7 @@ public class ImageTrackingController : MonoBehaviour
             }
             else
             {
-                webTexture = ((DownloadHandlerTexture)uwr.downloadHandler).texture as Texture2D;
+                webTexture = ((DownloadHandlerTexture)uwr.downloadHandler).texture;
                 // m_ImageTargetTexture.Add(webTexture);
 
                 if (!isLocalFile)
@@ -170,6 +169,7 @@ public class ImageTrackingController : MonoBehaviour
                     FileHandler.SaveFile(m_TargetLocalPath, m_TargetImageName, uwr.downloadHandler.data);
                 }
             }
+            uwr.Dispose();
         }       
 
         #if !UNITY_EDITOR
@@ -215,7 +215,7 @@ public class ImageTrackingController : MonoBehaviour
 
     IEnumerator LoadTexture(string AssetURI,string name)
     {
-
+        Texture2D webTexture;
         using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(AssetURI))
         {
             // www.downloadHandler = new DownloadHandlerBuffer();
@@ -227,16 +227,16 @@ public class ImageTrackingController : MonoBehaviour
             }
             else
             {
-                Texture2D webTexture = DownloadHandlerTexture.GetContent(uwr); //((DownloadHandlerTexture)www.downloadHandler).texture as Texture2D;
+                webTexture = DownloadHandlerTexture.GetContent(uwr); //((DownloadHandlerTexture)www.downloadHandler).texture as Texture2D;
                 m_ImageTargetTexture.Add(webTexture);
 
                 webTexture.LoadImage(uwr.downloadHandler.data);
 
                 AddImageJob(webTexture, name);
             }
+            uwr.Dispose();
 
         }
-
     }
 
     public IEnumerator AddImageJob(Texture2D texture2D , string imageTargetName)
@@ -283,10 +283,10 @@ public class ImageTrackingController : MonoBehaviour
     void ImageManagerOnTrackedImagesChanged(ARTrackedImagesChangedEventArgs obj)
     {
         // added, spawn prefab
-        foreach (ARTrackedImage image in obj.added)
+        /*foreach (ARTrackedImage image in obj.added)
         {
             Debug.Log("Image ready to tracked : "+image.referenceImage.guid);
-        }
+        }*/
 
         // updated, set prefab position and rotation
         foreach (ARTrackedImage image in obj.updated)
@@ -459,7 +459,10 @@ public class ImageTrackingController : MonoBehaviour
         if (audioSource.isPlaying)
             audioSource.Stop();
 
-        //Destroy(temp);
+        m_TargetLib.Clear();
+        ModuleContent.Clear();
+        ModuleContent.TrimExcess();
+        Destroy(tempClip);
     }
 
     #region PlayAudio
@@ -483,7 +486,7 @@ public class ImageTrackingController : MonoBehaviour
             }
             else
             {
-                AudioClip tempClip = DownloadHandlerAudioClip.GetContent(www);
+                tempClip = DownloadHandlerAudioClip.GetContent(www);
                 Debug.Log("Audio length: "+ tempClip.length);
                 if (tempClip.length <= 0)
                 {
@@ -503,6 +506,7 @@ public class ImageTrackingController : MonoBehaviour
                     audioSource.Play();
                 }
             }
+            www.Dispose();
         }
     }
     #endregion

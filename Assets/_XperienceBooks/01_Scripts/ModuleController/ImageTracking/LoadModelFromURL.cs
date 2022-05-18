@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.IO;
 using TriLibCore;
-using TriLibCore.General;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -66,14 +65,12 @@ public class LoadModelFromURL : MonoBehaviour
             progressBar.fillAmount = 0f;
 
         Debug.Log("StartLoadObject path/url: " + _url);
-        //var assetLoaderOptions = AssetLoader.CreateDefaultLoaderOptions();
-        //assetLoaderOptions.PivotPosition = PivotPosition.Default;
-        
         webRequest = AssetDownloader.CreateWebRequest(_url);
         if (isLocal)
             AssetDownloader.LoadModelFromZip(_url, OnLoad, OnMaterialsLoad, OnProgress, OnError, _RootObject);//, assetLoaderOptions
         else
             AssetDownloader.LoadModelFromUri(webRequest, OnLoad, OnMaterialsLoad, OnProgress, OnError, _RootObject);//, assetLoaderOptions
+        
     }
 
     private void OnError(IContextualizedError obj)

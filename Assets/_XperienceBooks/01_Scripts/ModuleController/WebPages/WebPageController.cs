@@ -9,7 +9,7 @@ public class WebPageController : MonoBehaviour
     public ScrollRect scrollview;
     public GameObject scrollContent;
     public GameObject scrollItemPrefab;
-    public Image seriesLogo, Bg;
+    public Image seriesLogo, Bg, backIcon;
     public List<ContentModel> ModuleContent = new List<ContentModel>();
 
     bool isInventoryApiCall = false;
@@ -29,10 +29,17 @@ public class WebPageController : MonoBehaviour
        
         scrollview.verticalNormalizedPosition = 1;
         Bg.sprite = ThemeManager.Instance.background;
+        backIcon.sprite = ThemeManager.Instance.backBtn;
         seriesLogo.sprite = ThemeManager.Instance.seriesLogo;
 
         if (!isInventoryApiCall)
         { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(11); }
+    }
+
+    public void onBackBtn()
+    {
+        ModuleContent.Clear();
+        ModuleContent.TrimExcess();
     }
 
     private void OnDisable()

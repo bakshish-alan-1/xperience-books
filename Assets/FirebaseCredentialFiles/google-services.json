@@ -1,40 +1,40 @@
 {
   "project_info": {
-    "project_number": "1081869654938",
-    "project_id": "arbooks-353cc",
-    "storage_bucket": "arbooks-353cc.appspot.com"
+    "project_number": "1068746741452",
+    "project_id": "continuum-a0394",
+    "storage_bucket": "continuum-a0394.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1081869654938:android:26e2dab6a02a0f5a8ff823",
+        "mobilesdk_app_id": "1:1068746741452:android:bfc50b9aa52ce47d1bd469",
         "android_client_info": {
-          "package_name": "com.theintellify.continuummedia"
+          "package_name": "com.continuummedia.xperiencebooks"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1081869654938-spa0ukrjls58a0qnmj6rgj8eprggntbm.apps.googleusercontent.com",
+          "client_id": "1068746741452-2gikqgecr9ff951e3umssrb3lav9g2cg.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBSqnkq7R6ZvvKUu9mw70_NmUfDFl9KXzc"
+          "current_key": "AIzaSyAydby7xlBL09Qmh2msdeCuNv6cSvCuODQ"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1081869654938-spa0ukrjls58a0qnmj6rgj8eprggntbm.apps.googleusercontent.com",
+              "client_id": "1068746741452-2gikqgecr9ff951e3umssrb3lav9g2cg.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "1081869654938-d8211m3mtkfvq5ue8jpu0kuk6fa8s0ok.apps.googleusercontent.com",
+              "client_id": "1068746741452-1s0m2ndme9ljirapc7ccj23ok941oj1v.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.theintellify.continuummedia"
+                "bundle_id": "com.continuummedia.xperiencebooks"
               }
             }
           ]

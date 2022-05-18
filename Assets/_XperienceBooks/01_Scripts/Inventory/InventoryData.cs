@@ -73,5 +73,6 @@ public class InventoryData : MonoBehaviour
             if (inventoryImg)
                 inventoryImg.sprite = GameManager.Instance.Texture2DToSprite(texture);
         }
+        request.Dispose();
     }
 }

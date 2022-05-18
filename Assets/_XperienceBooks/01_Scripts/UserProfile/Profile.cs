@@ -88,8 +88,12 @@ public class Profile : MonoBehaviour
             if (GameManager.Instance.TitleFont != null)
             {
                 title.font = GameManager.Instance.TitleFont;
-                m_LogoutButtonText.font = GameManager.Instance.TitleFont;
             }
+            if (GameManager.Instance.DetailFont != null)
+            {
+                m_LogoutButtonText.font = GameManager.Instance.DetailFont;
+            }
+
             Color newCol;
             if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
             {
@@ -108,6 +112,12 @@ public class Profile : MonoBehaviour
                 Password_Lbl.color = newCol;
                 CPassword_Lbl.color = newCol;
                 m_LogoutButtonText.color = newCol;
+            }
+
+            if (!ThemeManager.Instance.isThemeAvailable)
+            {
+                Debug.Log("Color changed");
+                m_LogoutButtonText.color = new Color32(95, 93, 169, 255);
             }
         }
     }

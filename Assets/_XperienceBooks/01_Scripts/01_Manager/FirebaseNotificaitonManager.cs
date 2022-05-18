@@ -1,5 +1,7 @@
-﻿using Firebase.Extensions;
+﻿//#if UNITY_EDITOR
+using Firebase.Extensions;
 using Firebase.Messaging;
+//#endif
 using UnityEngine;
 
 public class FirebaseNotificaitonManager : MonoBehaviour

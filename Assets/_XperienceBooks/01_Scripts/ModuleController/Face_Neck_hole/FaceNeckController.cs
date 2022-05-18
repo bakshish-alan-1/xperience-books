@@ -25,12 +25,10 @@ public class FaceNeckController : MonoBehaviour
 
     string AssetURI;
     public bool isTextureAvailable = false;
-    bool isTextureSet = false;
     bool isInventoryApiCall = false;
 
     public Vector3 builderPosition = Vector3.zero;
 
-    GameObject trackablesObj, FaceModelDummy;
     Texture2D webTexture = null;
     public bool isBackBtn = false;
 
@@ -40,7 +38,6 @@ public class FaceNeckController : MonoBehaviour
             Instance = this;
 
         ModuleContent.AddRange(GameManager.Instance.GetModuleData());
-        trackablesObj = GameObject.Find("Trackables");
     }
 
     void Start()
@@ -64,6 +61,7 @@ public class FaceNeckController : MonoBehaviour
         StopAllCoroutines();
         CancelInvoke();
         ModuleContent.Clear();
+        ModuleContent.TrimExcess();
         webTexture = null;
     }
 

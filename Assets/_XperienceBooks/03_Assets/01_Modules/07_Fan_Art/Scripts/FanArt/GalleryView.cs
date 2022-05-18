@@ -24,6 +24,7 @@ public class GalleryView : MonoBehaviour
     public bool isFanART = false;
 
     [Header("Fan-Art Theme")]
+    [SerializeField] Image backBtn;
     [SerializeField] Image HeaderBg;
     [SerializeField] Image emailBtnIcon;
     [SerializeField] TMPro.TMP_Text EmailBtnTxt;
@@ -31,6 +32,8 @@ public class GalleryView : MonoBehaviour
     [Header("EmailBox Theme")]
     [SerializeField] Image BoxBg;
     [SerializeField] Image boxBtnIcon;
+    [SerializeField] TMPro.TMP_Text titleTxt;
+    [SerializeField] TMPro.TMP_Text detailMailTxt;
     [SerializeField] TMPro.TMP_Text boxBtnTxt;
 
     string AssetURI;
@@ -64,18 +67,20 @@ public class GalleryView : MonoBehaviour
         isBackBtn = true;
         StopAllCoroutines();
         ModuleContent.Clear();
+        ModuleContent.TrimExcess();
     }
 
     void loadTheme()
     {
         // fan art theme
+        backBtn.sprite = ThemeManager.Instance.backBtn;
         HeaderBg.sprite = ThemeManager.Instance.fanArtHeaderBg;
         if (isFanART)
         {
             //Todo : Manage Email theme for Fan ART from here only
             emailBtnIcon.sprite = ThemeManager.Instance.commonBtn;
             
-            EmailBtnTxt.font = GameManager.Instance.TitleFont;
+            EmailBtnTxt.font = GameManager.Instance.DetailFont;
             Color newCol;
             if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
                 EmailBtnTxt.color = newCol;
@@ -84,7 +89,10 @@ public class GalleryView : MonoBehaviour
             BoxBg.sprite = ThemeManager.Instance.dialoguebox;
             boxBtnIcon.sprite = ThemeManager.Instance.commonBtn;
 
-            boxBtnTxt.font = GameManager.Instance.TitleFont;
+            titleTxt.font = GameManager.Instance.TitleFont;
+            detailMailTxt.font = GameManager.Instance.DetailFont;
+
+            boxBtnTxt.font = GameManager.Instance.DetailFont;
             boxBtnTxt.color = newCol;
         }
     }

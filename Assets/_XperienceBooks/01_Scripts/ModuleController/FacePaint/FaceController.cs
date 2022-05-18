@@ -273,7 +273,9 @@ public class FaceController : MonoBehaviour
         StopAllCoroutines();
         CancelInvoke();
         m_FacePaintTextures.Clear();
+        m_FacePaintTextures.TrimExcess();
         cellData.Clear();
+        cellData.TrimExcess();
     }
 
     public void setMaterial()

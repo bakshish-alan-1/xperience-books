@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 using TMPro;
 using System.Threading.Tasks;
 using KetosGames.SceneTransition;
+using System.Collections;
 
 public class ThemeManager : MonoBehaviour
 {
@@ -13,11 +14,15 @@ public class ThemeManager : MonoBehaviour
     [SerializeField] TMP_Text progressText;
     public Sprite background, scanBackground, scanBtn, seriesLogo, seriesIcon;
     public Sprite dialoguebox, commonBtn, backBtn, profileIcon, newIcon, inventoryIcon, inventoryPlaceholder, fanArtHeaderBg;
+    public Sprite cameraBtn, infoBtn, cameraSwapBtn;
     public Sprite facebook, insta, youtube, website, twitter;
     public Sprite notificationNextBtn, notificationIcon, notificationTill;
 
     Sprite textureToSprite = null;
+    Texture2D t = null;
     string theme = "";
+
+    public bool isThemeAvailable = true;
 
     private void Start()
     {
@@ -51,9 +56,17 @@ public class ThemeManager : MonoBehaviour
         theme = GameManager.Instance.GetThemePath();
 
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.image_path))
-        { urls.Add(GameManager.Instance.selectedSeries.image_path); name.Add(theme + "/" + StaticKeywords.SeriesImage); }
+        { urls.Add(GameManager.Instance.selectedSeries.image_path); name.Add(GameManager.Instance.LocalStoragePath + "/Theme/" + StaticKeywords.SeriesImage); }
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.logo))
         { urls.Add(GameManager.Instance.selectedSeries.theme.logo); name.Add(theme + "/" + StaticKeywords.LogoTheme); }
+
+
+        if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.camera_icon))
+        { urls.Add(GameManager.Instance.selectedSeries.theme.camera_icon); name.Add(theme + "/" + StaticKeywords.CameraBtn); }
+        if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.camera_swap_icon))
+        { urls.Add(GameManager.Instance.selectedSeries.theme.camera_swap_icon); name.Add(theme + "/" + StaticKeywords.CameraSwapBtn); }
+        if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.info_icon))
+        { urls.Add(GameManager.Instance.selectedSeries.theme.info_icon); name.Add(theme + "/" + StaticKeywords.InfoBtn); }
 
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.dialog_box))
         { urls.Add(GameManager.Instance.selectedSeries.theme.dialog_box); name.Add(theme + "/" + StaticKeywords.DialogBox); }
@@ -129,6 +142,9 @@ public class ThemeManager : MonoBehaviour
         if (urls.Count > 0)
         {
             Debug.Log(urls.Count);
+
+            isThemeAvailable = true;
+
             per = 100 / urls.Count;
             GameManager.Instance.isNewThemeDownload = true;
             GameManager.Instance.OpenPrepareThemWindow(true);
@@ -140,6 +156,13 @@ public class ThemeManager : MonoBehaviour
                     OnDownloadTheme(urls[i], name[i]);// async call for download data
                 }
             }
+        }
+        else if (urls.Count == 0)
+        {
+            PlayerPrefs.SetString("IsThemeSaved", "true");
+            isThemeAvailable = false;
+            Debug.Log("isThemeAvailable is false now");
+            LoadSkinTheme();
         }
     }
 
@@ -155,7 +178,7 @@ public class ThemeManager : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.ConnectionError)
         {
-            Debug.Log(request.error);
+            Debug.Log("error: " + request.error + ", code: " + request.responseCode);
             GameManager.Instance.OpenPrepareThemWindow(false);
             ErrorWindow.Instance.SetErrorMessage("Something Went Wrong", request.error, "TRY AGAIN", ErrorWindow.ResponseData.InternetIssue, true);
         }
@@ -166,7 +189,8 @@ public class ThemeManager : MonoBehaviour
             if ((no + 1) >= urls.Count)
             {
                 PlayerPrefs.SetString("IsThemeSaved", "true");
-                LoadSkinTheme();
+                StartCoroutine(LoadSkin());
+                //LoadSkinTheme();
             }
             else
             {
@@ -174,6 +198,28 @@ public class ThemeManager : MonoBehaviour
                 progressText.text = (no * per) + " %";
             }
         }
+        request.Dispose();
+    }
+
+    public async void SaveSeriesIcon(string url, string path)
+    {
+        Debug.Log("url: " + url + ", name: " + path);
+
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+        var operation = request.SendWebRequest();
+        while (!operation.isDone)
+            await Task.Yield();
+
+        if (request.result == UnityWebRequest.Result.ConnectionError)
+        {
+            Debug.Log(request.error);
+        }
+        else
+        {
+            File.WriteAllBytes(path, request.downloadHandler.data);
+            seriesIcon = getTexture(GameManager.Instance.LocalStoragePath + "/Theme/", StaticKeywords.SeriesImage);
+        }
+        request.Dispose();
     }
 
     private void Update()
@@ -199,13 +245,170 @@ public class ThemeManager : MonoBehaviour
 
     Sprite getTexture(string path, string name)
     {
-        Texture2D t = new Texture2D(100, 100);
+        t = new Texture2D(100, 100);
         byte[] b = File.ReadAllBytes(path + "/" + name);
         t.LoadImage(b);
 
         textureToSprite = Sprite.Create(t, new Rect(0, 0, t.width, t.height), new Vector2(0.5f, 0.5f), 100.0f);
 
         return textureToSprite;
+    }
+
+    IEnumerator LoadSkin()
+    {
+        yield return new WaitForEndOfFrame();
+        theme = GameManager.Instance.GetThemePath();
+
+        if (!File.Exists(theme + "/" + StaticKeywords.BGTheme))
+            background = Resources.Load<Sprite>("Main_BG");
+        else
+            background = getTexture(theme, StaticKeywords.BGTheme);
+        yield return new WaitForEndOfFrame();
+
+        if (!File.Exists(theme + "/" + StaticKeywords.Scan_BGTheme))
+            scanBackground = Resources.Load<Sprite>("MainBG_New");
+        else
+            scanBackground = getTexture(theme, StaticKeywords.Scan_BGTheme);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.ScanTheme))
+            scanBtn = Resources.Load<Sprite>("scan_button");
+        else
+            scanBtn = getTexture(theme, StaticKeywords.ScanTheme);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.LogoTheme))
+            seriesLogo = Resources.Load<Sprite>("transparentImage");
+        else
+            seriesLogo = getTexture(theme, StaticKeywords.LogoTheme);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(GameManager.Instance.LocalStoragePath + "/Theme/" + StaticKeywords.SeriesImage))
+            seriesIcon = Resources.Load<Sprite>("NoImage");
+        else
+            seriesIcon = getTexture(GameManager.Instance.LocalStoragePath + "/Theme/", StaticKeywords.SeriesImage);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.DialogBox))
+            dialoguebox = Resources.Load<Sprite>("DialogBox");
+        else
+            dialoguebox = getTexture(theme, StaticKeywords.DialogBox);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.Fan_art_Img_Bg))
+            fanArtHeaderBg = Resources.Load<Sprite>("transparentImage");
+        else
+            fanArtHeaderBg = getTexture(theme, StaticKeywords.Fan_art_Img_Bg);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.DialogBoxBtn))
+            commonBtn = Resources.Load<Sprite>("StoneBack");
+        else
+            commonBtn = getTexture(theme, StaticKeywords.DialogBoxBtn);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.BackBtnTheme))
+            backBtn = Resources.Load<Sprite>("btn_back_white");
+        else
+            backBtn = getTexture(theme, StaticKeywords.BackBtnTheme);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.CameraBtn))
+            cameraBtn = Resources.Load<Sprite>("btn_camera");
+        else
+            cameraBtn = getTexture(theme, StaticKeywords.CameraBtn);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.CameraSwapBtn))
+            cameraSwapBtn = Resources.Load<Sprite>("btn_camera_swap");
+        else
+            cameraSwapBtn = getTexture(theme, StaticKeywords.CameraSwapBtn);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.InfoBtn))
+            infoBtn = Resources.Load<Sprite>("InfoBtn");
+        else
+            infoBtn = getTexture(theme, StaticKeywords.InfoBtn);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.ProfileTheme))
+            profileIcon = Resources.Load<Sprite>("Profile");
+        else
+            profileIcon = getTexture(theme, StaticKeywords.ProfileTheme);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.NotificationTheme))
+            newIcon = Resources.Load<Sprite>("Notification");
+        else
+            newIcon = getTexture(theme, StaticKeywords.NotificationTheme);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.InventoryTheme))
+            inventoryIcon = Resources.Load<Sprite>("Inventory");
+        else
+            inventoryIcon = getTexture(theme, StaticKeywords.InventoryTheme);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.InventoryPlaceholderImage))
+            inventoryPlaceholder = Resources.Load<Sprite>("InventoryPlaceHolder");
+        else
+            inventoryPlaceholder = getTexture(theme, StaticKeywords.InventoryPlaceholderImage);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.FacebookTheme))
+            facebook = Resources.Load<Sprite>("Facebook");
+        else
+            facebook = getTexture(theme, StaticKeywords.FacebookTheme);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.InstaTheme))
+            insta = Resources.Load<Sprite>("Insta");
+        else
+            insta = getTexture(theme, StaticKeywords.InstaTheme);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.YoutubeTheme))
+            youtube = Resources.Load<Sprite>("Youtube");
+        else
+            youtube = getTexture(theme, StaticKeywords.YoutubeTheme);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.WebsiteTheme))
+            website = Resources.Load<Sprite>("Website");
+        else
+            website = getTexture(theme, StaticKeywords.WebsiteTheme);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.TwitterTheme))
+            twitter = Resources.Load<Sprite>("Twitter");
+        else
+            twitter = getTexture(theme, StaticKeywords.TwitterTheme);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.NotificationNextBtn))
+            notificationNextBtn = Resources.Load<Sprite>("NotificationNext");
+        else
+            notificationNextBtn = getTexture(theme, StaticKeywords.NotificationNextBtn);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.NotificationCellIcon))
+            notificationIcon = Resources.Load<Sprite>("New_Icon");
+        else
+            notificationIcon = getTexture(theme, StaticKeywords.NotificationCellIcon);
+
+        yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.NotificationCellBG))
+            notificationTill = Resources.Load<Sprite>("StoneBack");
+        else
+            notificationTill = getTexture(theme, StaticKeywords.NotificationCellBG);
+
+        progressText.text = "100 %";
+
+        urls.Clear();
+        name.Clear();
+        urls.TrimExcess();
+        name.TrimExcess();
+        SceneLoader.LoadScene(1);
     }
 
     // call from loadMainScene, BookData script and current script as well
@@ -229,15 +432,30 @@ public class ThemeManager : MonoBehaviour
         else
             scanBtn = getTexture(theme, StaticKeywords.ScanTheme);
 
+        if (!File.Exists(theme + "/" + StaticKeywords.CameraBtn))
+            cameraBtn = Resources.Load<Sprite>("btn_camera");
+        else
+            cameraBtn = getTexture(theme, StaticKeywords.CameraBtn);
+
+        if (!File.Exists(theme + "/" + StaticKeywords.CameraSwapBtn))
+            cameraSwapBtn = Resources.Load<Sprite>("btn_camera_swap");
+        else
+            cameraSwapBtn = getTexture(theme, StaticKeywords.CameraSwapBtn);
+
+        if (!File.Exists(theme + "/" + StaticKeywords.InfoBtn))
+            infoBtn = Resources.Load<Sprite>("InfoBtn");
+        else
+            infoBtn = getTexture(theme, StaticKeywords.InfoBtn);
+
         if (!File.Exists(theme + "/" + StaticKeywords.LogoTheme))
             seriesLogo = Resources.Load<Sprite>("transparentImage");
         else
             seriesLogo = getTexture(theme, StaticKeywords.LogoTheme);
 
-        if (!File.Exists(theme + "/" + StaticKeywords.SeriesImage))
+        if (!File.Exists(GameManager.Instance.LocalStoragePath + "/Theme/" + StaticKeywords.SeriesImage))
             seriesIcon = Resources.Load<Sprite>("NoImage");
         else
-            seriesIcon = getTexture(theme, StaticKeywords.SeriesImage);
+            seriesIcon = getTexture(GameManager.Instance.LocalStoragePath + "/Theme/", StaticKeywords.SeriesImage);
 
         if (!File.Exists(theme + "/" + StaticKeywords.DialogBox))
             dialoguebox = Resources.Load<Sprite>("DialogBox");

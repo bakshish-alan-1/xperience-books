@@ -44,6 +44,11 @@ public class HomeScreen : MonoBehaviour
         Debug.Log("IsThemeSaved: "+ PlayerPrefs.GetString("IsThemeSaved"));
     }
 
+    private void Start()
+    {
+        
+    }
+
     public void OnScanBtnHit()
     {
         if (GameManager.Instance.IsCameraPermissionGranted())
@@ -155,7 +160,7 @@ public class HomeScreen : MonoBehaviour
         seriesImage.sprite = (ThemeManager.Instance.seriesIcon);
         seriesLogo.sprite = (ThemeManager.Instance.seriesLogo);
 
-        ScanBtnTxt.font = GameManager.Instance.TitleFont;
+        ScanBtnTxt.font = GameManager.Instance.DetailFont;
         Color newCol;
         if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
             ScanBtnTxt.color = newCol;

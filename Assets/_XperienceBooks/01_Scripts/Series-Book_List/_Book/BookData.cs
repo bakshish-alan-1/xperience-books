@@ -67,6 +67,7 @@ public class BookData : MonoBehaviour
             Debug.Log("Call LoadSkinTheme from BookData");
             ThemeManager.Instance.LoadSkinTheme();// already theme available then direct set to the home panel
         }
+        ThemeManager.Instance.SaveSeriesIcon(GameManager.Instance.selectedBooks.image, GameManager.Instance.LocalStoragePath + "Theme/" + StaticKeywords.SeriesImage);
     }
 
     public async void setImage(string url)

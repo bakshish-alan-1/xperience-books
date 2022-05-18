@@ -192,6 +192,8 @@ namespace Ecommerce
 
         public void BackToMainScreen() {
 
+            m_CategoryList.Clear();
+            m_CategoryList.TrimExcess();
             SceneLoader.LoadScene("01_Home");
         }
 

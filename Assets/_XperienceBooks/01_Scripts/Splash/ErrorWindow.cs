@@ -35,7 +35,7 @@ public class ErrorWindow : MonoBehaviour
 
     void setBGTheme(bool isDefault)
     {
-        if (isDefault)
+        /*if (isDefault)
         {
             Debug.Log("set them for error msg default");
             BG.sprite = Resources.Load<Sprite>("DialogBox");
@@ -65,11 +65,50 @@ public class ErrorWindow : MonoBehaviour
             if (GameManager.Instance.TitleFont != null)
             {
                 TitleText.font = GameManager.Instance.TitleFont;
-                ButtonText.font = GameManager.Instance.TitleFont;
             }
 
             if (GameManager.Instance.DetailFont != null)
+            {
+                ButtonText.font = GameManager.Instance.DetailFont;
                 Message.font = GameManager.Instance.DetailFont;
+            }
+        }*/
+
+        BG.sprite = (ThemeManager.Instance.dialoguebox);
+        ButtonImg.sprite = (ThemeManager.Instance.commonBtn);
+        Color newCol;
+        if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.color_code))
+        {
+            if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
+            {
+                TitleText.color = newCol;
+                Message.color = newCol;
+                ButtonText.color = newCol;
+            }
+        }
+        else
+        {
+            Message.color = Color.white;
+            TitleText.color = Color.white;
+            ButtonText.color = new Color32(95, 93, 170, 255);
+        }
+
+        if (GameManager.Instance.TitleFont != null)
+        {
+            TitleText.font = GameManager.Instance.TitleFont;
+        }
+        else
+            TitleText.font = GameManager.Instance.DefaultFont;
+
+        if (GameManager.Instance.DetailFont != null)
+        {
+            ButtonText.font = GameManager.Instance.DetailFont;
+            Message.font = GameManager.Instance.DetailFont;
+        }
+        else
+        {
+            Message.font = GameManager.Instance.DefaultFont;
+            ButtonText.font = GameManager.Instance.DefaultFont;
         }
     }
 

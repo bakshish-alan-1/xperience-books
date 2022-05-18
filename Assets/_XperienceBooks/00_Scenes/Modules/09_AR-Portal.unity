@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.5748171, a: 1}
+  m_IndirectSpecularColor: {r: 0.44391298, g: 0.49315572, b: 0.5722092, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1190,6 +1190,7 @@ GameObject:
   - component: {fileID: 1335839540}
   - component: {fileID: 1335839539}
   - component: {fileID: 1335839541}
+  - component: {fileID: 1335839542}
   m_Layer: 0
   m_Name: AR Session Origin
   m_TagString: Untagged
@@ -1319,6 +1320,27 @@ MonoBehaviour:
   m_DisablePlaneRendering: 1
   m_PointCloudManager: {fileID: 1335839536}
   m_PlaneManager: {fileID: 1335839537}
+--- !u!114 &1335839542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1335839533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 324071488fdc94ec48140a8cc6dddc82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DialogBox: {fileID: 0}
+  DialogButton: {fileID: 0}
+  backIcon: {fileID: 5860559420898483392}
+  cameraIcon: {fileID: 0}
+  cameraSwapIcon: {fileID: 0}
+  infoIcon: {fileID: 0}
+  DialogTitle: {fileID: 0}
+  DialogText: {fileID: 0}
+  ButtonText: {fileID: 0}
 --- !u!1 &1367190531
 GameObject:
   m_ObjectHideFlags: 0
@@ -1742,7 +1764,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b9d6a685e4ec74c1ba2559bf3ed99d85, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c2214fb5a010342529742b533faa3302, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1766,10 +1788,10 @@ RectTransform:
   m_Father: {fileID: 5860559421057727734}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 75, y: -75}
-  m_SizeDelta: {x: 80, y: 80}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 72, y: 57}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5860559420898483395
 CanvasRenderer:
@@ -1958,7 +1980,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 75, y: -75}
-  m_SizeDelta: {x: 150, y: 150}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &5860559421057727735
 GameObject:

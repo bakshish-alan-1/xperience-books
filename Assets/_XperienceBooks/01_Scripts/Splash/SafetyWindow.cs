@@ -60,7 +60,10 @@ public class SafetyWindow : MonoBehaviour
         }
 
         if (GameManager.Instance.DetailFont != null)
+        {
+            BtnText.font = GameManager.Instance.DetailFont;
             message.font = GameManager.Instance.DetailFont;
+        }
     }
 
     public void OpenWebsite()

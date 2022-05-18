@@ -54,6 +54,8 @@ public class ARPortalController : MonoBehaviour
         if (m_PortalAudioSource.isPlaying)
             m_PortalAudioSource.Stop();
 
+        ModuleContent.Clear();
+        ModuleContent.TrimExcess();
         Destroy(temp);
     }
 
@@ -139,6 +141,7 @@ public class ARPortalController : MonoBehaviour
                 if (audioFile.Length > 0)
                     StartCoroutine(LoadAudioFile("file://" + audioFile[0].ToString()));
             }
+            uwr.Dispose();
         }
         controller.UpdatePlacementState();
 
@@ -160,7 +163,7 @@ public class ARPortalController : MonoBehaviour
         doorRootObject.transform.GetChild(0).GetComponent<Animation>().wrapMode = WrapMode.Once;
 
     }
-
+    
     private IEnumerator LoadImageTexture(string path)
     {
         Debug.Log("LOADING Image: " + path);
@@ -179,6 +182,7 @@ public class ARPortalController : MonoBehaviour
             controller.m_Preloader.SetActive(false);
             loadingFinished = true;
         }
+        www.Dispose();
     }
 
     private void Update()
@@ -208,6 +212,7 @@ public class ARPortalController : MonoBehaviour
                 temp = DownloadHandlerAudioClip.GetContent(www);
                 m_PortalAudioSource.clip = temp;
             }
+            www.Dispose();
         }
     }
 }

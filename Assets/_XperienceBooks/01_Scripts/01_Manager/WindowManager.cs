@@ -43,7 +43,9 @@ public class WindowManager : MonoBehaviour
 
         if (PlayerPrefs.GetInt(StaticKeywords.Login, 0) == 1)// 1 = login, 0 = logout
         {
-            if (PlayerPrefs.GetString("IsThemeSaved").Equals("false") || GameManager.Instance.selectedSeries.id == -1 || GameManager.Instance.selectedBooks.id == -1)
+            if (!ThemeManager.Instance.isThemeAvailable)
+                currentWindowIndex = 7;
+            else if (PlayerPrefs.GetString("IsThemeSaved").Equals("false") || GameManager.Instance.selectedSeries.id == -1 || GameManager.Instance.selectedBooks.id == -1)
                 currentWindowIndex = 5;// redirect to series screen
             else
                 currentWindowIndex = 7;// redirect to home screen
@@ -72,7 +74,9 @@ public class WindowManager : MonoBehaviour
 
         if (PlayerPrefs.GetInt(StaticKeywords.Login, 0) == 1 && !GlobalControl.Instance.scanComplete)
         {
-            if (PlayerPrefs.GetString("IsThemeSaved").Equals("false") || GameManager.Instance.selectedSeries.id == -1 || GameManager.Instance.selectedBooks.id == -1)
+            if (!ThemeManager.Instance.isThemeAvailable)
+                HomeScreen.Instance.OnSetHomePanelData();
+            else if (PlayerPrefs.GetString("IsThemeSaved").Equals("false") || GameManager.Instance.selectedSeries.id == -1 || GameManager.Instance.selectedBooks.id == -1)
             {
                 ApiManager.Instance.GetSeriesList();
             }

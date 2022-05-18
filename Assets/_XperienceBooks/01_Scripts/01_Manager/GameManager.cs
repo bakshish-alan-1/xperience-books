@@ -257,7 +257,11 @@ public class GameManager : MonoBehaviour
         }
 
         if (DetailFont != null)
+        {
+            closeBtnText.font = DetailFont;
+            websiteBtnText.font = DetailFont;
             message.font = DetailFont;
+        }
     }
 
     public void OpenMarkerDetailsWindow()
@@ -302,6 +306,7 @@ public class GameManager : MonoBehaviour
             WindowManager.Instance.LogOut();
             SeriesController.Instance.OnRemoveChield();
 
+            //firebase
             firebase.OnDeInitializeToken();
 
             Debug.Log(LocalStoragePath);

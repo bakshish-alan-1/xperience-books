@@ -41,6 +41,7 @@ public class SeriesData : MonoBehaviour
 
         FileHandler.SaveSeriesData(GameManager.Instance.selectedSeries);
         ApiManager.Instance.GetSeriesDetails(GameManager.Instance.m_Series[index].id);
+        //ThemeManager.Instance.SaveSeriesIcon(GameManager.Instance.selectedSeries.image_path, GameManager.Instance.LocalStoragePath + "Theme/" + StaticKeywords.SeriesImage);
     }
 
     public async void setImage(string url)

@@ -50,6 +50,7 @@ public class ObjectAndMeController : MonoBehaviour
         isBackBtn = true;
         StopAllCoroutines();
         ModuleContent.Clear();
+        ModuleContent.TrimExcess();
         Destroy(m_2DTexture);
     }
 

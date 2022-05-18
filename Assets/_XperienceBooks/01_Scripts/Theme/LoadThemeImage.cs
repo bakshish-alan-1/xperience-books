@@ -8,6 +8,8 @@ public class LoadThemeImage : MonoBehaviour
     [Header("Set Theme")]
     public Image DialogBox;
     public Image DialogButton;
+    public Image backIcon;
+    public Image cameraIcon, cameraSwapIcon, infoIcon;
     public TMPro.TMP_Text DialogTitle;
     public TMPro.TMP_Text DialogText;
     public TMPro.TMP_Text ButtonText;
@@ -21,21 +23,39 @@ public class LoadThemeImage : MonoBehaviour
         if (DialogButton != null)
             DialogButton.sprite = ThemeManager.Instance.commonBtn;
 
-        if (GameManager.Instance.TitleFont != null)
+        if (backIcon != null)
+            backIcon.sprite = ThemeManager.Instance.backBtn;
+
+        if (cameraIcon != null)
+            cameraIcon.sprite = ThemeManager.Instance.cameraBtn;
+
+        if (cameraSwapIcon != null)
+            cameraSwapIcon.sprite = ThemeManager.Instance.cameraSwapBtn;
+
+        if (infoIcon != null)
+            infoIcon.sprite = ThemeManager.Instance.infoBtn;
+
+        if (GameManager.Instance.TitleFont != null && DialogTitle != null)
         {
             DialogTitle.font = GameManager.Instance.TitleFont;
-            ButtonText.font = GameManager.Instance.TitleFont;
         }
 
         if (GameManager.Instance.DetailFont != null)
-            DialogText.font = GameManager.Instance.DetailFont;
-
+        {
+            if (ButtonText != null)
+                ButtonText.font = GameManager.Instance.DetailFont;
+            if (DialogText != null)
+                DialogText.font = GameManager.Instance.DetailFont;
+        }
         Color newCol;
         if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
         {
-            DialogTitle.color = newCol;
-            DialogText.color = newCol;
-            ButtonText.color = newCol;
+            if (DialogTitle != null)
+                DialogTitle.color = newCol;
+            if (DialogText != null)
+                DialogText.color = newCol;
+            if (ButtonText != null)
+                ButtonText.color = newCol;
         }
     }
 }
