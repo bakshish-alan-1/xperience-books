@@ -204,22 +204,26 @@ public class ThemeManager : MonoBehaviour
     public async void SaveSeriesIcon(string url, string path)
     {
         Debug.Log("url: " + url + ", name: " + path);
-
-        UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-        var operation = request.SendWebRequest();
-        while (!operation.isDone)
-            await Task.Yield();
-
-        if (request.result == UnityWebRequest.Result.ConnectionError)
-        {
-            Debug.Log(request.error);
-        }
+        if (string.IsNullOrEmpty(url))
+            seriesIcon = Resources.Load<Sprite>("NoImage");
         else
         {
-            File.WriteAllBytes(path, request.downloadHandler.data);
-            seriesIcon = getTexture(GameManager.Instance.LocalStoragePath + "/Theme/", StaticKeywords.SeriesImage);
+            UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+            var operation = request.SendWebRequest();
+            while (!operation.isDone)
+                await Task.Yield();
+
+            if (request.result == UnityWebRequest.Result.ConnectionError)
+            {
+                Debug.Log(request.error);
+            }
+            else
+            {
+                File.WriteAllBytes(path, request.downloadHandler.data);
+                seriesIcon = getTexture(GameManager.Instance.LocalStoragePath + "/Theme/", StaticKeywords.SeriesImage);
+            }
+            request.Dispose();
         }
-        request.Dispose();
     }
 
     private void Update()
@@ -283,7 +287,7 @@ public class ThemeManager : MonoBehaviour
             seriesLogo = getTexture(theme, StaticKeywords.LogoTheme);
 
         yield return new WaitForEndOfFrame();
-        if (!File.Exists(GameManager.Instance.LocalStoragePath + "/Theme/" + StaticKeywords.SeriesImage))
+        if (!File.Exists(GameManager.Instance.LocalStoragePath + "/Theme/" + StaticKeywords.SeriesImage) || string.IsNullOrEmpty(GameManager.Instance.selectedBooks.image))
             seriesIcon = Resources.Load<Sprite>("NoImage");
         else
             seriesIcon = getTexture(GameManager.Instance.LocalStoragePath + "/Theme/", StaticKeywords.SeriesImage);
@@ -452,7 +456,7 @@ public class ThemeManager : MonoBehaviour
         else
             seriesLogo = getTexture(theme, StaticKeywords.LogoTheme);
 
-        if (!File.Exists(GameManager.Instance.LocalStoragePath + "/Theme/" + StaticKeywords.SeriesImage))
+        if (!File.Exists(GameManager.Instance.LocalStoragePath + "/Theme/" + StaticKeywords.SeriesImage) || string.IsNullOrEmpty(GameManager.Instance.selectedBooks.image))
             seriesIcon = Resources.Load<Sprite>("NoImage");
         else
             seriesIcon = getTexture(GameManager.Instance.LocalStoragePath + "/Theme/", StaticKeywords.SeriesImage);

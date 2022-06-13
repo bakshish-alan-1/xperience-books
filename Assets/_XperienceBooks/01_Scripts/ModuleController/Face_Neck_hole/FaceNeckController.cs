@@ -165,11 +165,12 @@ public class FaceNeckController : MonoBehaviour
             screenSpaceUI.SetActive(false);
         }
 
-#if UNITY_ANDROID
+
         if (FaceFound())
             cameraBtn.SetActive(true);
         else
             cameraBtn.SetActive(false);
+#if UNITY_ANDROID
 #endif
     }
 

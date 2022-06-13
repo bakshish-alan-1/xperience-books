@@ -11,26 +11,26 @@
       }, 
       "oauth_client": [
         {
-          "client_id": "1068746741452-1s0m2ndme9ljirapc7ccj23ok941oj1v.apps.googleusercontent.com"
+          "client_id": "1081869654938-d8211m3mtkfvq5ue8jpu0kuk6fa8s0ok.apps.googleusercontent.com"
         }
       ], 
       "api_key": [
         {
-          "current_key": "AIzaSyCaJ1PhyFOuDs7Ag-0wQ0hh0VSMhDlOS4w"
+          "current_key": "AIzaSyDFBAA8IqeEuEraEVKqOihbH9G2fvPrDBk"
         }
       ], 
       "client_info": {
-        "mobilesdk_app_id": "1:1068746741452:ios:a7ee956c014235841bd469", 
+        "mobilesdk_app_id": "1:1081869654938:ios:1688282cc546e2ec8ff823", 
         "android_client_info": {
-          "package_name": "com.continuummedia.xperiencebooks"
+          "package_name": "com.theintellify.continuummedia"
         }
       }
     }
   ], 
   "configuration_version": "1", 
   "project_info": {
-    "storage_bucket": "continuum-a0394.appspot.com", 
-    "project_id": "continuum-a0394", 
-    "project_number": "1068746741452"
+    "storage_bucket": "arbooks-353cc.appspot.com", 
+    "project_id": "arbooks-353cc", 
+    "project_number": "1081869654938"
   }
 }

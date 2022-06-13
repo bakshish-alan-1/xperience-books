@@ -1288,6 +1288,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ItemPrefab: {fileID: 1294738756}
   m_SpawnObject: {fileID: 0}
+  m_CameraBtn: {fileID: 0}
   audioSource: {fileID: 2119718425}
   m_Preloader: {fileID: 993961300}
   m_ScreenSpaceUI: {fileID: 929128228}

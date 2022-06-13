@@ -15,6 +15,7 @@ using UnityEngine.XR.ARFoundation;
 public class PlacementController : MonoBehaviour
 {
 	public GameObject m_ItemPrefab, m_SpawnObject;
+	public GameObject m_CameraBtn;
 	[SerializeField] AudioSource audioSource;
 	private FocusSquare m_FocusSquare;
 	private float m_minimumThreshold = 0.001f;
@@ -31,7 +32,10 @@ public class PlacementController : MonoBehaviour
 	private void Awake()
     {
         m_FocusSquare = GetComponent<FocusSquare>();
-    }
+		if (m_CameraBtn != null)
+			m_CameraBtn.SetActive(false);
+
+	}
 
     private void Start()
     {
@@ -104,7 +108,8 @@ public class PlacementController : MonoBehaviour
 								if (m_SpawnObject != null)
 									m_SpawnObject.SetActive(true);
 							}
-
+							if (m_CameraBtn != null)
+								m_CameraBtn.SetActive(true);
 							if (!isInventoryApiCall)
 							{ isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(4); }
 						}

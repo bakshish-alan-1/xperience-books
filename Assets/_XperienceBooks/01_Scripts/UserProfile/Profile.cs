@@ -180,7 +180,7 @@ public class Profile : MonoBehaviour
         if (m_LogoutButtonText.text.ToLower() == "update" && text.ToLower() == "back")
         { SetProfileData(GameManager.Instance.m_UserData); }
 
-        m_LogoutButtonText.text = "LOGOUT";
+        m_LogoutButtonText.text = "UPDATE";// change LOGOUT to UPDATE akash
         m_errorText.text = "";
     }
 

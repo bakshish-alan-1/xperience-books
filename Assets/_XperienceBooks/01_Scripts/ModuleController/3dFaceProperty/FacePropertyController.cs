@@ -102,6 +102,7 @@ public class FacePropertyController : MonoBehaviour
     public void Init()
     {
         FacePropertyData.AddRange(GameManager.Instance.GetModuleData());
+        m_ScreenShotCameraBtn.SetActive(false);
 
         //passing index 0 because there is only 1 file in plane tracking model , if multiple then need to pass acordingly value
         filePath = GameManager.Instance.GetLocalPath(StaticKeywords.Face3DProperty); //GameManager.Instance.currentBook.BasePath()+ "/" + StaticKeywords.Face3DProperty + "/";

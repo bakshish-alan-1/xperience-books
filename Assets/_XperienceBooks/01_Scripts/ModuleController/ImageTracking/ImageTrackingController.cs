@@ -65,6 +65,7 @@ public class ImageTrackingController : MonoBehaviour
 
     bool isInventoryApiCall = false;
     bool isBackBtnClick = false;
+    bool audioInLoop = false;
 
     AudioClip tempClip = null;
     string audioPath = "";
@@ -136,7 +137,7 @@ public class ImageTrackingController : MonoBehaviour
         audioPath = GameManager.Instance.LocalStoragePath + m_TargetLocalPath;
         Debug.Log("audio_play_in_loop: " + data.audio_play_in_loop);
         audioSource.loop = data.audio_play_in_loop;
-
+        audioInLoop = data.audio_play_in_loop;
         var TaregtURI = "";
 
         if (FileHandler.ValidateFile(m_TargetLocalPath + m_TargetImageName))
@@ -291,6 +292,7 @@ public class ImageTrackingController : MonoBehaviour
         // updated, set prefab position and rotation
         foreach (ARTrackedImage image in obj.updated)
         {
+            //Debug.Log("image.trackingState: " + image.trackingState);
             // image is tracking or tracking with limited state, show visuals and update it's position and rotation
             if (image.trackingState == TrackingState.Tracking)
             {
@@ -322,6 +324,12 @@ public class ImageTrackingController : MonoBehaviour
                     Builder_Rotation = m_TargetLib[image.referenceImage.name].modelRotation;
                     Builder_Scale = m_TargetLib[image.referenceImage.name].modelScale;
                     m_ArObjectsToPlace.transform.SetPositionAndRotation(image.transform.position, image.transform.rotation);
+
+                    if (audioSource.clip != null && !audioSource.isPlaying)
+                    {
+                        audioSource.Stop();
+                        audioSource.Play();
+                    }
                 }
 
                 if (n == 0)
@@ -346,11 +354,11 @@ public class ImageTrackingController : MonoBehaviour
                     m_Preloader.transform.position = image.transform.position;
                 }
 
-                if (audioSource.clip != null && !audioSource.isPlaying)
+                /*if (audioSource.clip != null && !audioSource.isPlaying)
                 {
                     audioSource.Stop();
                     audioSource.Play();
-                }
+                }*/
 
                 m_ArObjectsToPlace.transform.SetPositionAndRotation(image.transform.position, image.transform.rotation);
             }
@@ -405,6 +413,7 @@ public class ImageTrackingController : MonoBehaviour
         }
         else
         {
+            m_ScreenSpaceUI.SetActive(true);
             if (m_Preloader.gameObject.activeInHierarchy)
                 m_Preloader.SetActive(false);
         }

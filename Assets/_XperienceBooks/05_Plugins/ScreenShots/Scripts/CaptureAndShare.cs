@@ -35,8 +35,8 @@ public class CaptureAndShare : MonoBehaviour
         if (!string.IsNullOrEmpty(GameManager.Instance.WatermarkURL))
         {
             OnDownloadWatermark(GameManager.Instance.WatermarkURL);
-        }
-        else
+        } 
+        else if (watermark != null)
             watermark.SetActive(false);
     }
 
