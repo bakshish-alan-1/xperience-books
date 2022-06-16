@@ -55,7 +55,8 @@ namespace Ecommerce.checkout
                 nCart = cart[i];
                 if (cart[i].m_SelectedAttributes[0] >= 0)
                 {
-                    nCart.m_product.image[0] = cart[i].m_product.attributes[cart[i].m_SelectedAttributes[0]].color_image;
+                    if (nCart.m_product.image.Count > 0)
+                        nCart.m_product.image[0] = cart[i].m_product.attributes[cart[i].m_SelectedAttributes[0]].color_image;
                     newCart.Add(nCart);
                 }
             }

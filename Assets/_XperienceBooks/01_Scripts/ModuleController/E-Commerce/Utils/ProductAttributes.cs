@@ -88,18 +88,19 @@ public class ProductAttributes : MonoBehaviour
 
         obj.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = name;
 
-        /*if (index == 0)
+        if (index == 0)
         {
             try
             {
                 obj.GetComponent<Toggle>().isOn = true;
+                obj.GetComponent<Toggle>().Select();
             }
             catch (Exception Ex)
             {
 
                 Debug.LogError("Getting Someting issue : " + Ex);
             }
-        }*/
+        }
     }
 
 

@@ -92,8 +92,10 @@ namespace Ecommerce
                             }
                         }
                         else
+                        {
                             color.sizeAttribute.SetActive(false);
-
+                            SelectedSize = -1;
+                        }
                         break;
                     case 1:
 
