@@ -24,6 +24,9 @@ namespace Ecommerce
 
         [SerializeField]
         ProductAttributes color;
+        [SerializeField] GameObject colorTitle;
+        [SerializeField] TMP_Text colorTitleName;
+        [SerializeField] TMP_Text sizeAttributeTitle;
 
         #region ProductInfo
 
@@ -33,6 +36,7 @@ namespace Ecommerce
 
         float FinalPrice = 0.0f;
         float productPrice = 0.0f;
+        public int productQty = 0;
         #endregion
 
         public int SelectedColor = -1;
@@ -75,46 +79,67 @@ namespace Ecommerce
                         Debug.Log(" color: " + index + " Type : " + type);
                         clearfillterBtn.SetActive(true);
                         SelectedColor = index;
-                        m_ColorAdditionalPrice = float.Parse(m_ProductDetails.attributes[SelectedColor].color_price);
+                        if (!string.IsNullOrEmpty(m_ProductDetails.attributes[SelectedColor].color_price))
+                            m_ColorAdditionalPrice = float.Parse(m_ProductDetails.attributes[SelectedColor].color_price);
+                        productQty = int.Parse(m_ProductDetails.attributes[SelectedColor].color_quantity);
                         FinalPrice = m_ColorAdditionalPrice;
-
+                        colorTitleName.text = "Color: " + m_ProductDetails.attributes[SelectedColor].color_name;
                         Reset();
                         Add(sss.NumberOfPanels, "", m_ProductDetails.attributes[SelectedColor].color_image);
 
                         color.ResetSizeAttributeObject();
                         if (m_ProductDetails.attributes[SelectedColor].sizes.Count >= 1)
                         {
-                            color.sizeAttribute.SetActive(true);
-                            color.sizeObjectList.Clear();
-                            for (int j = 0; j < m_ProductDetails.attributes[SelectedColor].sizes.Count; j++)
-                            {
-                                color.LoadSizeAttributesData(j, m_ProductDetails.attributes[SelectedColor].sizes[j].size_name);
-                            }
+                            onLoadSizeAttributes();
                         }
                         else
                         {
                             color.sizeAttribute.SetActive(false);
+                            color.sizeAttributeTitle.SetActive(false);
                             SelectedSize = -1;
                         }
                         break;
                     case 1:
 
-                        Debug.Log("size of colorindex: " + SelectedColor + ", size index: " + index);
+                        int i = SelectedColor;
+                        if (SelectedColor == -1)
+                            i = 0;
+
+                        Debug.Log("size of colorindex: " + i + ", size index: " + index);
                         SelectedSize = index;
-                        m_SizeAdditionalPrice = float.Parse(m_ProductDetails.attributes[SelectedColor].sizes[SelectedSize].size_price);
+                        sizeAttributeTitle.text = "Attributes: " + m_ProductDetails.attributes[i].sizes[SelectedSize].size_name;
+                        m_SizeAdditionalPrice = float.Parse(m_ProductDetails.attributes[i].sizes[SelectedSize].size_price);
+                        productQty = int.Parse(m_ProductDetails.attributes[i].sizes[SelectedSize].size_quantity);
                         FinalPrice = m_SizeAdditionalPrice;
+                        if(!string.IsNullOrEmpty(m_ProductDetails.attributes[i].sizes[SelectedSize].size_image))
+                        {
+                            Reset();
+                            Add(sss.NumberOfPanels, "", m_ProductDetails.attributes[i].sizes[SelectedSize].size_image);
+                        }
                         break;
                 }
-
-                //   float total = 0.0f;
-
-                //FinalPrice = float.Parse(m_ProductDetails.price) + m_ColorAdditionalPrice + m_SizeAdditionalPrice;
-
                 m_ProductPrice.text = "$" + FinalPrice;
             }
             catch (Exception ex)
             {
                 Debug.LogError("Issue in atribute selection :" + ex.Message);
+            }
+        }
+
+        void onLoadSizeAttributes()
+        {
+            Debug.Log("onLoadSizeAttributes");
+            int i = SelectedColor;
+            if (SelectedColor == -1)
+                i = 0;
+
+            color.sizeAttribute.SetActive(true);
+            color.sizeAttributeTitle.SetActive(true);
+            color.sizeObjectList.Clear();
+            productQty = int.Parse(m_ProductDetails.attributes[i].sizes[0].size_quantity);
+            for (int j = 0; j < m_ProductDetails.attributes[i].sizes.Count; j++)
+            {
+                color.LoadSizeAttributesData(j, m_ProductDetails.attributes[i].sizes[j].size_name);
             }
         }
 
@@ -146,6 +171,7 @@ namespace Ecommerce
             }
         }
 
+        // when select any product from product list control comes here to set details of that product
         public void UpdateProductDetails(Product product)
         {
             try
@@ -155,27 +181,47 @@ namespace Ecommerce
                 SelectedColor = -1;
                 SelectedSize = -1;
 
-                for (int i = 0; i < m_ProductDetails.image.Count; i++)
-                {
-                    Add(sss.NumberOfPanels, "", product.image[i]);
-                }
-
                 m_ProductName.text = product.name;
-                m_ProductPrice.text = "$"+product.price;
                 m_ProductDiscription.text = product.desc;
-                FinalPrice = float.Parse(product.price);
-                productPrice = FinalPrice;
+
 
                 color.gameObject.SetActive(false);
+                colorTitle.SetActive(false);
 
-                if (product.attributes.Count >= 1) {
-                    color.ResetColorAttributeObject();
-                    color.gameObject.SetActive(true);
-                    for (int i = 0; i < product.attributes.Count; i++)
+                if (product.attributes.Count > 0)
+                {
+                    if (product.attributes[0].id == 0)
                     {
-                        color.LoadAttributeData(product.attributes[i], i, "Color");
+                        if (product.attributes[0].sizes.Count > 0)
+                        {
+                            color.ResetSizeAttributeObject();
+                            Add(sss.NumberOfPanels, "", m_ProductDetails.attributes[0].sizes[0].size_image);// to show selected attribute image
+                            FinalPrice = float.Parse(product.attributes[0].sizes[0].size_price);
+                            onLoadSizeAttributes();
+                        }
+                    }
+                    else
+                    {
+
+                        Add(sss.NumberOfPanels, "", m_ProductDetails.attributes[0].color_image);// to show selected color image
+
+                        if (!string.IsNullOrEmpty(product.attributes[0].color_price))
+                            FinalPrice = float.Parse(product.attributes[0].color_price);
+                        if (!string.IsNullOrEmpty(product.attributes[0].color_quantity))
+                            productQty = int.Parse(product.attributes[0].color_quantity);
+                        color.ResetColorAttributeObject();
+                        colorTitle.SetActive(true);
+                        color.gameObject.SetActive(true);
+                        for (int i = 0; i < product.attributes.Count; i++)
+                        {
+                            color.LoadAttributeData(product.attributes[i], i, "Color");
+                        }
                     }
                 }
+
+                m_ProductPrice.text = "$" + FinalPrice.ToString();
+                productPrice = FinalPrice;
+
             }
             catch (Exception EX)
             {
@@ -188,7 +234,9 @@ namespace Ecommerce
         {
             color.ResetObject();
             clearfillterBtn.SetActive(false);
+            colorTitleName.text = "Color:";
             color.sizeAttribute.SetActive(false);
+            color.sizeAttributeTitle.SetActive(false);
             color.ResetColorAttributeObject();
             color.ResetSizeAttributeObject();
             SelectedColor = -1;
@@ -236,7 +284,7 @@ namespace Ecommerce
 
         public void AddToCart(bool callFromBuyNowBtn) {
 
-            if (CartController.Instance.OnCheckItemQuantity(m_ProductDetails.id, int.Parse(m_ProductDetails.qty)))
+            if (CartController.Instance.OnCheckItemQuantity(m_ProductDetails.id, productQty, SelectedColor, SelectedSize) && productQty > 0)
             {
                 Reset();
 
@@ -248,7 +296,7 @@ namespace Ecommerce
                 product.m_SelectedAttributes.Add(SelectedColor);
                 product.m_SelectedAttributes.Add(SelectedSize);
                 product.m_TotalQty = 1;
-
+                product.m_TotalQtyAvailable = productQty;
                 product.m_FinalPrice = FinalPrice;
                 Debug.Log("AddToCart product: " + product.ToString());
                 ECommerceManager.Instance.AddToCart(product, callFromBuyNowBtn);
@@ -257,26 +305,6 @@ namespace Ecommerce
             {
                 ApiManager.Instance.errorWindow.SetErrorMessage("", "Currently unavailable.", "OKAY", ErrorWindow.ResponseData.JustClose, false);
             }
-        }
-
-        private bool OnCheckItemQuantity(int id, int maxQty)
-        {
-            bool available = true;
-            int qty = 0;
-            for (int i = 0; i < CartController.Instance.container.transform.childCount; i++)
-            {
-                if (CartController.Instance.container.transform.GetChild(i).GetComponent<CartProductCell>().cartProduct.isActive)
-                {
-                    if (id == CartController.Instance.container.transform.GetChild(i).GetComponent<CartProductCell>().cartProduct.m_product.id)
-                        qty += CartController.Instance.container.transform.GetChild(i).GetComponent<CartProductCell>().qty;
-                }
-            }
-
-            Debug.Log("Qty: " + qty + ", " + maxQty);
-            if (qty >= maxQty)
-                available = false;
-
-            return available;
         }
     }
 }

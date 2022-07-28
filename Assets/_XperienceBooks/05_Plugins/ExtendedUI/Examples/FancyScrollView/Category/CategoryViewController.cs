@@ -18,6 +18,15 @@ namespace Ecommerce.Category
             m_CategoryList.AddRange(data);
         }
 
+        public void onRemoveCategoryCells()
+        {
+            for (int i = 0; i < PrefabsParent.transform.childCount; i++)
+            {
+                PrefabsParent.transform.GetChild(i).transform.gameObject.SetActive(false);
+                Destroy(PrefabsParent.transform.GetChild(i).transform.gameObject);
+            }
+        }
+
         public void GenerateCategoryCells()
         {
             try

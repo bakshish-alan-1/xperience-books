@@ -45,21 +45,54 @@ public class CartController : MonoBehaviour
         }
     }
 
-    public bool OnCheckItemQuantity(int id, int maxQty)
+    public bool OnCheckItemQuantity(int id, int orderQty, int selectedColor, int selectedAttribute)
     {
+        Debug.Log("OnCheckItemQuantity color: " + selectedColor + ", size: " + selectedAttribute);
         bool available = true;
         int qty = 0;
+        List<int> nodes = new List<int>();
+
         for (int i = 0; i < container.transform.childCount; i++)
         {
             if (container.transform.GetChild(i).GetComponent<CartProductCell>().cartProduct.isActive)
             {
                 if (id == container.transform.GetChild(i).GetComponent<CartProductCell>().cartProduct.m_product.id)
-                    qty += container.transform.GetChild(i).GetComponent<CartProductCell>().qty;
+                {
+                    CartProductCell cartProductObj = container.transform.GetChild(i).GetComponent<CartProductCell>();
+                    if (cartProductObj.cartProduct.m_SelectedAttributes[0] >= 0 && cartProductObj.cartProduct.m_SelectedAttributes[0] == selectedColor && cartProductObj.cartProduct.m_SelectedAttributes[1] == selectedAttribute)
+                    {
+                        nodes.Add(i);
+                    }
+                    else if (cartProductObj.cartProduct.m_SelectedAttributes[1] >= 0 && cartProductObj.cartProduct.m_SelectedAttributes[0] == selectedColor && cartProductObj.cartProduct.m_SelectedAttributes[1] == selectedAttribute)
+                    {
+                        nodes.Add(i);
+                    }
+                }
             }
         }
 
-        Debug.Log("Qty: " + qty + ", " + maxQty);
-        if (qty >= maxQty)
+        Debug.Log("node size: " + nodes.Count);
+        if (nodes.Count == 0)
+        {
+            return true;
+        }
+
+        for (int j = 0; j < nodes.Count; j++)
+        {
+            Debug.Log("nodes[" + j + "]: " + nodes[j]);
+            CartProductCell cartProductObj = container.transform.GetChild(nodes[j]).GetComponent<CartProductCell>();
+            if (cartProductObj.cartProduct.m_SelectedAttributes[0] >= 0)
+            {
+                qty += cartProductObj.qty;
+            }
+            else if (cartProductObj.cartProduct.m_SelectedAttributes[1] >= 0)
+            {
+                qty += cartProductObj.qty;
+            }
+        }
+
+        Debug.Log("Qty: " + qty + ", " + orderQty);
+        if (qty >= orderQty)
             available = false;
 
         return available;

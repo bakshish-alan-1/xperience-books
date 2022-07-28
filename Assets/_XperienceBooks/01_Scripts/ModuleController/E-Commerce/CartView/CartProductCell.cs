@@ -30,7 +30,7 @@ public class CartProductCell : MonoBehaviour
         cartProduct = data;
         title.text = data.m_product.name;
         StringBuilder disc = new StringBuilder();
-        totalQtyAvailable = int.Parse(cartProduct.m_product.qty);
+        totalQtyAvailable = data.m_TotalQtyAvailable;
 
         disc.Append("");
 
@@ -41,9 +41,15 @@ public class CartProductCell : MonoBehaviour
 
             if (data.m_SelectedAttributes[1] >= 0)
             {
-                disc.Append("    Size : " + data.m_product.attributes[data.m_SelectedAttributes[0]].sizes[data.m_SelectedAttributes[1]].size_name);
+                disc.Append("    Attribute : " + data.m_product.attributes[data.m_SelectedAttributes[0]].sizes[data.m_SelectedAttributes[1]].size_name);
             }
             StartCoroutine(LoadRemoteImage(data.m_product.attributes[data.m_SelectedAttributes[0]].color_image));
+        }
+        else if (data.m_SelectedAttributes[1] >= 0)
+        {
+            disc.Append("Attribute : " + data.m_product.attributes[0].sizes[data.m_SelectedAttributes[1]].size_name);
+
+            StartCoroutine(LoadRemoteImage(data.m_product.attributes[0].sizes[data.m_SelectedAttributes[1]].size_image));
         }
         else if (data.m_product.image.Count >= 1) // default fillter are selected by user
         {
@@ -100,9 +106,9 @@ public class CartProductCell : MonoBehaviour
 
     public void IncresedQty() {
 
-        if (!CartController.Instance.OnCheckItemQuantity(cartProduct.m_product.id, totalQtyAvailable))
+        if (!CartController.Instance.OnCheckItemQuantity(cartProduct.m_product.id, totalQtyAvailable, cartProduct.m_SelectedAttributes[0],cartProduct.m_SelectedAttributes[1]))
             return;
-       
+
         qty++;
         UpdatePrice();
     }

@@ -31,6 +31,8 @@ public class AttributeSize
     public int id; //{ get; set; }
     public string size_name; //{ get; set; }
     public string size_price; //{ get; set; }
+    public string size_image;//{ get; set; }
+    public string size_quantity = "0"; //{ get; set; }
 }
 
 
@@ -49,6 +51,7 @@ public class Attributes
     public string color_image; //{ get; set; }
     public string attribute_image_filename; //{ get; set; }
     public string color_price; //{ get; set; }
+    public string color_quantity = "0"; //{ get; set; }
 
     public List<AttributeSize> sizes; //{ get; set; }
 }

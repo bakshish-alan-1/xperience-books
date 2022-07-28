@@ -10,6 +10,8 @@ public class HomeScreen : MonoBehaviour
 {
     public static HomeScreen Instance = null;
 
+    [SerializeField] InputField mytoken;
+
     [Header("Login Panel Social Media Link")]
     [SerializeField] string instaLink = "";
     [SerializeField] string websiteLink = "";
@@ -262,5 +264,10 @@ public class HomeScreen : MonoBehaviour
                 }
                 break;
         }
+    }
+
+    private void Update()
+    {
+        mytoken.text = GameManager.Instance.FirebaseToken;
     }
 }

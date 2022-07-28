@@ -19,7 +19,7 @@ public class ProductAttributes : MonoBehaviour
 
     [Header("Size Attribute reference")]
     public int m_SizeAttributeIndex = 1;
-    public GameObject sizeAttribute, sizePrefab;
+    public GameObject sizeAttributeTitle, sizeAttribute, sizePrefab;
     public GameObject sizeParent;
     public ToggleGroup sizeParentGroup;
 
@@ -28,6 +28,7 @@ public class ProductAttributes : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        sizeAttributeTitle.SetActive(false);
         sizeAttribute.SetActive(false);
     }
 
@@ -49,29 +50,32 @@ public class ProductAttributes : MonoBehaviour
             GameObject obj = Instantiate(prefab, parent.transform, false);
             obj.GetComponent<ToggleSelector>().index = i;
             obj.GetComponent<ToggleSelector>().m_AttributeIndex = m_ColorAttributeIndex;
-            obj.GetComponent<Toggle>().group = parentGroup;
+            Toggle toggle = obj.GetComponent<Toggle>();
+            toggle.group = parentGroup;
             objectList.Add(obj);
 
             ColorUtility.TryParseHtmlString(attributes.color_code, out myColor);
             obj.GetComponent<ProceduralImage>().color = myColor;
             obj.transform.GetChild(0).gameObject.GetComponent<ProceduralImage>().color = myColor;
 
-            /*if (i == 0) {
+            if (i == 0) {
                 try
                 {
-                    obj.GetComponent<Toggle>().isOn = true;
+                    toggle.isOn = true;
+                    toggle.Select();
                 }
                 catch (Exception Ex) {
 
-                    Debug.LogError("Getting Someting issue : " + Ex);
+                    Debug.LogError("Getting issue while default color set: " + Ex);
                 }
-            }*/
+            }
         }
     }
 
     // reset size object list when color change
     public void ResetSizeAttributeObject()
     {
+        Debug.Log("ResetSizeAttributeObject");
         for (int i = 0; i < sizeParent.transform.childCount; i++)
         {
             Destroy(sizeParent.transform.GetChild(i).gameObject);
@@ -83,26 +87,25 @@ public class ProductAttributes : MonoBehaviour
         GameObject obj = Instantiate(sizePrefab, sizeParent.transform, false);
         obj.GetComponent<ToggleSelector>().index = index;
         obj.GetComponent<ToggleSelector>().m_AttributeIndex = m_SizeAttributeIndex;
-        obj.GetComponent<Toggle>().group = sizeParentGroup;
+        Toggle toggle1 = obj.GetComponent<Toggle>();
+        toggle1.group = sizeParentGroup;
         sizeObjectList.Add(obj);
 
         obj.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = name;
 
-        if (index == 0)
-        {
+        if (index == 0) {
             try
             {
-                obj.GetComponent<Toggle>().isOn = true;
-                obj.GetComponent<Toggle>().Select();
+                toggle1.isOn = true;
+                toggle1.Select();
             }
             catch (Exception Ex)
             {
 
-                Debug.LogError("Getting Someting issue : " + Ex);
+                Debug.LogError("Getting issue while default attribute set: " + Ex);
             }
         }
     }
-
 
     public void ResetObject() {
         foreach (GameObject obj in objectList) {

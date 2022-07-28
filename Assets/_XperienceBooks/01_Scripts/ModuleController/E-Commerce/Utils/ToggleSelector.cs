@@ -31,7 +31,9 @@ public class ToggleSelector : MonoBehaviour
         }
     }
 
-
-
-
+    private void Update()
+    {
+        if (toggle.isOn)
+            toggle.Select();
+    }
 }

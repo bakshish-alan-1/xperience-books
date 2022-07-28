@@ -35,6 +35,7 @@ namespace Ecommerce
         public Product m_product;
         public List<int> m_SelectedAttributes = new List<int>();
         public int m_TotalQty;
+        public int m_TotalQtyAvailable;
         public float m_FinalPrice;
     }
 
@@ -135,7 +136,7 @@ namespace Ecommerce
                 Instance = this;
             }
             GetFeaturedProduct();
-            GetCategoryList();
+            //GetCategoryList();
         }
 
         //Checking Intenet Connection before Every API Call & Handle Internet Connection Error 
@@ -214,10 +215,10 @@ namespace Ecommerce
 
         #region Get Product By Category ID
         public void GetProductByCategoryID(int index) {
-            Debug.Log("Get category of index: " + index);
             int catID = m_CategoryList[index].id;
             string catName = m_CategoryList[index].category_name;
 
+            Debug.Log("Get category of index: " + index + ", name: " + catName);
             StartCoroutine(CheckInternetConnection(isConnected =>
             {
                 if (isConnected)
@@ -250,19 +251,16 @@ namespace Ecommerce
         public void GetCategoryList() {
             //For closing open Hamburger Menu
 
-            if (m_CategoryList.Count <= 0)
+            int bookID = GameManager.Instance.currentBook.book_id;
+            int chapterID = GameManager.Instance.currentBook.chapter_id;
+            StartCoroutine(CheckInternetConnection(isConnected =>
             {
-                StartCoroutine(CheckInternetConnection(isConnected =>
+                if (isConnected)
                 {
-                    if (isConnected)
-                    {
-                        APIClient.CallWebAPI(Method.GET.ToString(), ApiManager.Instance.properties.GetAllCategory, string.Empty, GameManager.Instance.m_UserData.token, SetCategoryList);
-                    }
-                }));
-            }
-            else {
-                OpenPanel("CategoryList");
-            }
+                    APIClient.CallWebAPI(Method.GET.ToString(), string.Format(ApiManager.Instance.properties.GetAllCategory, bookID, chapterID), string.Empty, GameManager.Instance.m_UserData.token, SetCategoryList);
+                    //APIClient.CallWebAPI(Method.GET.ToString(), ApiManager.Instance.properties.GetAllCategory, string.Empty, GameManager.Instance.m_UserData.token, SetCategoryList);
+                }
+            }));
             submenu.Close();
         }
         public void SetCategoryList(bool success, object data, long statusCode) {
@@ -275,13 +273,21 @@ namespace Ecommerce
                 CategoryList response = JsonUtility.FromJson<CategoryList>(data.ToString());
                 //Clear previouly loaded category data
                 m_CategoryView.ClearCategoryList(response.data);
+                m_CategoryView.onRemoveCategoryCells();
 
+                m_CategoryList.Clear();
                 m_CategoryList.AddRange(response.data);
-                m_CategoryView.GenerateCategoryCells();
+                Invoke("updateCategoryList", 1.5f);
             }
             else {
                 ApiManager.Instance.APIResponseFailPopup(statusCode, "Something Went Wrong", data.ToString(), false);
+                ApiManager.Instance.RaycastUnblock();
             }
+        }
+
+        void updateCategoryList()
+        {
+            m_CategoryView.GenerateCategoryCells();
             ApiManager.Instance.RaycastUnblock();
         }
 

@@ -29,13 +29,19 @@ public class CheckOutOrderCell : MonoBehaviour
         disc.Append("");
         if (data.m_SelectedAttributes[0] >= 0)
         {
-            disc.Append("Color : " + data.m_product.attributes[data.m_SelectedAttributes[0]].color_name);
+            disc.Append("Color: " + data.m_product.attributes[data.m_SelectedAttributes[0]].color_name);
 
             if (data.m_SelectedAttributes[1] >= 0)
             {
-                disc.Append("    Size : " + data.m_product.attributes[data.m_SelectedAttributes[0]].sizes[data.m_SelectedAttributes[1]].size_name);
+                disc.Append("    Attribute: " + data.m_product.attributes[data.m_SelectedAttributes[0]].sizes[data.m_SelectedAttributes[1]].size_name);
             }
             StartCoroutine(LoadRemoteImage(data.m_product.attributes[data.m_SelectedAttributes[0]].color_image));
+        }
+        else if (data.m_SelectedAttributes[1] >= 0)
+        {
+            disc.Append("Attribute: " + data.m_product.attributes[0].sizes[data.m_SelectedAttributes[1]].size_name);
+
+            StartCoroutine(LoadRemoteImage(data.m_product.attributes[0].sizes[data.m_SelectedAttributes[1]].size_image));
         }
         else if (data.m_product.image.Count >= 1)
         {

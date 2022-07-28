@@ -47,18 +47,37 @@ public class RowCellView : MonoBehaviour
             // set the text if the cell is inside the data range
             // text.text = data.someText;
 
-            priceText.text = "$"+ data.price;
             productName.text = data.name;
 
             string path = "";
             if (product.image.Count > 0)
                 path = product.image[0];
 
+            if (data.attributes.Count > 0)
+            {
+                if (data.attributes[0].id == 0)
+                {
+                    if (data.attributes[0].sizes.Count > 0)// && !string.IsNullOrEmpty(data.attributes[0].sizes[0].size_image))
+                    {
+                        path = data.attributes[0].sizes[0].size_image;
+                        priceText.text = "$" + data.attributes[0].sizes[0].size_price;
+                    }
+                }
+                else
+                {
+                    path = data.attributes[0].color_image;
+                    if (data.attributes[0].sizes.Count > 0)
+                    {
+                        priceText.text = "$" + data.attributes[0].sizes[0].size_price;
+                    }
+                    else
+                        priceText.text = "$" + data.attributes[0].color_price;
+                }
+            }
+
+
             if (string.IsNullOrWhiteSpace(path))
                 return;
-
-            // Debug.Log("*** : "+gameObject.activeInHierarchy);
-            //  if(gameObject.activeInHierarchy)
 
             this.path = path;
             Invoke("LateIamgeUpdate", 1f);
