@@ -75,7 +75,10 @@ public class HomeScreen : MonoBehaviour
         }
 
         if (WindowManager.Instance.windows[WindowManager.Instance.currentWindowIndex].windowName == StaticKeywords.HomePanel)
-        { isThemeSet = false; ApiManager.Instance.GetSeriesDetails(GameManager.Instance.selectedSeries.id); }
+        {
+            isThemeSet = false;
+            ApiManager.Instance.GetSeriesDetails(GameManager.Instance.selectedSeries.id);
+        }
         else if (WindowManager.Instance.windows[WindowManager.Instance.currentWindowIndex].windowName == "Series")
             WindowManager.Instance.LogOut();
         else if (WindowManager.Instance.windows[WindowManager.Instance.currentWindowIndex].windowName == "Register")
@@ -147,6 +150,11 @@ public class HomeScreen : MonoBehaviour
 
         NotificationPanel.Instance.OnSetThem();// set downloaded theme for notification panel
         Profile.Instance.OnSetThem();// set theme for profile screen
+    }
+
+    public void onSetBookImage(Sprite img)
+    {
+        seriesImage.sprite = img;
     }
 
     public void setHomeTheameOfSeries()

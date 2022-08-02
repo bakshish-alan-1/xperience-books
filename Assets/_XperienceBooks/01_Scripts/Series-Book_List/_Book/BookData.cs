@@ -56,7 +56,7 @@ public class BookData : MonoBehaviour
         checkDownloadedThemeSeries();
         GameManager.Instance.selectedBooks = GameManager.Instance.m_SeriesDetails[index];
         FileHandler.SaveBooksData(GameManager.Instance.selectedBooks);
-        // if theme is not available then save new theme and set
+        // if theme is not available then save new theame and set
         if (!Directory.Exists(GameManager.Instance.GetThemePath()))
         {
             PlayerPrefs.SetString("IsThemeSaved", "false");
@@ -65,9 +65,9 @@ public class BookData : MonoBehaviour
         else
         {
             Debug.Log("Call LoadSkinTheme from BookData");
-            ThemeManager.Instance.LoadSkinTheme();// already theme available then direct set to the home panel
+            ThemeManager.Instance.LoadSkinTheme(true);// already theme available then direct set to the home panel
         }
-        ThemeManager.Instance.SaveSeriesIcon(GameManager.Instance.selectedBooks.image, GameManager.Instance.LocalStoragePath + "Theme/" + StaticKeywords.SeriesImage);
+        //ThemeManager.Instance.SaveSeriesIcon(GameManager.Instance.selectedBooks.image, GameManager.Instance.LocalStoragePath + "Theme/" + StaticKeywords.SeriesImage);
     }
 
     public async void setImage(string url)

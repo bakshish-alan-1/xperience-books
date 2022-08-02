@@ -55,8 +55,8 @@ public class ThemeManager : MonoBehaviour
         }
         theme = GameManager.Instance.GetThemePath();
 
-        if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.image_path))
-        { urls.Add(GameManager.Instance.selectedSeries.image_path); name.Add(GameManager.Instance.LocalStoragePath + "/Theme/" + StaticKeywords.SeriesImage); }
+        /*if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.image_path))
+        { urls.Add(GameManager.Instance.selectedSeries.image_path); name.Add(GameManager.Instance.LocalStoragePath + "/Theme/" + StaticKeywords.SeriesImage); }*/
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.logo))
         { urls.Add(GameManager.Instance.selectedSeries.theme.logo); name.Add(theme + "/" + StaticKeywords.LogoTheme); }
 
@@ -162,7 +162,7 @@ public class ThemeManager : MonoBehaviour
             PlayerPrefs.SetString("IsThemeSaved", "true");
             isThemeAvailable = false;
             Debug.Log("isThemeAvailable is false now");
-            LoadSkinTheme();
+            LoadSkinTheme(true);
         }
     }
 
@@ -211,8 +211,13 @@ public class ThemeManager : MonoBehaviour
             UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             var operation = request.SendWebRequest();
             while (!operation.isDone)
+            {
+                float per1 = request.downloadProgress * 100f;
+                int a = (int)per1;
+                //Debug.Log(per1.ToString() + ", " + a.ToString());
+                progressText.text = a.ToString() + " %";
                 await Task.Yield();
-
+            }
             if (request.result == UnityWebRequest.Result.ConnectionError)
             {
                 Debug.Log(request.error);
@@ -221,8 +226,13 @@ public class ThemeManager : MonoBehaviour
             {
                 File.WriteAllBytes(path, request.downloadHandler.data);
                 seriesIcon = getTexture(GameManager.Instance.LocalStoragePath + "/Theme/", StaticKeywords.SeriesImage);
+                if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex == 1)
+                    HomeScreen.Instance.onSetBookImage(seriesIcon);
             }
+            progressText.text = "100 %";
             request.Dispose();
+            GameManager.Instance.OpenPrepareThemWindow(false);
+            SceneLoader.LoadScene(1);
         }
     }
 
@@ -258,6 +268,7 @@ public class ThemeManager : MonoBehaviour
         return textureToSprite;
     }
 
+    // call after download theme
     IEnumerator LoadSkin()
     {
         yield return new WaitForEndOfFrame();
@@ -411,15 +422,19 @@ public class ThemeManager : MonoBehaviour
         urls.Clear();
         name.Clear();
         urls.TrimExcess();
-        name.TrimExcess();
-        SceneLoader.LoadScene(1);
+        name.TrimExcess(); 
+        SaveSeriesIcon(GameManager.Instance.selectedBooks.image, GameManager.Instance.LocalStoragePath + "Theme/" + StaticKeywords.SeriesImage);
+        //SceneLoader.LoadScene(1);
     }
 
     // call from loadMainScene, BookData script and current script as well
-    public void LoadSkinTheme()
+    public void LoadSkinTheme(bool isDownloadSeriesIcon)
     {
-        Debug.Log("ThemeManager LoadTheme");
+        Debug.Log("ThemeManager LoadTheme: " + isDownloadSeriesIcon);
         theme = GameManager.Instance.GetThemePath();
+        if (isDownloadSeriesIcon)
+            GameManager.Instance.OpenPrepareThemWindow(true);
+        progressText.text = "10 %";
 
         if (!File.Exists(theme + "/" + StaticKeywords.BGTheme))
             background = Resources.Load<Sprite>("Main_BG");
@@ -455,6 +470,8 @@ public class ThemeManager : MonoBehaviour
             seriesLogo = Resources.Load<Sprite>("transparentImage");
         else
             seriesLogo = getTexture(theme, StaticKeywords.LogoTheme);
+
+        progressText.text = "50 %";
 
         if (!File.Exists(GameManager.Instance.LocalStoragePath + "/Theme/" + StaticKeywords.SeriesImage) || string.IsNullOrEmpty(GameManager.Instance.selectedBooks.image))
             seriesIcon = Resources.Load<Sprite>("NoImage");
@@ -541,10 +558,16 @@ public class ThemeManager : MonoBehaviour
         else
             notificationTill = getTexture(theme, StaticKeywords.NotificationCellBG);
 
-        progressText.text = "100 %";
 
         urls.Clear();
         name.Clear();
-        SceneLoader.LoadScene(1);
+
+        if (isDownloadSeriesIcon)
+            SaveSeriesIcon(GameManager.Instance.selectedBooks.image, GameManager.Instance.LocalStoragePath + "Theme/" + StaticKeywords.SeriesImage);
+        else
+        {
+            progressText.text = "100 %";
+            SceneLoader.LoadScene(1);
+        }
     }
 }
