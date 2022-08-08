@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a99d7a77d0214e80ab4de49344c1498, type: 3}
   m_Name: Properties
   m_EditorClassIdentifier: 
-  m_CurrentEnvirnment: 0
+  m_CurrentEnvirnment: 1
   TestingBaseURL: https://arbooks-test.theintellify.net/api/
   Staging: https://arbooks-stage.theintellify.net/api/
   ProductionBaseURL: https://admin.continuummultimedia.com/api/

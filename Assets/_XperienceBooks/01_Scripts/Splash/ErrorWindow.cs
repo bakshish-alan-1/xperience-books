@@ -35,45 +35,6 @@ public class ErrorWindow : MonoBehaviour
 
     void setBGTheme(bool isDefault)
     {
-        /*if (isDefault)
-        {
-            Debug.Log("set them for error msg default");
-            BG.sprite = Resources.Load<Sprite>("DialogBox");
-            ButtonImg.sprite = Resources.Load<Sprite>("StoneBack");
-
-            Message.font = GameManager.Instance.DefaultFont;
-            TitleText.font = GameManager.Instance.DefaultFont;
-            ButtonText.font = GameManager.Instance.DefaultFont;
-
-            Message.color = Color.white;
-            TitleText.color = Color.white;
-            ButtonText.color = new Color32(95, 93, 170, 255);
-        }
-        else
-        {
-            Debug.Log("set them for error msg");
-            BG.sprite = (ThemeManager.Instance.dialoguebox);
-            ButtonImg.sprite = (ThemeManager.Instance.commonBtn);
-            Color newCol;
-            if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
-            {
-                TitleText.color = newCol;
-                Message.color = newCol;
-                ButtonText.color = newCol;
-            }
-
-            if (GameManager.Instance.TitleFont != null)
-            {
-                TitleText.font = GameManager.Instance.TitleFont;
-            }
-
-            if (GameManager.Instance.DetailFont != null)
-            {
-                ButtonText.font = GameManager.Instance.DetailFont;
-                Message.font = GameManager.Instance.DetailFont;
-            }
-        }*/
-
         BG.sprite = (ThemeManager.Instance.dialoguebox);
         ButtonImg.sprite = (ThemeManager.Instance.commonBtn);
         Color newCol;
@@ -129,6 +90,11 @@ public class ErrorWindow : MonoBehaviour
         Message.text = string.Empty;
         ButtonText.text = string.Empty;
         currentWindowAnimator.Play(windowFadeOut);
+
+        if (string.Equals(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name, "01_Home"))
+        {
+            QRScanController.Instance.Stop();
+        }
 
         if (response == ResponseData.SessionExpire) {
             WindowManager.Instance.LogOut();

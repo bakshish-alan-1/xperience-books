@@ -205,7 +205,12 @@ public class ThemeManager : MonoBehaviour
     {
         Debug.Log("url: " + url + ", name: " + path);
         if (string.IsNullOrEmpty(url))
+        {
             seriesIcon = Resources.Load<Sprite>("NoImage");
+            progressText.text = "100 %";
+            GameManager.Instance.OpenPrepareThemWindow(false);
+            SceneLoader.LoadScene(1);
+        }
         else
         {
             UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);

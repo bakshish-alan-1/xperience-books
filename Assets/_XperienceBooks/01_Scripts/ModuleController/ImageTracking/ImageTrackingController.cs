@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using TriLibCore;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -14,6 +15,7 @@ public class ImageTargetData {
     public string m_TargetName;
     public string m_LocalURL;
     public string m_WebURL;
+    public bool audio_loop;
     public Vector3 modelPosition;
     public Vector3 modelRotation;
     public Vector3 modelScale;
@@ -58,6 +60,7 @@ public class ImageTrackingController : MonoBehaviour
     public List<ContentModel> ModuleContent = new List<ContentModel>();
 
     public GameObject m_Preloader;
+    public string m_PreviousTrackedImage = "n";
     public string m_LastTrackedImage = "none";
 
     [Header("Audio Player")]
@@ -65,7 +68,7 @@ public class ImageTrackingController : MonoBehaviour
 
     bool isInventoryApiCall = false;
     bool isBackBtnClick = false;
-    bool audioInLoop = false;
+    bool audioFinish = false;
 
     AudioClip tempClip = null;
     string audioPath = "";
@@ -137,7 +140,6 @@ public class ImageTrackingController : MonoBehaviour
         audioPath = GameManager.Instance.LocalStoragePath + m_TargetLocalPath;
         Debug.Log("audio_play_in_loop: " + data.audio_play_in_loop);
         audioSource.loop = data.audio_play_in_loop;
-        audioInLoop = data.audio_play_in_loop;
         var TaregtURI = "";
 
         if (FileHandler.ValidateFile(m_TargetLocalPath + m_TargetImageName))
@@ -185,6 +187,7 @@ public class ImageTrackingController : MonoBehaviour
         targetData.modelPosition = myPosition;
         targetData.modelRotation = myRotation;
         targetData.modelScale = myScale;
+        targetData.audio_loop = data.audio_play_in_loop;
 
         m_TargetLib.Add(m_TargetImageName, targetData);
 
@@ -279,35 +282,49 @@ public class ImageTrackingController : MonoBehaviour
         }
     }
 
+    IEnumerator removeRootChild()
+    {
+        for (int i = 0; i < rootObject.transform.childCount; i++)
+        {
+            DestroyImmediate(rootObject.transform.GetChild(i).transform.gameObject);
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
     bool isPreloaderPositionSet = false;
     int n = 0;
     void ImageManagerOnTrackedImagesChanged(ARTrackedImagesChangedEventArgs obj)
     {
-        // added, spawn prefab
-        /*foreach (ARTrackedImage image in obj.added)
-        {
-            Debug.Log("Image ready to tracked : "+image.referenceImage.guid);
-        }*/
-
         // updated, set prefab position and rotation
         foreach (ARTrackedImage image in obj.updated)
         {
-            //Debug.Log("image.trackingState: " + image.trackingState);
+            //Debug.Log("image name: " + image.referenceImage.name);
             // image is tracking or tracking with limited state, show visuals and update it's position and rotation
             if (image.trackingState == TrackingState.Tracking)
             {
+                CancelInvoke("stopMyAudio");
                 if (m_LastTrackedImage.Equals("none") || !m_LastTrackedImage.Equals(image.referenceImage.name))
                 {
+                    if (audioSource.isPlaying)
+                        audioSource.Stop();
+
+                    audioSource.clip = null;
+                    m_PreviousTrackedImage = m_LastTrackedImage;
                     m_LastTrackedImage = image.referenceImage.name;
                     
                     Debug.Log("TrackedImagesChanged: " + m_LastTrackedImage);
-                    if (rootObject.childCount >= 1)
+                    if (rootObject.transform.childCount > 0)
                     {
-                        Destroy(rootObject.GetChild(0).gameObject);
+                        for (int i = 0; i < rootObject.transform.childCount; i++)
+                        {
+                            DestroyImmediate(rootObject.transform.GetChild(i).transform.gameObject);
+                        }
                     }
+
                     if (File.Exists(m_TargetLib[image.referenceImage.name].m_LocalURL))
                     {
                         isLocalModleFile = true;
+                        isModelAvailable = false;
                         localModelFilePath = m_TargetLib[image.referenceImage.name].m_LocalURL;
                         Debug.Log("localModelFilePath: " + localModelFilePath);
                         ModelLoader.StartLoadObject(localModelFilePath, true, ModelLoaded, OnMaterialsLoad);
@@ -315,21 +332,18 @@ public class ImageTrackingController : MonoBehaviour
                     else
                     {
                         isLocalModleFile = false;
+                        isModelAvailable = false;
                         localModelFilePath = m_TargetLib[image.referenceImage.name].m_LocalURL;
                         Debug.Log("webURL: " + m_TargetLib[image.referenceImage.name].m_WebURL);
                         ModelLoader.StartLoadObject(m_TargetLib[image.referenceImage.name].m_WebURL, false, ModelLoaded, OnMaterialsLoad);
                     }
                     n = 0;
+                    audioSource.loop = m_TargetLib[image.referenceImage.name].audio_loop;
                     Builder_Position = m_TargetLib[image.referenceImage.name].modelPosition;
                     Builder_Rotation = m_TargetLib[image.referenceImage.name].modelRotation;
                     Builder_Scale = m_TargetLib[image.referenceImage.name].modelScale;
                     m_ArObjectsToPlace.transform.SetPositionAndRotation(image.transform.position, image.transform.rotation);
-
-                    if (audioSource.clip != null && !audioSource.isPlaying)
-                    {
-                        audioSource.Stop();
-                        audioSource.Play();
-                    }
+                    Debug.Log("Audio loop: " + audioSource.loop);
                 }
 
                 if (n == 0)
@@ -341,33 +355,35 @@ public class ImageTrackingController : MonoBehaviour
                     { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(3); }
                 }
 
+                if (audioSource.clip != null && !audioSource.isPlaying && audioFinish)
+                {
+                    audioFinish = false;
+                    audioSource.Play();
+                }
+
                 rootObject.gameObject.SetActive(true);
                 
                 if (n == 1)
-                {
                     n = 2;
-                }
 
-                //if (!isPreloaderPositionSet)
-                {
-                    isPreloaderPositionSet = true;
-                    m_Preloader.transform.position = image.transform.position;
-                }
-
-                /*if (audioSource.clip != null && !audioSource.isPlaying)
-                {
-                    audioSource.Stop();
-                    audioSource.Play();
-                }*/
+                isPreloaderPositionSet = true;
+                m_Preloader.transform.position = image.transform.position;
 
                 m_ArObjectsToPlace.transform.SetPositionAndRotation(image.transform.position, image.transform.rotation);
             }
-            else
+            else if (image.trackingState != TrackingState.Tracking && m_LastTrackedImage.Equals(image.referenceImage.name))
             {
+                Debug.Log("state: " + image.trackingState + ", imageName: " + m_LastTrackedImage);
+                StopAllCoroutines();
+                ModelLoader.onStopDownload();
                 rootObject.gameObject.SetActive(false);
                 isPreloaderPositionSet = false;
-                if (audioSource.isPlaying)
+                /*if (audioSource.clip != null && audioSource.isPlaying)
+                {
                     audioSource.Stop();
+                }*/
+                if (!IsInvoking("stopMyAudio"))
+                    Invoke("stopMyAudio", 0.25f);
             }
         }
 
@@ -376,6 +392,12 @@ public class ImageTrackingController : MonoBehaviour
         {
             Destroy(rootObject.gameObject);
         }
+    }
+
+    void stopMyAudio()
+    {
+        audioSource.Stop();
+        audioFinish = true;
     }
 
     private void ModelLoadFinished(UnityWebRequest request)
@@ -392,6 +414,9 @@ public class ImageTrackingController : MonoBehaviour
                 FileHandler.ExtractFiles(localModelFilePath, audioPath, true);// extract zip at path
             }
         }
+        Debug.Log("Root obj active: " + rootObject.gameObject.activeSelf);
+        if (!rootObject.gameObject.activeSelf)
+            rootObject.gameObject.SetActive(true);
     }
 
     bool isModelAvailable = false;
@@ -405,6 +430,18 @@ public class ImageTrackingController : MonoBehaviour
     {
         if (isBackBtnClick)
             return;
+
+        /*if (!ImageFound() && audioSource.clip != null && !audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
+
+        if (audioSource.isPlaying && audioLength > 0f)
+            audioLength -= Time.deltaTime;
+        else if (!audioSource.isPlaying && audioLength <= 0f && !audioSource.loop)
+        {
+            audioSource.Stop();
+        }*/
 
         if (ImageFound() && !isModelAvailable)
         {
@@ -424,7 +461,6 @@ public class ImageTrackingController : MonoBehaviour
         }
     }
 
-    bool posReset = false;
     public void ModelLoaded(AssetLoaderContext assetLoaderContext) {
         //isModelAvailable = true;
     }
@@ -434,7 +470,7 @@ public class ImageTrackingController : MonoBehaviour
         if (isBackBtnClick)
             return;
 
-        Debug.Log("Materials loaded. Model fully loaded.");
+        Debug.Log("Materials loaded. Model fully loaded: " + rootObject.transform.childCount.ToString());
         isModelAvailable = true;
 
         string mp3Path = GetAudioPath();
@@ -446,9 +482,13 @@ public class ImageTrackingController : MonoBehaviour
             if (audioFile.Length > 0)
             {
                 string str = "file://" + audioFile[0].ToString();
-                StartCoroutine(LoadAudioFile(str));
+                OnDownloadAudio(str);//StartCoroutine(LoadAudioFile(str));
             }
         }
+
+        Debug.Log("1 Root obj active: " + rootObject.gameObject.activeSelf);
+        if (!rootObject.gameObject.activeSelf)
+            rootObject.gameObject.SetActive(true);
     }
 
     public void ResetGameObject(GameObject obj)
@@ -478,44 +518,98 @@ public class ImageTrackingController : MonoBehaviour
     string GetAudioPath()
     {
         // return path of the mp3 file directory
-        Debug.Log("inside GetAudioPath: " + audioPath);
-        string[] dir = Directory.GetDirectories(audioPath);
-        return dir[0];
+        string path = localModelFilePath.Substring(0, localModelFilePath.Length - 4);
+        Debug.Log("inside GetAudioPath: " + path);
+        
+        DirectoryInfo dirInfo = new DirectoryInfo(path);
+        FileInfo[] audioFile = dirInfo.GetFiles("*.mp3");
+        if (audioFile.Length != 0)
+        { return path; }
+        else
+            return "";
+    }
+
+    public async void OnDownloadAudio(string url)
+    {
+        Debug.Log("OnDownloadAudio url: " + url);
+
+        UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.MPEG);
+        var operation = request.SendWebRequest();
+        while (!operation.isDone)
+            await Task.Yield();
+
+        if (request.result == UnityWebRequest.Result.ConnectionError)
+        {
+            Debug.Log("Get Audio Error: " + request.error);
+        }
+        else
+        {
+            tempClip = DownloadHandlerAudioClip.GetContent(request);
+             
+            Debug.Log("Audio length: " + tempClip.length);
+            if (tempClip.length <= 0)
+            {
+                string msg = "Unsupported file or audio format.";
+                ApiManager.Instance.errorWindow.SetErrorMessage("Something Went Wrong", msg, "OKAY", ErrorWindow.ResponseData.JustClose, false);
+            }
+            else
+            {
+                if (audioSource == null)
+                    return;
+
+                audioSource.clip = tempClip;
+                while (audioSource.clip.loadState != AudioDataLoadState.Loaded)
+                {
+                    Debug.Log("Waiting for clip to ready");
+                }
+                Debug.Log("Clip loaded success for marker: " + m_LastTrackedImage);
+                Debug.Log("Audio name: " + audioSource.clip.name);
+                Debug.Log("Audio volume: " + audioSource.volume);
+                if (!string.IsNullOrEmpty(m_LastTrackedImage))
+                {
+                    audioSource.Play();
+                }
+            }
+        }
+        request.Dispose();
     }
 
     private IEnumerator LoadAudioFile(string fullpath)
     {
-        Debug.Log("LOADING CLIP: " + fullpath);
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fullpath, AudioType.MPEG))
+        if (!string.IsNullOrEmpty(fullpath))
         {
-            yield return www.SendWebRequest();
-            if (www.isNetworkError || www.isHttpError)
+            Debug.Log("LOADING CLIP: " + fullpath);
+            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fullpath, AudioType.MPEG))
             {
-                Debug.Log("Get Audio Error: " + www.error);
-            }
-            else
-            {
-                tempClip = DownloadHandlerAudioClip.GetContent(www);
-                Debug.Log("Audio length: "+ tempClip.length);
-                if (tempClip.length <= 0)
+                yield return www.SendWebRequest();
+                if (www.isNetworkError || www.isHttpError)
                 {
-                    string msg = "Unsupported file or audio format.";
-                    ApiManager.Instance.errorWindow.SetErrorMessage("Something Went Wrong", msg, "OKAY", ErrorWindow.ResponseData.JustClose, false);
+                    Debug.Log("Get Audio Error: " + www.error);
                 }
                 else
                 {
-                    audioSource.clip = tempClip;
-                    while (audioSource.clip.loadState != AudioDataLoadState.Loaded)
+                    tempClip = DownloadHandlerAudioClip.GetContent(www);
+                    Debug.Log("Audio length: " + tempClip.length);
+                    if (tempClip.length <= 0)
                     {
-                        Debug.Log("Waiting for clip to ready");
+                        string msg = "Unsupported file or audio format.";
+                        ApiManager.Instance.errorWindow.SetErrorMessage("Something Went Wrong", msg, "OKAY", ErrorWindow.ResponseData.JustClose, false);
                     }
-                    Debug.Log("Clip loaded success");
-                    Debug.Log("Audio name: " + audioSource.clip.name);
-                    Debug.Log("Audio volume: " + audioSource.volume);
-                    audioSource.Play();
+                    else
+                    {
+                        audioSource.clip = tempClip;
+                        while (audioSource.clip.loadState != AudioDataLoadState.Loaded)
+                        {
+                            Debug.Log("Waiting for clip to ready");
+                        }
+                        Debug.Log("Clip loaded success");
+                        Debug.Log("Audio name: " + audioSource.clip.name);
+                        Debug.Log("Audio volume: " + audioSource.volume);
+                        audioSource.Play();
+                    }
                 }
+                www.Dispose();
             }
-            www.Dispose();
         }
     }
     #endregion
