@@ -162,7 +162,7 @@ namespace Ecommerce.address
                 return false;
             }
 
-            if (m_zipCode.text.Length < 6)
+            if (m_zipCode.text.Length < 5)
             {
                 SetError(m_zipCode, true);
                 return false;

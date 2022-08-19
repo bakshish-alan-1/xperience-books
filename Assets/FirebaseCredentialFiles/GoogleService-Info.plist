@@ -3,23 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1081869654938-d8211m3mtkfvq5ue8jpu0kuk6fa8s0ok.apps.googleusercontent.com</string>
+	<string>1068746741452-1s0m2ndme9ljirapc7ccj23ok941oj1v.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1081869654938-d8211m3mtkfvq5ue8jpu0kuk6fa8s0ok</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>1081869654938-6lkep6asmmvh2ueqh0b2m3kmas37qclg.apps.googleusercontent.com</string>
+	<string>com.googleusercontent.apps.1068746741452-1s0m2ndme9ljirapc7ccj23ok941oj1v</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDFBAA8IqeEuEraEVKqOihbH9G2fvPrDBk</string>
+	<string>AIzaSyCaJ1PhyFOuDs7Ag-0wQ0hh0VSMhDlOS4w</string>
 	<key>GCM_SENDER_ID</key>
-	<string>1081869654938</string>
+	<string>1068746741452</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.theintellify.continuummedia</string>
+	<string>com.continuummedia.xperiencebooks</string>
 	<key>PROJECT_ID</key>
-	<string>arbooks-353cc</string>
+	<string>continuum-a0394</string>
 	<key>STORAGE_BUCKET</key>
-	<string>arbooks-353cc.appspot.com</string>
+	<string>continuum-a0394.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1081869654938:ios:1688282cc546e2ec8ff823</string>
+	<string>1:1068746741452:ios:a7ee956c014235841bd469</string>
 </dict>
 </plist>
