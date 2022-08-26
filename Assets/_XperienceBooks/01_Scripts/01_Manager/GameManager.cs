@@ -282,6 +282,7 @@ public class GameManager : MonoBehaviour
     public void CloseMarkerWindow()
     {
         markerWindowAnimator.Play("Window Out");
+        safetyWindow.OpenWindow();
     }
     #endregion
 
