@@ -31,7 +31,7 @@ namespace EnhancedScrollerDemos.RemoteResourcesDemo
 #if UNITY_2017_4_OR_NEWER
             var webRequest = UnityWebRequestTexture.GetTexture(path);
             yield return webRequest.SendWebRequest();
-            if (webRequest.isNetworkError || webRequest.isHttpError)
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError || webRequest.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError("Failed to download image [" + path + "]: " + webRequest.error);
             }

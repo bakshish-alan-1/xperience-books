@@ -112,7 +112,9 @@ public class CaptureAndShare : MonoBehaviour
         }
         else
         {
-            watermark.SetActive(true);
+            if (watermark != null)
+                watermark.SetActive(true);
+
             Texture2D texture2D = DownloadHandlerTexture.GetContent(request);
             watermarkIcon.sprite = GameManager.Instance.Texture2DToSprite(texture2D);
         }

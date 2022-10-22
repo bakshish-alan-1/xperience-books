@@ -21,7 +21,7 @@ public class Extras : MonoBehaviour
     {
         UnityWebRequest request = new UnityWebRequest("https://google.com");
         yield return request.SendWebRequest();
-        if (request.isNetworkError)
+        if (request.result == UnityWebRequest.Result.ConnectionError)
         {
             Debug.Log("net error: " + request.error);
             action(false);

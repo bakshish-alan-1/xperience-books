@@ -3,6 +3,7 @@
 Online documentation & example code available at: https://github.com/yasirkula/UnityNativeShare
 E-mail: yasirkula@gmail.com
 
+
 1. ABOUT
 This plugin helps you natively share files (images, videos, documents, etc.) and/or plain text on Android & iOS. A ContentProvider is used to share the media on Android.
 
@@ -17,10 +18,10 @@ For reference, the legacy documentation is available at: https://github.com/yasi
 There are two ways to set up the plugin on iOS:
 
 a. Automated Setup for iOS
-- change the value of PHOTO_LIBRARY_USAGE_DESCRIPTION in Plugins/NativeShare/Editor/NSPostProcessBuild.cs (optional)
+- (optional) change the value of 'Photo Library Usage Description' at 'Project Settings/yasirkula/Native Share'
 
 b. Manual Setup for iOS
-- set the value of ENABLED to false in NSPostProcessBuild.cs
+- set the value of 'Automated Setup' to false at 'Project Settings/yasirkula/Native Share'
 - build your project
 - enter a Photo Library Usage Description to Info.plist in Xcode (in case user decides to save the shared media to Photos)
 - also enter a Photo Library Additions Usage Description to Info.plist in Xcode, if exists
@@ -48,6 +49,7 @@ Simply create a new NativeShare object and customize it by chaining the followin
 - SetUrl( string url ): sets the shared url. On supported iOS apps, this url is used to generate a preview of the target webpage. Other iOS apps may append the url to the text or omit it. While sharing a file on iOS or while sharing anything on Android, the url is appended to the text (unless the text already contains the url)
 - AddFile( string filePath, string mime = null ): adds the file at path to the share action. You can add multiple files of different types. The MIME of the file is automatically determined if left null; however, if the file doesn't have an extension and/or you already know the MIME of the file, you can enter the MIME manually. MIME has no effect on iOS
 - AddFile( Texture2D texture, string createdFileName = "Image.png" ): saves the texture to Application.temporaryCachePath with the specified filename and adds the image file to the share action
+- AddEmailRecipient( string emailAddress ): auto-populates the recipients field of e-mail applications on Android platform. Has no effect on iOS
 - SetTitle( string title ): sets the title of the share dialog on Android platform. Has no effect on iOS
 - AddTarget( string androidPackageName, string androidClassName = null ): shares content on a specific application on Android platform. If androidClassName is left null, list of activities in the share dialog will be narrowed down to the activities in the specified androidPackageName that can handle this share action. Note that androidClassName, if provided, must be the full name of the activity (with its package). You can call this function multiple times. This function has no effect on iOS
 - SetCallback( ShareResultCallback callback ): invokes the callback function after the share action is completed. ShareResultCallback has the following signature: void ShareResultCallback( ShareResult result, string shareTarget )

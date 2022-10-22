@@ -44,7 +44,7 @@ public class LoadModelFromURL : MonoBehaviour
                 yield return null;
             }
 
-            if (uwr.isNetworkError || uwr.isHttpError)
+            if (uwr.result == UnityWebRequest.Result.ConnectionError || uwr.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.Log("Error:- " + uwr.error);
             }

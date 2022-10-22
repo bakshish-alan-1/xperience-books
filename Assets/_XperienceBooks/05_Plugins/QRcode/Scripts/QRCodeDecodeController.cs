@@ -114,7 +114,7 @@ public class QRCodeDecodeController : MonoBehaviour
 					}
 					catch (Exception e)
 					{
-						//	Debug.LogError("Decode Error: " + e.Data.ToString());
+                        Debug.LogError("Decode Error: " + e.Data.ToString());
 						decoding = false;
 					}
 				});	

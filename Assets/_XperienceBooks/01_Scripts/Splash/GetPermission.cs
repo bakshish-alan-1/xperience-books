@@ -8,7 +8,6 @@ using UnityEngine.Android;
 public class GetPermission : MonoBehaviour
 {
     static public GetPermission Instance = null;
-    int index = 0;
 
     private void Awake()
     {
@@ -86,66 +85,4 @@ public class GetPermission : MonoBehaviour
         }
     }
 
-    /*void Start()
-    {
-        OnGetPermission();
-    }
-
-    void OnGetPermission()
-    {
-        StartCoroutine(myPermission());
-    }
-
-    IEnumerator myPermission()
-    {
-        yield return new WaitForEndOfFrame();
-#if !UNITY_EDITOR
-        if (index == 0)
-            getCameraPermission();
-        else if (index == 1)
-            getLocationPermission();
-        else if (index == 2)
-            getStoragePermission();
-            
-        index += 1;
-
-        if(index < 3)
-            StartCoroutine(myPermission());
-#endif
-    }
-
-    void getLocationPermission()
-    {
-#if UNITY_ANDROID
-        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
-        {
-            Permission.RequestUserPermission(Permission.FineLocation);
-        }
-#endif
-    }
-
-    void getStoragePermission()
-    {
-#if UNITY_ANDROID
-        if (!Permission.HasUserAuthorizedPermission(Permission.ExternalStorageWrite))
-        {
-            Permission.RequestUserPermission(Permission.ExternalStorageWrite);
-        }
-#endif
-    }
-
-    void getCameraPermission()
-    {
-#if UNITY_ANDROID
-        if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
-        {
-            Permission.RequestUserPermission(Permission.Camera);
-        }
-#elif UNITY_IOS
-        if (!Application.HasUserAuthorization(UserAuthorization.WebCam))
-        {
-            Application.RequestUserAuthorization(UserAuthorization.WebCam);
-        }
-#endif
-    }*/
 }

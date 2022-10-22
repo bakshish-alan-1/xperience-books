@@ -58,6 +58,7 @@ public class SeriesData : MonoBehaviour
         else
         {
             texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+            Debug.Log("texture length: " + texture.width + ", " + texture.height);
             if (seriesImg)
                 seriesImg.sprite = GameManager.Instance.Texture2DToSprite(texture);
         }

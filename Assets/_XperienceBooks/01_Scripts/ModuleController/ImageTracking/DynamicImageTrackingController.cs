@@ -31,7 +31,7 @@ public class DynamicImageTrackingController : MonoBehaviour
 
         trackImageManager = gameObject.AddComponent<ARTrackedImageManager>();
         trackImageManager.referenceLibrary = trackImageManager.CreateRuntimeLibrary(runtimeImageLibrary);
-        trackImageManager.maxNumberOfMovingImages = 1;
+        trackImageManager.requestedMaxNumberOfMovingImages = 1;
         trackImageManager.trackedImagePrefab = placedObject;
 
         trackImageManager.enabled = true;

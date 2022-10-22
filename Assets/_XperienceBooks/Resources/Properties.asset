@@ -16,6 +16,7 @@ MonoBehaviour:
   TestingBaseURL: https://arbooks-test.theintellify.net/api/
   Staging: https://arbooks-stage.theintellify.net/api/
   ProductionBaseURL: https://admin.continuummultimedia.com/api/
+  AppVersion: 1.0
   LoginAPI: login
   Register: register
   GetOTPforForgotPassword: forget-password/get-otp

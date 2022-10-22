@@ -343,7 +343,7 @@ public class ApiManager : MonoBehaviour
 
         UnityWebRequest request = new UnityWebRequest("https://google.com");
         yield return request.SendWebRequest();
-        if (request.isNetworkError)
+        if (request.result == UnityWebRequest.Result.ConnectionError)
         {
             Debug.Log("net error: " + request.error);
             errorWindow.SetErrorMessage("Internet Connection Failed !", "Please, Check you internet connection and try again.", "TRY AGAIN",ErrorWindow.ResponseData.InternetIssue, true);
@@ -894,7 +894,7 @@ public class ApiManager : MonoBehaviour
         while (!operation.isDone)
             await Task.Yield();
 
-        if (request.isNetworkError)
+        if (request.result == UnityWebRequest.Result.ConnectionError)
         {
             Debug.Log("callNotification: " + request.error);
         }

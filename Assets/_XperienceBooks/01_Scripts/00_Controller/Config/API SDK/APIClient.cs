@@ -36,9 +36,17 @@ namespace Intellify.core
         public User data;
         public string message;
     }
-    #endregion 
+    #endregion
 
-
+    #region ForceUpdate
+    [Serializable]
+    public class ForceUpdate
+    {
+        public string message;
+        public bool success;
+        public int code;
+    }
+    #endregion
 
     public class APIClient : BaseClient
     {
@@ -62,7 +70,7 @@ namespace Intellify.core
 
              request.SendWebRequest().completed += _ =>
              {
-                 if (request.isNetworkError)
+                 if (request.result == UnityWebRequest.Result.ConnectionError)
                  {
                      ApiManager.Instance.RaycastUnblock();
                      action(false);
@@ -92,7 +100,9 @@ namespace Intellify.core
 
                 UnityWebRequest request = new UnityWebRequest(APIEnvironment.BaseUrl() + endPoint, method);
 
-                if (!string.IsNullOrEmpty(accessToken))
+            request.SetRequestHeader("min-app-version", properties.AppVersion);
+
+            if (!string.IsNullOrEmpty(accessToken))
                     request.SetRequestHeader("Authorization", accessToken);
 
                 request.SetRequestHeader("Content-Type", "application/json");
@@ -142,7 +152,14 @@ namespace Intellify.core
                 }
                 else {
                     JSONNode _node = JSON.Parse(res);
-                    if (_node["code"].AsInt != 200)
+                    Debug.Log("Code: " + _node["code"]);
+                    if (_node["code"].AsInt == 901 || _node["code"].AsInt == 902)
+                    {
+                        Debug.Log("Force Update required");
+                        ForceUpdate data = JsonUtility.FromJson<ForceUpdate>(res);
+                        ForceUpdateData.Instance.onSetdata(data.message);
+                    }
+                    else if (_node["code"].AsInt != 200)
                     {
                         onComplete?.Invoke(false, res, status);
                         return;

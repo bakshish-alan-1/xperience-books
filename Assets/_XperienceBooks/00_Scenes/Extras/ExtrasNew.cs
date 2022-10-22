@@ -1,10 +1,33 @@
-﻿using UnityEngine.SceneManagement;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
 
 public class ExtrasNew : MonoBehaviour
 {
-    public void onBack()
+    public GameObject hideObj;
+    public GameObject previewObj;
+    public Image previewIMG;
+
+    Texture2D texture;
+
+    public void onTackSS()
     {
-        SceneManager.LoadScene(0);
+        StartCoroutine(TakeSSAndPreview());
+    }
+
+    IEnumerator TakeSSAndPreview()
+    {
+        yield return new WaitForEndOfFrame();
+
+        hideObj.SetActive(false);
+        texture = ScreenCapture.CaptureScreenshotAsTexture(4);
+        previewIMG.sprite = Utility.Texture2DToSprite(texture);
+        previewObj.SetActive(true);
+        hideObj.SetActive(true);
+    }
+
+    public void onSave()
+    {
+        NativeGallery.SaveImageToGallery(texture, "ARBook", "highResolution.png");
     }
 }

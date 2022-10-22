@@ -31,6 +31,11 @@ public class Properties : ScriptableObject
     public string ProductionBaseURL = "https://admin.continuummultimedia.com/api/";
 
     [Space(15)]
+    [Tooltip("Update version every time when published new build, it will used to handle force update popup.")]
+    public string AppVersion = "0.9";
+
+
+    [Space(15)]
     [Header("API List")]
     [Space(15)]
 

@@ -93,7 +93,7 @@ public class ErrorWindow : MonoBehaviour
 
         if (string.Equals(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name, "01_Home"))
         {
-            QRScanController.Instance.Stop();
+            QRScanController.Instance.Play();
         }
 
         if (response == ResponseData.SessionExpire) {

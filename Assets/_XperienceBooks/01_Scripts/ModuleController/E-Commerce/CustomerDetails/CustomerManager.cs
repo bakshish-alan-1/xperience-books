@@ -76,7 +76,7 @@ namespace Ecommerce.address
 
             UnityWebRequest request = new UnityWebRequest("https://google.com");
             yield return request.SendWebRequest();
-            if (request.isNetworkError)
+            if (request.result == UnityWebRequest.Result.ConnectionError)
             {
                 ApiManager.Instance.errorWindow.SetErrorMessage("Internet Connection Failed !", "Please, Check you internet connection and try again.", "TRY AGAIN", ErrorWindow.ResponseData.InternetIssue, false);
                 ApiManager.Instance.RaycastUnblock();

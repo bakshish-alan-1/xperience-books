@@ -94,7 +94,7 @@ public class FaceController : MonoBehaviour
             using (UnityWebRequest uwr = UnityWebRequest.Get(data.ar_content))
             {
                 yield return uwr.SendWebRequest();
-                if (uwr.isNetworkError || uwr.isHttpError)
+                if (uwr.result == UnityWebRequest.Result.ConnectionError || uwr.result == UnityWebRequest.Result.ProtocolError)
                 {
                     Debug.Log("Error:- " + uwr.error);
                 }
@@ -169,7 +169,7 @@ public class FaceController : MonoBehaviour
             // www.downloadHandler = new DownloadHandlerBuffer();
             yield return uwr.SendWebRequest();
 
-            if (uwr.isNetworkError || uwr.isHttpError)
+            if (uwr.result == UnityWebRequest.Result.ConnectionError || uwr.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.Log("Error:- " + uwr.error);
             }
@@ -283,7 +283,7 @@ public class FaceController : MonoBehaviour
         if (this.isBackBtn)
             return;
 
-        if (currentMateria < 0 || currentMateria == visibleMaterial)
+        if (currentMateria < 0)// || currentMateria == visibleMaterial)
             return;
 
         Debug.Log("setMaterial currentMateria: " + currentMateria);

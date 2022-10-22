@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1068746741452-kjpmrjsdaoo050j1fpecqjcad1is5hq1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.continuummedia.xperiencebooks",
+            "certificate_hash": "710deb920be665adb367a65090a9f06e17b18a13"
+          }
+        },
+        {
           "client_id": "1068746741452-2gikqgecr9ff951e3umssrb3lav9g2cg.apps.googleusercontent.com",
           "client_type": 3
         }

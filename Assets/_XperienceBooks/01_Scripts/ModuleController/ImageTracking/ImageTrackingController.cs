@@ -158,7 +158,7 @@ public class ImageTrackingController : MonoBehaviour
         using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(TaregtURI))
         {
             yield return uwr.SendWebRequest();
-            if (uwr.isNetworkError || uwr.isHttpError)
+            if (uwr.result == UnityWebRequest.Result.ConnectionError || uwr.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.Log("Error:- " + uwr.error);
             }
@@ -225,7 +225,7 @@ public class ImageTrackingController : MonoBehaviour
             // www.downloadHandler = new DownloadHandlerBuffer();
             yield return uwr.SendWebRequest();
 
-            if (uwr.isNetworkError || uwr.isHttpError)
+            if (uwr.result == UnityWebRequest.Result.ConnectionError || uwr.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.Log("Error:- " + uwr.error);
             }
@@ -582,7 +582,7 @@ public class ImageTrackingController : MonoBehaviour
             using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(fullpath, AudioType.MPEG))
             {
                 yield return www.SendWebRequest();
-                if (www.isNetworkError || www.isHttpError)
+                if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
                 {
                     Debug.Log("Get Audio Error: " + www.error);
                 }
