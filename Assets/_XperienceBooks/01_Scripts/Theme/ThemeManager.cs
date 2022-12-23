@@ -14,7 +14,7 @@ public class ThemeManager : MonoBehaviour
     [SerializeField] TMP_Text progressText;
     public Sprite background, scanBackground, scanBtn, seriesLogo, seriesIcon;
     public Sprite dialoguebox, commonBtn, backBtn, profileIcon, newIcon, inventoryIcon, inventoryPlaceholder, fanArtHeaderBg;
-    public Sprite cameraBtn, infoBtn, cameraSwapBtn;
+    public Sprite cameraBtn, infoBtn, helpBtn, cameraSwapBtn;
     public Sprite facebook, insta, youtube, website, twitter;
     public Sprite notificationNextBtn, notificationIcon, notificationTill;
 
@@ -60,13 +60,14 @@ public class ThemeManager : MonoBehaviour
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.logo))
         { urls.Add(GameManager.Instance.selectedSeries.theme.logo); name.Add(theme + "/" + StaticKeywords.LogoTheme); }
 
-
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.camera_icon))
         { urls.Add(GameManager.Instance.selectedSeries.theme.camera_icon); name.Add(theme + "/" + StaticKeywords.CameraBtn); }
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.camera_swap_icon))
         { urls.Add(GameManager.Instance.selectedSeries.theme.camera_swap_icon); name.Add(theme + "/" + StaticKeywords.CameraSwapBtn); }
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.info_icon))
         { urls.Add(GameManager.Instance.selectedSeries.theme.info_icon); name.Add(theme + "/" + StaticKeywords.InfoBtn); }
+        if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.help_icon))
+        { urls.Add(GameManager.Instance.selectedSeries.theme.help_icon); name.Add(theme + "/" + StaticKeywords.HelpBtn); }
 
         if (!string.IsNullOrEmpty(GameManager.Instance.selectedSeries.theme.dialog_box))
         { urls.Add(GameManager.Instance.selectedSeries.theme.dialog_box); name.Add(theme + "/" + StaticKeywords.DialogBox); }
@@ -351,6 +352,12 @@ public class ThemeManager : MonoBehaviour
             infoBtn = getTexture(theme, StaticKeywords.InfoBtn);
 
         yield return new WaitForEndOfFrame();
+        if (!File.Exists(theme + "/" + StaticKeywords.HelpBtn))
+            helpBtn = Resources.Load<Sprite>("help");
+        else
+            helpBtn = getTexture(theme, StaticKeywords.HelpBtn);
+
+        yield return new WaitForEndOfFrame();
         if (!File.Exists(theme + "/" + StaticKeywords.ProfileTheme))
             profileIcon = Resources.Load<Sprite>("Profile");
         else
@@ -470,6 +477,11 @@ public class ThemeManager : MonoBehaviour
             infoBtn = Resources.Load<Sprite>("InfoBtn");
         else
             infoBtn = getTexture(theme, StaticKeywords.InfoBtn);
+
+        if (!File.Exists(theme + "/" + StaticKeywords.HelpBtn))
+            helpBtn = Resources.Load<Sprite>("help");
+        else
+            helpBtn = getTexture(theme, StaticKeywords.HelpBtn);
 
         if (!File.Exists(theme + "/" + StaticKeywords.LogoTheme))
             seriesLogo = Resources.Load<Sprite>("transparentImage");

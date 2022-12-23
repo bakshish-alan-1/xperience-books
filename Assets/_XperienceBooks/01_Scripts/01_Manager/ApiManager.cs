@@ -64,6 +64,7 @@ public class BookDetails
 [Serializable]
 public class MapModuleData {
     public Book book_details;
+    public int scan_id;
     public List<ARModulesData> mapped_data;
 }
 
@@ -176,7 +177,7 @@ public class Skin
     public string name, dialog_box, dialog_box_btn, scan_qr_bg, fan_art_img_glry;
     public string color_code, notif_icon, notif_thumbnail, notif_next, notif_tile;
     public string background_image, scan_button, back_button, inventory_placeholder;
-    public string camera_icon, info_icon, camera_swap_icon;
+    public string camera_icon, info_icon, help_icon, camera_swap_icon;
     public string logo, facebook_icon, twitter_icon, youtube_icon, instagram_icon, website_icon, profile_icon, inventory_icon;
     public string module_1, module_2, module_3, module_4, module_5, module_6, module_7, module_8, module_9, module_10, module_11, module_12;
     public string font_h1, font_h2, font_h3, font_h4;
@@ -298,6 +299,7 @@ public class ApiManager : MonoBehaviour
     public List<String> ErrorMessage = new List<string>();
 
     private bool IsValid(long code) => (int)code / 100 == 2;
+    public int moduleListScanID = 0;
 
     private void Awake()
     {
@@ -502,7 +504,7 @@ public class ApiManager : MonoBehaviour
             if (isConnected)
             {
                 RayCastBlock();
-                APIClient.CallWebAPI(Method.GET.ToString(), string.Format(properties.GetMappModuleList, bookID, chapterID, qrCodeID, latitude, longitude) , string.Empty, GameManager.Instance.m_UserData.token, GetMappedModuleList);
+                APIClient.CallWebAPI(Method.GET.ToString(), string.Format(properties.GetMappModuleList, bookID, chapterID, qrCodeID, latitude, longitude, GameManager.Instance.selectedBooks.id) , string.Empty, GameManager.Instance.m_UserData.token, GetMappedModuleList);
             }
         }));
     }
@@ -512,7 +514,9 @@ public class ApiManager : MonoBehaviour
         if (success)
         {
             ARMappedModuleList response = JsonUtility.FromJson<ARMappedModuleList>(data.ToString());
-            
+
+            moduleListScanID = response.data.scan_id;
+
             List<int> mappedModules = new List<int>();
             for (int i = 0; i < response.data.mapped_data.Count; i++)
             {
@@ -575,11 +579,12 @@ public class ApiManager : MonoBehaviour
 
         if (moduleID == 2)
         {
-            method = string.Format(properties.GetMarkerImages, chapterID, moduleID, GameManager.Instance.currentBook.qr_code_id);
+            method = string.Format(properties.GetMarkerImages, chapterID, moduleID, GameManager.Instance.currentBook.qr_code_id, moduleListScanID);
         }
         else
         {
-            method = string.Format(properties.GetModuleContent, chapterID, moduleID, GameManager.Instance.currentBook.qr_code_id);
+            method = string.Format(properties.GetModuleContent, chapterID, moduleID, GameManager.Instance.currentBook.qr_code_id, moduleListScanID);
+            Debug.Log("GetModuleData method: " + method);
         }
         
         StartCoroutine(CheckInternetConnection(isConnected =>

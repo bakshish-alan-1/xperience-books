@@ -17,7 +17,7 @@ public class WebPageData : MonoBehaviour
         if (string.IsNullOrWhiteSpace(URL)) {
             return;
         }
-        webView = transform.gameObject.AddComponent<UniWebView>();
+        /*webView = transform.gameObject.AddComponent<UniWebView>();
         webView.Frame = new Rect(0, 0, Screen.width, Screen.height);
         webView.SetShowToolbar(true, false, false, true);
         webView.Load(URL);
@@ -26,8 +26,9 @@ public class WebPageData : MonoBehaviour
         webView.OnShouldClose += (view) => {
             webView = null;
             return true;
-        };
-
+        };*/
+        Debug.Log("WebPageData click: " + URL);
+        Application.OpenURL(URL);
     }
 
     void setTheme()

@@ -135,7 +135,7 @@ namespace Ecommerce
             {
                 Instance = this;
             }
-            GetFeaturedProduct();
+            GetFeaturedProduct(true);
             //GetCategoryList();
         }
 
@@ -161,15 +161,21 @@ namespace Ecommerce
         #endregion
 
         #region Feature ProductList
-        public void GetFeaturedProduct()
+        public void GetFeaturedProduct(bool isSendScanID = false)
         {
             int bookID = GameManager.Instance.currentBook.book_id;
             int chapterID = GameManager.Instance.currentBook.chapter_id;
+            string str = "";
+            if (isSendScanID)
+                str = ApiManager.Instance.properties.GetFeatureProductList;
+            else
+                str = ApiManager.Instance.properties.GetFeatureProductListSubMenu;
+
             StartCoroutine(CheckInternetConnection(isConnected =>
             {
                 if (isConnected)
                 {
-                    APIClient.CallWebAPI(Method.GET.ToString(), string.Format(ApiManager.Instance.properties.GetFeatureProductList, bookID, chapterID), string.Empty, GameManager.Instance.m_UserData.token, GetFeaturedProductList);
+                    APIClient.CallWebAPI(Method.GET.ToString(), string.Format(str, bookID, chapterID, ApiManager.Instance.moduleListScanID), string.Empty, GameManager.Instance.m_UserData.token, GetFeaturedProductList);
                 }
             }));
         }

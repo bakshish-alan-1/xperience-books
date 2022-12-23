@@ -15,7 +15,7 @@ public class FaceNeckController : MonoBehaviour
     public static OnFaceNeckImageDownloaded builerDataDownloaded;// implemented in face neck builder script
 
     public CanvasGroup CaptureBtnUI;
-    public GameObject InfoBox, screenSpaceUI, cameraBtn, LoadingUI;
+    public GameObject InfoBox, HelpBox, screenSpaceUI, cameraBtn, LoadingUI;
     public ARFaceManager arFaceManager;
     [SerializeField] GameObject m_RootObject;
     public Text progressText;
@@ -68,6 +68,11 @@ public class FaceNeckController : MonoBehaviour
     public void OnInfoBtnHite(bool value)
     {
         InfoBox.SetActive(value);
+    }
+
+    public void OnHelpBtnHite(bool value)
+    {
+        HelpBox.SetActive(value);
     }
 
     private void LoadData()

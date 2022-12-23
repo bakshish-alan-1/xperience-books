@@ -19,6 +19,7 @@ public class StaticKeywords
     public static string LogoTheme = "logo.png";
     public static string CameraBtn = "camera.png";
     public static string InfoBtn = "infoBtn.png";
+    public static string HelpBtn = "helpBtn.png";
     public static string CameraSwapBtn = "cameraSwap.png";
     public static string Scan_BGTheme = "scan_qr_bg.png";// scan screen main BG
     public static string BGTheme="background_image.png";

@@ -28,7 +28,7 @@ public class FacePropertyController : MonoBehaviour
     string finalPath = "", localModelFilePath = "";
 
     [SerializeField]
-    public GameObject InfoBox, m_RootObject;
+    public GameObject InfoBox, HelpBox, m_RootObject;
     [SerializeField]
     public GameObject m_ScreenShotCameraBtn, m_ScreenSpaceUI;
 
@@ -169,6 +169,11 @@ public class FacePropertyController : MonoBehaviour
     public void OnInfoBtnHite(bool value)
     {
         InfoBox.SetActive(value);
+    }
+
+    public void OnHelpBtnHite(bool value)
+    {
+        HelpBox.SetActive(value);
     }
     
     public void LoadModelOnFace() {

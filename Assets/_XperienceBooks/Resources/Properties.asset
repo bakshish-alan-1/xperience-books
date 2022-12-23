@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a99d7a77d0214e80ab4de49344c1498, type: 3}
   m_Name: Properties
   m_EditorClassIdentifier: 
-  m_CurrentEnvirnment: 2
+  m_CurrentEnvirnment: 1
   TestingBaseURL: https://arbooks-test.theintellify.net/api/
   Staging: https://arbooks-stage.theintellify.net/api/
   ProductionBaseURL: https://admin.continuummultimedia.com/api/
@@ -22,14 +22,15 @@ MonoBehaviour:
   GetOTPforForgotPassword: forget-password/get-otp
   ForgotPassword: forget-password
   UpdateParentEmail: user/parent-email/update
-  GetMappModuleList: chapter/getarmoduleschapters?book_id={0}&chapter_id={1}&qr_code_id={2}&latitude={3}&longitude={4}
-  GetModuleContent: chapter/getchapterqrcodealldata?chapter_id={0}&ar_module_id={1}&qr_code_id={2}
-  GetMarkerImages: chapter/getchapterccodealldata?chapter_id={0}&ar_module_id={1}&qr_code_id={2}
+  GetMappModuleList: chapter/getarmoduleschapters?book_id={0}&chapter_id={1}&qr_code_id={2}&latitude={3}&longitude={4}&book_selected_id={5}
+  GetModuleContent: chapter/getchapterqrcodealldata?chapter_id={0}&ar_module_id={1}&qr_code_id={2}&scan_id={3}
+  GetMarkerImages: chapter/getchapterccodealldata?chapter_id={0}&ar_module_id={1}&qr_code_id={2}&scan_id={3}
   UpdateUserProfile: profile/update
   UpdateUserPassword: change-password
   seriesList: series
   seriesDetails: series
-  GetFeatureProductList: product/getfeaturedproducts?book_id={0}&chapter_id={1}
+  GetFeatureProductList: product/getfeaturedproducts?book_id={0}&chapter_id={1}&scan_id={2}
+  GetFeatureProductListSubMenu: product/getfeaturedproducts?book_id={0}&chapter_id={1}
   GetAllCategory: category/show
   GetProductByCategory: product/getproductsbycategory?category_id={0}
   GetAddressList: address/v1

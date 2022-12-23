@@ -50,13 +50,13 @@ public class Properties : ScriptableObject
     public string UpdateParentEmail = "user/parent-email/update";
 
     [Tooltip("3) Mapped Module List - Call when QR Scan : Required 3 Param : Book ID , Chapter ID , Index")]
-    public string GetMappModuleList = "chapter/getarmoduleschapters?book_id={0}&chapter_id={1}&qr_code_id={2}&latitude={3}&longitude={4}";
+    public string GetMappModuleList = "chapter/getarmoduleschapters?book_id={0}&chapter_id={1}&qr_code_id={2}&latitude={3}&longitude={4}&book_selected_id={5}";
 
     [Tooltip("4) Get Selected Module Data")]
-    public string GetModuleContent = "chapter/getchapterqrcodealldata?chapter_id={0}&ar_module_id={1}&qr_code_id={2}";
+    public string GetModuleContent = "chapter/getchapterqrcodealldata?chapter_id={0}&ar_module_id={1}&qr_code_id={2}&scan_id={3}";
 
     [Tooltip("5) Get Image Target List :- Module 2")]
-    public string GetMarkerImages = "chapter/getchapterccodealldata?chapter_id={0}&ar_module_id={1}&qr_code_id={2}";
+    public string GetMarkerImages = "chapter/getchapterccodealldata?chapter_id={0}&ar_module_id={1}&qr_code_id={2}&scan_id={3}";
 
     [Tooltip("6) Update User Profile")]
     public string UpdateUserProfile = "profile/update";
@@ -75,7 +75,9 @@ public class Properties : ScriptableObject
     [Space(15)]
 
     [Tooltip("8) Get Feature Product List")]
-    public string GetFeatureProductList = "product/getfeaturedproducts?book_id={0}&chapter_id={1}";
+    public string GetFeatureProductList = "product/getfeaturedproducts?book_id={0}&chapter_id={1}&scan_id={2}";
+    [Tooltip("8.1) Get Feature Product List call inside ecommerce sub menu")]
+    public string GetFeatureProductListSubMenu = "product/getfeaturedproducts?book_id={0}&chapter_id={1}";
     [Tooltip("9) Get All Category List")]
     public string GetAllCategory = "category/show";
     [Tooltip("10) Get Product List By Category ID")]

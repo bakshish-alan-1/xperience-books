@@ -42,6 +42,7 @@ public class ContentModel
     public string filename;
     public string artist_name;
     public string description;
+    public string title;
     public string content_type;
     public string ar_module_name;
     public string chapter_name;

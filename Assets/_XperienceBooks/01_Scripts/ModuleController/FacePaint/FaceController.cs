@@ -31,7 +31,7 @@ public class FaceController : MonoBehaviour
     string m_FolderPath;
 
     [SerializeField]
-    public GameObject InfoBox, loadingUI, m_ScreenSpaceUI;
+    public GameObject HelpBox, loadingUI, m_ScreenSpaceUI;
     public CanvasGroup m_additionalUI;
     
     [SerializeField]
@@ -59,9 +59,9 @@ public class FaceController : MonoBehaviour
         GameManager.Instance.safetyWindow.OpenWindow();// call Safetywindow popup
     }
 
-    public void OnInfoBtnHite(bool value)
+    public void OnHelpBtnHite(bool value)
     {
-        InfoBox.SetActive(value);
+        HelpBox.SetActive(value);
     }
 
     public void LoadPaintTexture() {
