@@ -18,6 +18,16 @@ namespace Ecommerce.Category
             m_CategoryList.AddRange(data);
         }
 
+        public void onBackButtonPress(bool value)
+        {
+            if (GameManager.Instance.buyFromPrintfull)
+            {
+                ECommerceManager.Instance.BackToMainScreen();
+            }
+            else
+                ECommerceManager.Instance.GetFeaturedProduct(value);
+        }
+
         public void onRemoveCategoryCells()
         {
             for (int i = 0; i < PrefabsParent.transform.childCount; i++)

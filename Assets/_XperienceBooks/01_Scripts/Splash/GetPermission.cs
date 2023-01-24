@@ -5,6 +5,7 @@ using TBEasyWebCam;
 using UnityEngine;
 using UnityEngine.Android;
 
+
 public class GetPermission : MonoBehaviour
 {
     static public GetPermission Instance = null;
@@ -37,6 +38,7 @@ public class GetPermission : MonoBehaviour
         permissions.Push(Permission.Camera);
         permissions.Push(Permission.ExternalStorageWrite);
         permissions.Push(Permission.FineLocation);
+        permissions.Push("android.permission.POST_NOTIFICATIONS");
 #elif UNITY_IOS
         permissions.Push(Permission.Camera);
 #endif

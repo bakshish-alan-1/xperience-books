@@ -25,7 +25,9 @@ namespace PaymentSDK.Core
 
         public string AuthorizationString()
         {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"));
+            string str = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"));
+            //UnityEngine.Debug.Log("paypal AuthorizationString: " + str);
+            return str;//Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"));
         }
 
         public string ClientId()

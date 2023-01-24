@@ -56,11 +56,15 @@ public class CaptureAndShare : MonoBehaviour
 
         yield return new WaitForEndOfFrame();
 
+        tempTexture = ScreenCapture.CaptureScreenshotAsTexture(3);
+        /*
         tempTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
         tempTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
         tempTexture.Apply();
+        */
 
         //  previewImage.texture = tempTexture;
+        GameManager.Instance.printfulImage = tempTexture.EncodeToJPG(100);
         previewImage.sprite = Utility.Texture2DToSprite(tempTexture);
         previewImage.preserveAspect = true;
 

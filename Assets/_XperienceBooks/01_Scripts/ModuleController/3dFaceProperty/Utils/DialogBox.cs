@@ -35,7 +35,13 @@ public class DialogBox : MonoBehaviour
         if (ButtonText.text == "Done")
         {
             Ecommerce.ProductList.Instance.RefreshListData();
-            Ecommerce.ECommerceManager.Instance.GetFeaturedProduct();
+            if (GameManager.Instance.buyFromPrintfull)
+            {
+                Ecommerce.ECommerceManager.Instance.GetPrintfulCategoryList(GameManager.Instance.printfulCategoryID);
+            }
+            else
+                Ecommerce.ECommerceManager.Instance.GetFeaturedProduct();
+
             CartController.Instance.ClearCartList();
         }
     }

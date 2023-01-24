@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using KetosGames.SceneTransition;
 using TriLibCore;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -84,6 +85,14 @@ public class PlaneTrackingController : MonoBehaviour
 
         m_ModelDownloader.StartLoadObject(finalPath, isLocalFile, ModelLoaded, OnMaterialsLoad);
         GameManager.Instance.safetyWindow.OpenWindow();// call Safetywindow popup
+    }
+
+    public void OnPrintfulBuyBtnPress()
+    {
+        onBackBtnClick();
+        GameManager.Instance.buyFromPrintfull = true;
+        GameManager.Instance.printfulCategoryID = 11;
+        SceneLoader.LoadScene("04_E-commerce");
     }
 
     public void onBackBtnClick()

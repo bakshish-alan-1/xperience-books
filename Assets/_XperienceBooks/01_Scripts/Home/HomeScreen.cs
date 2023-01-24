@@ -55,6 +55,7 @@ public class HomeScreen : MonoBehaviour
     {
         if (GameManager.Instance.IsCameraPermissionGranted())
         {
+            GameManager.Instance.buyFromPrintfull = false;
             backBtn.SetActive(false);
             QRScanController.Instance.OnsetScanQRInfo("Scan QR");
             WindowManager.Instance.OpenPanel("QRScan");

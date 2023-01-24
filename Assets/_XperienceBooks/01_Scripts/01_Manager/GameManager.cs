@@ -73,6 +73,8 @@ public class GameManager : MonoBehaviour
     public Series selectedSeries;
     public SeriesBooks selectedBooks;
 
+    public bool buyFromPrintfull = false;
+    public int printfulCategoryID = 0;
     public bool isNewThemeDownload = false;
 
     /// <summary>
@@ -80,6 +82,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     [SerializeField] string m_LocalPath;
     public string WatermarkURL;
+    public int genreId = -1;
 
     /// <summary>
     /// Store warning window info
@@ -116,7 +119,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMPro.TMP_Text websiteBtnText;
 
     [SerializeField] FirebaseNotificaitonManager firebase;
-
+    public byte[] printfulImage;
     public string FirebaseToken = "";
     public string LocalStoragePath
     {
@@ -126,8 +129,10 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        PlayerPrefs.SetInt("GenreId", PlayerPrefs.GetInt("GenreId", -1));
         PlayerPrefs.SetString("IsThemeSaved", PlayerPrefs.GetString("IsThemeSaved", "false"));
         LocalStoragePath = Application.persistentDataPath + "/LocalStorage/";
+        genreId = PlayerPrefs.GetInt("GenreId");
         Debug.Log("GameManager: " + LocalStoragePath);
         if (PlayerPrefs.GetInt("IsFreshInstall", 0) == 0)
         {
@@ -308,7 +313,8 @@ public class GameManager : MonoBehaviour
             SeriesController.Instance.OnRemoveChield();
 
             //firebase
-            firebase.OnDeInitializeToken();
+            PlayerPrefs.SetInt("firebaseTokenSaved", 0);
+            //firebase.OnDeInitializeToken();
 
             Debug.Log(LocalStoragePath);
 

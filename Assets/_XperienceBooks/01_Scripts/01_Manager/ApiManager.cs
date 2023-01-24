@@ -177,7 +177,7 @@ public class Skin
     public string name, dialog_box, dialog_box_btn, scan_qr_bg, fan_art_img_glry;
     public string color_code, notif_icon, notif_thumbnail, notif_next, notif_tile;
     public string background_image, scan_button, back_button, inventory_placeholder;
-    public string camera_icon, info_icon, help_icon, camera_swap_icon;
+    public string camera_icon, info_icon, help_icon, printful_icon, camera_swap_icon;
     public string logo, facebook_icon, twitter_icon, youtube_icon, instagram_icon, website_icon, profile_icon, inventory_icon;
     public string module_1, module_2, module_3, module_4, module_5, module_6, module_7, module_8, module_9, module_10, module_11, module_12;
     public string font_h1, font_h2, font_h3, font_h4;
@@ -643,6 +643,7 @@ public class ApiManager : MonoBehaviour
 
     private void RegisterOrder(bool success, object data, long statusCode)
     {
+        RaycastUnblock();
         if (success)
         {
             Debug.Log("RegisterOrder: " + data.ToString());
@@ -652,8 +653,8 @@ public class ApiManager : MonoBehaviour
         else
         {
             APIResponseFailPopup(statusCode, "Something Went Wrong", data.ToString(), false);
+            Checkout.Instance.NewOrderRegisteFail();
         }
-        RaycastUnblock();
     }
 
     public class UpdateOrderDetails
@@ -667,6 +668,9 @@ public class ApiManager : MonoBehaviour
         UpdateOrderDetails updateOrderDetails = new UpdateOrderDetails();
         updateOrderDetails.system_order_id = system_order_ID;
         updateOrderDetails.payment_status = status;
+
+        if (GameManager.Instance.printfulImage.Length > 0)
+            APIClient.UploadPrintfulImage(system_order_ID);
 
         StartCoroutine(CheckInternetConnection(isConnected =>
         {
@@ -826,17 +830,55 @@ public class ApiManager : MonoBehaviour
     }
     #endregion
 
-    // Series Apis
-    #region Series Apis
-    public void GetSeriesList()
+    #region GenreList
+    public void getGenre()
     {
         StartCoroutine(CheckInternetConnection(isConnected =>
         {
             if (isConnected)
             {
-                APIClient.CallWebAPI(Method.GET.ToString(), properties.seriesList, string.Empty, GameManager.Instance.m_UserData.token, OnSeriesList);
+                APIClient.CallWebAPI(Method.GET.ToString(), properties.genreList, string.Empty, GameManager.Instance.m_UserData.token, OnGenreList);
             }
         }));
+    }
+
+    void OnGenreList(bool success, object data, long statusCode)
+    {
+        if (success)
+        {
+            Debug.Log("OnGenreList: " + data.ToString());
+            SeriesController.Instance.setGenreList(data.ToString());
+            WindowManager.Instance.OpenPanel("Series");
+        }
+        else
+        {
+            APIResponseFailPopup(statusCode, "Something Went Wrong", data.ToString(), true);
+        }
+        RaycastUnblock();
+    }
+    #endregion
+
+    // Series Apis
+    #region Series Apis
+    public void GetSeriesList()
+    {
+        if (GameManager.Instance.genreId < 0)
+        {
+            Debug.Log("ApiManager series: " + GameManager.Instance.genreId);
+            getGenre();
+            SeriesController.Instance.ShowGenreInfo(true);
+        }
+        else
+        {
+            int id = SeriesController.Instance.genreData.data[GameManager.Instance.genreId - 1].id;
+            StartCoroutine(CheckInternetConnection(isConnected =>
+            {
+                if (isConnected)
+                {
+                    APIClient.CallWebAPI(Method.GET.ToString(), string.Format(properties.seriesList, id), string.Empty, GameManager.Instance.m_UserData.token, OnSeriesList);
+                }
+            }));
+        }
     }
 
     private void OnSeriesList(bool success, object data, long statusCode)

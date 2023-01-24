@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using KetosGames.SceneTransition;
 using TriLibCore;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -134,7 +135,6 @@ public class FacePropertyController : MonoBehaviour
         GameManager.Instance.safetyWindow.OpenWindow();// call Safetywindow popup
     }
 
-    
     private void OnMaterialsLoad(AssetLoaderContext assetLoaderContext)
     {
         if (isBackBtn)
@@ -164,6 +164,14 @@ public class FacePropertyController : MonoBehaviour
     public void ModelLoaded(AssetLoaderContext assetLoaderContext)
     {
         Debug.Log("ModelLoaded: ");
+    }
+
+    public void OnPrintfulBuyBtnPress()
+    {
+        onBackBtnClick();
+        GameManager.Instance.buyFromPrintfull = true;
+        GameManager.Instance.printfulCategoryID = 11;
+        SceneLoader.LoadScene("04_E-commerce");
     }
     
     public void OnInfoBtnHite(bool value)

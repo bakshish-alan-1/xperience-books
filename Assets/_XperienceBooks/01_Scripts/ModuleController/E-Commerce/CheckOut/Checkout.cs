@@ -43,7 +43,7 @@ namespace Ecommerce.checkout
 
 
         public List<GameObject> cartList = new List<GameObject>();
-
+        string webViewapprovalLink = "";
 
         public void UpdateView(List<CartProduct> cart , CustomerDetails details) {
             orderDetails = new OrderDetails();
@@ -143,6 +143,7 @@ namespace Ecommerce.checkout
 
             dialogBox.SetActive(false);
             loadingPanel.SetActive(true);
+            ApiManager.Instance.RayCastBlock();
 
             PayPalClient.Buy(CreateOrder(), PlaceOrder);
         }
@@ -159,13 +160,25 @@ namespace Ecommerce.checkout
                 foreach (Link link in lastOrder.links)
                     if (link.rel == "approve")
                         approvalLink = link.href;
-                // Debug.Log("Order Approve Link : "+approvalLink);
-                //  webView.Show();
-                //  webView.Load(approvalLink);
-                CreateWebView(approvalLink);
+
+                webViewapprovalLink = approvalLink;
 
                 // call order api here
                 System_order_id = "";
+                for (int i = 0; i < orderDetails.m_FinalCart.Count; i++)
+                {
+                    orderDetails.m_FinalCart[i].m_product.price = orderDetails.m_FinalCart[i].m_FinalPrice.ToString();
+                    orderDetails.m_FinalCart[i].m_product.qty = orderDetails.m_FinalCart[i].m_TotalQty.ToString();
+                    orderDetails.m_FinalCart[i].m_product.currency = "usd";
+                    if (orderDetails.m_FinalCart[i].m_product.attributes.Count != 0)
+                    {
+                        int clr = orderDetails.m_FinalCart[i].m_SelectedAttributes[0];
+                        int size = orderDetails.m_FinalCart[i].m_SelectedAttributes[1];
+
+                        orderDetails.m_FinalCart[i].m_product.image.Add(orderDetails.m_FinalCart[i].m_product.attributes[clr].color_image);
+                    }
+                }
+                Debug.Log("Order Api data: " + JsonUtility.ToJson(orderDetails));
                 ApiManager.Instance.NewOrder(orderDetails);
             }
             else
@@ -206,6 +219,12 @@ namespace Ecommerce.checkout
         {
             System_order_id = registerId;
             Debug.Log("NewOrderRegisteSuccess: " + System_order_id + " , " + registerId);
+            CreateWebView(webViewapprovalLink);
+        }
+
+        public void NewOrderRegisteFail()
+        {
+            loadingPanel.SetActive(false);
         }
 
         public void ConfirmPayment()
@@ -223,11 +242,11 @@ namespace Ecommerce.checkout
           var Order = JsonUtility.FromJson<Order>(data.ToString());
             if (success)
             {
-                dialogBox.GetComponent<DialogBox>().SetDialogBox("Order Placed", "Order has been placed sucess fully, Order ID: " + Order.id, "Done");
+                dialogBox.GetComponent<DialogBox>().SetDialogBox("Order Placed", "Order has been placed successfully, Order ID: " + Order.id, "Done");
 
                 // messageBox.text = "Order has been placed sucess fully, Order ID : " + Order.id;
 
-                Debug.Log("Order Purchase Sucessfully");
+                Debug.Log("Order Purchase Sucessfully: " + Order.status.ToLower());
 
                 if (Order.status.ToLower() == "approve" || Order.status.ToLower() == "approved")
                 {
@@ -316,7 +335,7 @@ namespace Ecommerce.checkout
             }
             else
             {
-                dialogBox.GetComponent<DialogBox>().SetDialogBox("Payment Failed", "Order Approval failed , If Amount dedducted from your account will refund in 24 hours. Please keep Order ID : " + Order.id, "Done");
+                dialogBox.GetComponent<DialogBox>().SetDialogBox("Payment Failed", "Order Approval failed, If Amount dedducted from your account will refund in 24 hours. Please keep Order ID : " + Order.id, "Done");
                 // messageBox.text = "Order Approval failed , If Amount dedducted from your account will refund in 24 hours. Please keep Order ID : " + Order.id;
                 Debug.Log(Order.status);
             }

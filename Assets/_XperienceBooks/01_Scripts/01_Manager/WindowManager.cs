@@ -78,7 +78,7 @@ public class WindowManager : MonoBehaviour
                 HomeScreen.Instance.OnSetHomePanelData();
             else if (PlayerPrefs.GetString("IsThemeSaved").Equals("false") || GameManager.Instance.selectedSeries.id == -1 || GameManager.Instance.selectedBooks.id == -1)
             {
-                ApiManager.Instance.GetSeriesList();
+                ApiManager.Instance.getGenre();
             }
             else
             {

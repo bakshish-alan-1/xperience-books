@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using KetosGames.SceneTransition;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -53,6 +54,14 @@ public class FaceNeckController : MonoBehaviour
 
         if (!isInventoryApiCall)
         { isInventoryApiCall = true; GameManager.Instance.OnCheckToUnlockModule(6); }
+    }
+
+    public void OnPrintfulBuyBtnPress()
+    {
+        onBackBtnClick();
+        GameManager.Instance.buyFromPrintfull = true;
+        GameManager.Instance.printfulCategoryID = 11;
+        SceneLoader.LoadScene("04_E-commerce");
     }
 
     public void onBackBtnClick()

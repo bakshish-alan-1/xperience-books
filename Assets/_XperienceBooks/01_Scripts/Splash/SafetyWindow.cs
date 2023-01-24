@@ -30,7 +30,7 @@ public class SafetyWindow : MonoBehaviour
 
     public void OpenWindow()
     {
-        if (!isThemeSet)
+        //if (!isThemeSet)
         {
             setTheme();
         }

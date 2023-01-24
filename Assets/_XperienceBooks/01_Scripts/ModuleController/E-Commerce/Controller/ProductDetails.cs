@@ -49,13 +49,16 @@ namespace Ecommerce
 
             clearfillterBtn.SetActive(false);
             // toggleWidth = toggle.GetComponent<RectTransform>().sizeDelta.x * (Screen.width / 2048f);
+        }
 
-
-            /* for (int i = 0; i < 10; i++)
-             {
-                 Add(sss.NumberOfPanels);
-             }
-            */
+        public void onBackButtonPress(bool value)
+        {
+            if (GameManager.Instance.buyFromPrintfull)
+            {
+                ECommerceManager.Instance.GetPrintfulCategoryList(GameManager.Instance.printfulCategoryID);
+            }
+            else
+                ECommerceManager.Instance.GetFeaturedProduct(value);
         }
 
         private void OnEnable()

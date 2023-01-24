@@ -10,7 +10,9 @@ public class BookController : MonoBehaviour
 
     public void OnBackBtn()
     {
-        ApiManager.Instance.GetSeriesList(); //WindowManager.Instance.BackToPreviousWindow();
+        Debug.Log("BookController backBtn");
+        //GameManager.Instance.genreId = -1;
+        ApiManager.Instance.getGenre(); //WindowManager.Instance.BackToPreviousWindow();
         Invoke("OnRemoveChield", 1f);
     }
 

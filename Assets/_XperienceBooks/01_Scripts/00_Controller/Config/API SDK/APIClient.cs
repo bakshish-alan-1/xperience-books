@@ -123,6 +123,45 @@ namespace Intellify.core
         #endregion
 
 
+        public static void UploadPrintfulImage(string orderId)
+        {
+            new APIClient().printfulImage(orderId);
+        }
+
+        public void printfulImage(string orderId)
+        {
+            string url = APIEnvironment.BaseUrl() + properties.printfulImageUpload;
+            Debug.Log("printfulImage URL: " + url);
+            Debug.Log("OrderID: " + orderId);
+
+            WWWForm formrequest = new WWWForm();
+
+            Debug.Log("UploadMarkerImage byte length: " + GameManager.Instance.printfulImage.Length.ToString());
+            formrequest.AddBinaryData("printful_image", GameManager.Instance.printfulImage, "printful.jpg");
+            formrequest.AddField("system_order_id", orderId);
+
+            UnityWebRequest request = UnityWebRequest.Post(url, formrequest);
+            {
+                request.SetRequestHeader("Authorization", GameManager.Instance.m_UserData.token);
+                request.SetRequestHeader("Accept", "application/json");
+
+                request.SetRequestHeader("min-app-version", properties.AppVersion);
+
+                request.SendWebRequest();
+
+                Debug.Log("printfulImage upload code: " + request.responseCode);
+
+                if (request.result != UnityWebRequest.Result.Success || request.responseCode == 422 || request.responseCode == 500)
+                {
+                    Debug.Log("Upload printful IMG Error: " + request.error);
+                }
+                else
+                {
+                    Debug.Log("printful uploade success: " + request.downloadHandler.text);
+                }
+            }
+        }
+
         #region WebAPI call
         public static void CallWebAPI(string method, string endPoint, string jsonData, string accessToken, action onComplete = null)
         {

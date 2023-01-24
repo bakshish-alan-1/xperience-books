@@ -39,17 +39,12 @@ namespace Ecommerce
         public float m_FinalPrice;
     }
 
-    /*[Serializable]
-    public class Order {
-       public List<CartProduct> m_PurchasedProduct;
-       public float m_TotalPriceIncludingTexAmount;
-    }*/
-
     [Serializable]
     public class OrderDetails
     {
         public string m_OrderID;
         public string m_TotalPrice;
+        public byte[] printful_image;
         public CustomerDetails m_CustomerDetails;
         public List<CartProduct> m_FinalCart = new List<CartProduct>();
 
@@ -135,8 +130,13 @@ namespace Ecommerce
             {
                 Instance = this;
             }
-            GetFeaturedProduct(true);
-            //GetCategoryList();
+            Debug.Log("buyFromPrintfull: " + GameManager.Instance.buyFromPrintfull);
+            if (GameManager.Instance.buyFromPrintfull)
+            {
+                GetPrintfulCategoryList(GameManager.Instance.printfulCategoryID);
+            }
+            else
+                GetFeaturedProduct(true);
         }
 
         //Checking Intenet Connection before Every API Call & Handle Internet Connection Error 
@@ -201,6 +201,8 @@ namespace Ecommerce
 
             m_CategoryList.Clear();
             m_CategoryList.TrimExcess();
+            GameManager.Instance.buyFromPrintfull = false;
+            GameManager.Instance.printfulImage = null;
             SceneLoader.LoadScene("01_Home");
         }
 
@@ -218,6 +220,39 @@ namespace Ecommerce
         public void ProductList() {
             OpenPanel("ProductList");
         }
+
+        #region Printful Category List
+        public void GetPrintfulCategoryList(int index)
+        {
+            int catID = index;//m_CategoryList[index].id;
+
+            Debug.Log("Get Printful category of id: " + index);
+            StartCoroutine(CheckInternetConnection(isConnected =>
+            {
+                if (isConnected)
+                {
+                    APIClient.CallWebAPI(Method.GET.ToString(), string.Format(ApiManager.Instance.properties.GetProductByCategory, catID), string.Empty, GameManager.Instance.m_UserData.token, SetPrintfulCategoryList);
+                }
+            }));
+        }
+        public void SetPrintfulCategoryList(bool success, object data, long statusCode)
+        {
+            Products response = JsonUtility.FromJson<Products>(data.ToString());
+            if (success)
+            {
+                Debug.Log("Data Added" + response.data.Count);
+
+                m_ProductListView.InitList(response.data, "");
+                ProductList();
+            }
+            else
+            {
+                ApiManager.Instance.APIResponseFailPopup(statusCode, "Something Went Wrong", data.ToString(), false);
+            }
+            ApiManager.Instance.RaycastUnblock();
+        }
+
+        #endregion
 
         #region Get Product By Category ID
         public void GetProductByCategoryID(int index) {
@@ -264,7 +299,6 @@ namespace Ecommerce
                 if (isConnected)
                 {
                     APIClient.CallWebAPI(Method.GET.ToString(), string.Format(ApiManager.Instance.properties.GetAllCategory, bookID, chapterID), string.Empty, GameManager.Instance.m_UserData.token, SetCategoryList);
-                    //APIClient.CallWebAPI(Method.GET.ToString(), ApiManager.Instance.properties.GetAllCategory, string.Empty, GameManager.Instance.m_UserData.token, SetCategoryList);
                 }
             }));
             submenu.Close();

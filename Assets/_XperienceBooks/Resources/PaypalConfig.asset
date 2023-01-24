@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a4497d425db34cd2a19b5216ede9eaa, type: 3}
   m_Name: PaypalConfig
   m_EditorClassIdentifier: 
-  m_CurrentEnvirnment: 1
+  m_CurrentEnvirnment: 0
   payPalSandboxClientId: ARlcLRK4SkEm1fNUsAuZdeYfRJDkn53SP6b7ZC_NXZaENTcuDKi-UbdMpIP1y-RxT5UtYLv_tITEn-AB
-  payPalSandboxClientSecret: 'ELGAE--zlNKIK3eWSm96H1UVFlJHKLm9H6Rp4Vs-11aWwFrAL-Q8H0zj_J3x-sLLsWU-ZFcVxF-ddkhy '
+  payPalSandboxClientSecret: ELGAE--zlNKIK3eWSm96H1UVFlJHKLm9H6Rp4Vs-11aWwFrAL-Q8H0zj_J3x-sLLsWU-ZFcVxF-ddkhy
   paypalSandboxBaseURL: https://api.sandbox.paypal.com/
   payPalClientId: AaCelLEWSbl1y903lBQujF0Bc3AdoBbEgamGhReYpga-Mf4Cx-I_vZnFn7iFLZhFioFmEosyi002ue78
   payPalClientSecret: EKMVvOa_Y7XZx80kk_COb0OgPL_A2ZQzIPAQQgqt14H-h9RDIDgT5bgE_KYiM1nGCAQVS-GjoItG9Bx2

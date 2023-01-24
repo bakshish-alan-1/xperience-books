@@ -12,6 +12,9 @@ namespace Ecommerce
     IEnhancedScrollerDelegate
     {
         public static ProductList Instance = null;
+        [SerializeField] GameObject menuBtn;
+        [SerializeField] GameObject backBtnObj;
+        [SerializeField] GameObject titleObj;
         //Product List Data
         public List<Product> _ProductList = new List<Product>();
         public TextMeshProUGUI m_CategoryTitle;
@@ -29,7 +32,19 @@ namespace Ecommerce
         {
             if (Instance == null)
                 Instance = this;
-            // RefreshListData();
+
+            if (GameManager.Instance.buyFromPrintfull)
+            {
+                menuBtn.SetActive(false);
+                backBtnObj.SetActive(true);
+                titleObj.SetActive(true);
+            }
+            else
+            {
+                menuBtn.SetActive(true);
+                backBtnObj.SetActive(false);
+                titleObj.SetActive(false);
+            }
         }
 
         // Start is called before the first frame update
@@ -50,7 +65,7 @@ namespace Ecommerce
         public void InitList(List<Product> list , string title)
         {
            // RefreshListData();
-            m_CategoryTitle.text = title;
+            m_CategoryTitle.text = title;//Featured
             _ProductList.AddRange(list);
 
             LoadData();

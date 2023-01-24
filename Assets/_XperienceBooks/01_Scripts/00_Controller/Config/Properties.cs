@@ -65,10 +65,13 @@ public class Properties : ScriptableObject
     public string UpdateUserPassword = "change-password";
 
     [Tooltip("Get Series list")]
-    public string seriesList = "series";
+    public string seriesList = "series?genre_id={0}";//series?genre_id=2
 
     [Tooltip("Get Series Details with theame")]
     public string seriesDetails = "series";
+
+    [Tooltip("Get Genre list")]
+    public string genreList = "genre/list";
 
     [Space(15)]
     [Header("ECommerce API")]
@@ -121,6 +124,13 @@ public class Properties : ScriptableObject
     public string UnlockInventory = "inventory-unlock";
     [Tooltip("22) Open Inventory")]
     public string OpenInventory = "inventory-viewed";
+
+
+    [Space(15)]
+    [Header("Printful API")]
+    [Space(15)]
+    [Tooltip("23) Printful Image")]
+    public string printfulImageUpload = "order/printful_image";
 
     #endregion
 }

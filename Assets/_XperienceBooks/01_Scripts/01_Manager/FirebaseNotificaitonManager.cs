@@ -48,7 +48,9 @@ public class FirebaseNotificaitonManager : MonoBehaviour
 
     private void OnMessageReceived(object sender, MessageReceivedEventArgs e)
     {
+        Debug.Log("Firebase NotificationOpened: " + e.Message.NotificationOpened);
         Debug.Log("Firebase message: " + e.Message.From);
+        Debug.Log("Firebase data: " + e.Message.Data.ToString());
     }
 
     private void OnTokenReceived(object sender, TokenReceivedEventArgs e)

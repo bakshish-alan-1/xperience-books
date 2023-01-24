@@ -36,15 +36,10 @@ namespace PaymentSDK.Core
         private static string accessToken;
         #endregion
 
-      
-
-
         private static bool IsValid(long code) => (int)code / 100 == 2;
-
 
         string authenticate(string username, string password)
         {
-
             Debug.Log(username + " " + password);
             string auth = username + ":" + password;
             auth = System.Convert.ToBase64String(System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(auth));
@@ -55,6 +50,7 @@ namespace PaymentSDK.Core
         #region oauth2/token
         private void GetAccessToken(UnityAction callback)
         {
+            Debug.Log("paypal GetAccessToken: " + HasAccessToken);
             if (HasAccessToken)
             {
                 callback();
@@ -65,8 +61,7 @@ namespace PaymentSDK.Core
 
             request.SetRequestHeader("Accept", "application/json");
             request.SetRequestHeader("Accept-Language", "en_US");
-            request.SetRequestHeader("Authorization", "Basic "+ PayPalEnvironment.AuthorizationString());
-
+            request.SetRequestHeader("Authorization", "Basic " + PayPalEnvironment.AuthorizationString());
 
             request.downloadHandler = new DownloadHandlerBuffer();
             request.uploadHandler = new UploadHandlerRaw(Encoding.ASCII.GetBytes("grant_type=client_credentials"));
@@ -75,6 +70,7 @@ namespace PaymentSDK.Core
             {
                 var response = JsonUtility.FromJson<AccessToken>(request.downloadHandler.text);
                 accessToken = response?.access_token;
+
                 callback();
             };
         }

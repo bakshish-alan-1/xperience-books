@@ -8,6 +8,7 @@ public class LoadThemeImage : MonoBehaviour
     [Header("Set Theme")]
     public Image backIcon;
     public Image cameraIcon, cameraSwapIcon;
+    public Image printfulIcon;
 
     [Header("Info Popup")]
     public Image info_DialogBox;
@@ -35,6 +36,9 @@ public class LoadThemeImage : MonoBehaviour
 
         if (cameraSwapIcon != null)
             cameraSwapIcon.sprite = ThemeManager.Instance.cameraSwapBtn;
+
+        if (printfulIcon != null)
+            printfulIcon.sprite = ThemeManager.Instance.printfulBtn;
 
         if (string.IsNullOrEmpty(GameManager.Instance._ModuleData[0].title))
             info_DialogTitle.text = "";
