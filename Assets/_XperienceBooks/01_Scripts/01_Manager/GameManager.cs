@@ -309,27 +309,32 @@ public class GameManager : MonoBehaviour
         if (value)
         {
             Debug.Log("<color=red>I am ready to delete all</color>");
-            WindowManager.Instance.LogOut();
-            SeriesController.Instance.OnRemoveChield();
-
-            //firebase
-            PlayerPrefs.SetInt("firebaseTokenSaved", 0);
-            //firebase.OnDeInitializeToken();
-
-            Debug.Log(LocalStoragePath);
-
-            if (File.Exists(LocalStoragePath + "Theme/SeriesData.json"))
-                File.Delete(LocalStoragePath + "Theme/SeriesData.json");
-
-            if (File.Exists(LocalStoragePath + "Theme/BooksData.json"))
-                File.Delete(LocalStoragePath + "Theme/BooksData.json");
-
-            //Todo : HD
-            ClearAllData();
-            SceneManager.LoadSceneAsync(0);
+            ApiManager.Instance.deleteNotificationToken(FirebaseToken);
         }
         confrimWindowAnimator.Play("Window Out");
 
+    }
+
+    public void LogoutUser()
+    {
+        WindowManager.Instance.LogOut();
+        SeriesController.Instance.OnRemoveChield();
+
+        //firebase
+        PlayerPrefs.SetInt("firebaseTokenSaved", 0);
+
+        Debug.Log(LocalStoragePath);
+
+        if (File.Exists(LocalStoragePath + "Theme/SeriesData.json"))
+            File.Delete(LocalStoragePath + "Theme/SeriesData.json");
+
+        if (File.Exists(LocalStoragePath + "Theme/BooksData.json"))
+            File.Delete(LocalStoragePath + "Theme/BooksData.json");
+
+        //Todo : HD
+        ClearAllData();
+        firebase.InitializeFirebase();
+        SceneManager.LoadSceneAsync(0);
     }
 
     // Open Prepare theme box

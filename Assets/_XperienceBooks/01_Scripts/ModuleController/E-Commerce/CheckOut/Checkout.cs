@@ -330,7 +330,6 @@ namespace Ecommerce.checkout
             Debug.Log("ConfirmCapturePayment: " + Order.status.ToString()+ " , success: " + success);
             if (success)
             {
-                Debug.Log("ConfirmCapturePayment: " + Order.status);
                 ApiManager.Instance.UpdateOrder(System_order_id, Order.status);
             }
             else

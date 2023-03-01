@@ -206,11 +206,13 @@ public class WindowManager : MonoBehaviour
     public void LogOut()
     {
         string str = PlayerPrefs.GetString("UserEmailID");
+        string firebaseToken = PlayerPrefs.GetString("FirebaseToken");
         //ToDo : Clear all playerPref
         PlayerPrefs.DeleteAll();
 
         //Clear all user Data
         PlayerPrefs.SetString("UserEmailID", str);
+        PlayerPrefs.SetString("FirebaseToken", firebaseToken);
         PlayerPrefs.SetInt(StaticKeywords.Login, 0);
         OpenPanel("Login");
     }

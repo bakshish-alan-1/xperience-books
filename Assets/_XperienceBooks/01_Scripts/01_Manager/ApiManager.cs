@@ -7,6 +7,7 @@ using Ecommerce.checkout;
 using Intellify.core;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public enum Method
 {
@@ -398,7 +399,8 @@ public class ApiManager : MonoBehaviour
                 GameManager.Instance.OpenMarkerDetailsWindow();
                 WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel); // Redirect to Home Panel
             }
-
+            Debug.Log("Login success: " + PlayerPrefs.GetInt("firebaseTokenSaved"));
+            Debug.Log("Firebase Token: " + GameManager.Instance.FirebaseToken);
             if (PlayerPrefs.GetInt("firebaseTokenSaved") == 0 && GameManager.Instance.FirebaseToken != "")
             {
                 SetNotificationToken(GameManager.Instance.FirebaseToken);
@@ -954,6 +956,42 @@ public class ApiManager : MonoBehaviour
             APIClient.CallWebAPI(Method.POST.ToString(), properties.sendToken, JsonUtility.ToJson(token), GameManager.Instance.m_UserData.token, OnTokenSet);
 
         }
+    }
+
+    public async void deleteNotificationToken(string myToken)
+    {
+        Debug.Log("inside deleteNotificationToken: " + myToken);
+        RayCastBlock();
+        UnityWebRequest request = new UnityWebRequest("https://google.com");
+        var operation = request.SendWebRequest();
+        while (!operation.isDone)
+            await Task.Yield();
+
+        if (request.result == UnityWebRequest.Result.ConnectionError)
+        {
+            RaycastUnblock();
+            Debug.Log("callNotification: " + request.error);
+            GameManager.Instance.LogoutUser();
+        }
+        else
+        {
+            NewToken token = new NewToken();
+            token.firebase_token = myToken;
+            Debug.Log("token: " + myToken);
+            APIClient.CallWebAPI(Method.POST.ToString(), properties.NotificationTokenDelete, JsonUtility.ToJson(token), GameManager.Instance.m_UserData.token, OnTokenDelete);
+        }
+    }
+
+    private void OnTokenDelete(bool success, object data, long statusCode)
+    {
+        RaycastUnblock();
+        Debug.Log("OnTokenDelete: " + data.ToString());
+        if (success)
+            Debug.Log("Notification delete successfully: " + statusCode);
+        else
+            Debug.Log("Notification delete fail: " + statusCode);
+
+        GameManager.Instance.LogoutUser();
     }
 
     private void OnTokenSet(bool success, object data, long statusCode)

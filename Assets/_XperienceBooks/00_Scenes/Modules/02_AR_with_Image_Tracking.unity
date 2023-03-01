@@ -2574,6 +2574,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2550068133924778519, guid: 68bfef37c589b471c8b268f596a739e8,
+        type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 68bfef37c589b471c8b268f596a739e8, type: 3}
 --- !u!224 &771152832 stripped
@@ -3042,6 +3047,7 @@ MonoBehaviour:
   backIcon: {fileID: 5860559421252019875}
   cameraIcon: {fileID: 0}
   cameraSwapIcon: {fileID: 0}
+  printfulIcon: {fileID: 0}
   info_DialogBox: {fileID: 2019242469}
   info_DialogButton: {fileID: 1194600932}
   infoIcon: {fileID: 406558025}

@@ -113,23 +113,25 @@ public class Properties : ScriptableObject
     public string GetNotification = "new-notification";
     [Tooltip("19) Set notification view bool")]
     public string NotificationViewed = "new-notification/";
+    [Tooltip("20) Delete firebase notification token")]
+    public string NotificationTokenDelete = "notif-devices/delete";
 
     [Space(15)]
     [Header("Inventory API")]
     [Space(15)]
 
-    [Tooltip("20) Get inventory List")]
+    [Tooltip("21) Get inventory List")]
     public string Inventory = "inventory?chapter_id={0}&qr_code_id={1}";
-    [Tooltip("21) Unlock Inventory")]
+    [Tooltip("22) Unlock Inventory")]
     public string UnlockInventory = "inventory-unlock";
-    [Tooltip("22) Open Inventory")]
+    [Tooltip("23) Open Inventory")]
     public string OpenInventory = "inventory-viewed";
 
 
     [Space(15)]
     [Header("Printful API")]
     [Space(15)]
-    [Tooltip("23) Printful Image")]
+    [Tooltip("24) Printful Image")]
     public string printfulImageUpload = "order/printful_image";
 
     #endregion

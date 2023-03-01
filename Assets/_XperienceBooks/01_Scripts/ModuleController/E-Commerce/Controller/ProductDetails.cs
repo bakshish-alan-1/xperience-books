@@ -10,7 +10,7 @@ namespace Ecommerce
 
         #region Product_ScrollSnap
         [SerializeField]
-        protected GameObject panel, toggle, clearfillterBtn;
+        protected GameObject printful_img, panel, toggle, clearfillterBtn;
         [SerializeField]
         private float toggleWidth;
         [SerializeField]
@@ -49,6 +49,19 @@ namespace Ecommerce
 
             clearfillterBtn.SetActive(false);
             // toggleWidth = toggle.GetComponent<RectTransform>().sizeDelta.x * (Screen.width / 2048f);
+        }
+
+        private void Start()
+        {
+            if (GameManager.Instance.buyFromPrintfull)
+            {
+                printful_img.SetActive(true);
+                Texture2D text = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+                text.LoadImage(GameManager.Instance.printfulImage);
+                printful_img.GetComponent<Image>().sprite = GameManager.Instance.Texture2DToSprite(text);
+            }
+            else
+                printful_img.SetActive(false);
         }
 
         public void onBackButtonPress(bool value)

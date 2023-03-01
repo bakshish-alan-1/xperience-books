@@ -18,10 +18,11 @@ public class FirebaseNotificaitonManager : MonoBehaviour
         FirebaseMessaging.DeleteTokenAsync();
     }
 
-    void InitializeFirebase()
+    public void InitializeFirebase()
     {
         Debug.Log("inside InitializeFirebase");
 
+        GameManager.Instance.FirebaseToken = PlayerPrefs.GetString("FirebaseToken", "");
         FirebaseMessaging.SubscribeAsync("Xperience Books").ContinueWithOnMainThread(task => {
             //LogTaskCompletion(task, "SubscribeAsync");
         });
@@ -57,6 +58,7 @@ public class FirebaseNotificaitonManager : MonoBehaviour
     {
         Debug.Log("Firebase token: " + e.Token);
         GameManager.Instance.FirebaseToken = e.Token;
+        PlayerPrefs.SetString("FirebaseToken", e.Token);
         if (PlayerPrefs.GetInt(StaticKeywords.Login) == 1)
         {
 #if !UNITY_EDITOR

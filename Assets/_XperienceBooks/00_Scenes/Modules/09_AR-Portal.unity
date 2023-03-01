@@ -2030,6 +2030,7 @@ MonoBehaviour:
   backIcon: {fileID: 5860559420898483392}
   cameraIcon: {fileID: 0}
   cameraSwapIcon: {fileID: 0}
+  printfulIcon: {fileID: 0}
   info_DialogBox: {fileID: 2015661904}
   info_DialogButton: {fileID: 1581250315}
   infoIcon: {fileID: 727262812}
@@ -2792,6 +2793,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1294738757}
     m_Modifications:
+    - target: {fileID: 898360694581662798, guid: dbba6a31c9467491a85fc3e213515109,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 898360695128718143, guid: dbba6a31c9467491a85fc3e213515109,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -2851,6 +2857,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalRotation.w
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451950296909740422, guid: dbba6a31c9467491a85fc3e213515109,
+        type: 3}
+      propertyPath: m_device
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7451950296909740423, guid: dbba6a31c9467491a85fc3e213515109,
         type: 3}
