@@ -261,7 +261,7 @@ namespace Ecommerce.checkout
             }
             else
             {
-                dialogBox.GetComponent<DialogBox>().SetDialogBox("Payment Failed", "Order Approval failed , If Amount dedducted from your account will refund in 24 hours. Please keep Order ID : " + Order.id, "Failed");
+                dialogBox.GetComponent<DialogBox>().SetDialogBox("Payment Failed", "Order approval failed. Any amount deducted from your account will be refunded in 24 hours. Keep the following Order ID for your records: " + Order.id, "Failed");
                 // messageBox.text = "Order Approval failed , If Amount dedducted from your account will refund in 24 hours. Please keep Order ID : " + Order.id;
                 Debug.Log(Order.status);
             }
@@ -334,7 +334,7 @@ namespace Ecommerce.checkout
             }
             else
             {
-                dialogBox.GetComponent<DialogBox>().SetDialogBox("Payment Failed", "Order Approval failed, If Amount dedducted from your account will refund in 24 hours. Please keep Order ID : " + Order.id, "Done");
+                dialogBox.GetComponent<DialogBox>().SetDialogBox("Payment Failed", "Order approval failed. Any amount deducted from your account will be refunded in 24 hours. Keep the following Order ID for your records: " + Order.id, "Done");
                 // messageBox.text = "Order Approval failed , If Amount dedducted from your account will refund in 24 hours. Please keep Order ID : " + Order.id;
                 Debug.Log(Order.status);
             }
