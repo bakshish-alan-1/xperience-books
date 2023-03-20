@@ -40,15 +40,21 @@ public class LoadThemeImage : MonoBehaviour
         if (printfulIcon != null)
             printfulIcon.sprite = ThemeManager.Instance.printfulBtn;
 
-        if (string.IsNullOrEmpty(GameManager.Instance._ModuleData[0].title))
-            info_DialogTitle.text = "";
-        else
-            info_DialogTitle.text = GameManager.Instance._ModuleData[0].title;
+        if (info_DialogTitle != null)
+        {
+            if (string.IsNullOrEmpty(GameManager.Instance._ModuleData[0].title))
+                info_DialogTitle.text = "";
+            else
+                info_DialogTitle.text = GameManager.Instance._ModuleData[0].title;
+        }
 
-        if (string.IsNullOrEmpty(GameManager.Instance._ModuleData[0].description))
-            info_DialogText.text = "No data found.";
-        else
-            info_DialogText.text = GameManager.Instance._ModuleData[0].description;
+        if (info_DialogText != null)
+        {
+            if (string.IsNullOrEmpty(GameManager.Instance._ModuleData[0].description))
+                info_DialogText.text = "No data found.";
+            else
+                info_DialogText.text = GameManager.Instance._ModuleData[0].description;
+        }
 
         // Help Popup data
         if (DialogBox != null)

@@ -2470,13 +2470,13 @@ MonoBehaviour:
   printfulIcon: {fileID: 0}
   info_DialogBox: {fileID: 0}
   info_DialogButton: {fileID: 0}
-  infoIcon: {fileID: 1602559787}
+  infoIcon: {fileID: 0}
   info_DialogTitle: {fileID: 0}
   info_DialogText: {fileID: 0}
   info_ButtonText: {fileID: 0}
   DialogBox: {fileID: 2007626662}
   DialogButton: {fileID: 897225933}
-  helpIcon: {fileID: 0}
+  helpIcon: {fileID: 1602559787}
   DialogTitle: {fileID: 108631351}
   DialogText: {fileID: 1577831925}
   ButtonText: {fileID: 1166813260}
@@ -3211,7 +3211,7 @@ GameObject:
   - component: {fileID: 1113510933}
   - component: {fileID: 1113510932}
   m_Layer: 5
-  m_Name: InfoBtn
+  m_Name: HelpBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4577,7 +4577,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 86982c6aeca4d4a70a3083974624463f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a93587bf568ea4e7b83b8def58a5cf64, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -5716,7 +5716,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2126169368}
   m_Layer: 5
-  m_Name: InfoPopup
+  m_Name: HelpPopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

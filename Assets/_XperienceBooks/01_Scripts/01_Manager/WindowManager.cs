@@ -96,6 +96,11 @@ public class WindowManager : MonoBehaviour
             OpenPanel("PrivacyPolicy");
     }
 
+    public string getCurrentWindowName()
+    {
+        return windows[currentWindowIndex].windowName;
+    }
+
     void SocialMediaList(string name)
     {
         if (name.Equals(StaticKeywords.HomePanel) || name.Equals(StaticKeywords.ContentList))

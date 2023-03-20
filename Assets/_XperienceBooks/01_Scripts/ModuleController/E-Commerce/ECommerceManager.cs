@@ -241,14 +241,13 @@ namespace Ecommerce
             if (success)
             {
                 Debug.Log("Data Added" + response.data.Count);
-
                 m_ProductListView.InitList(response.data, "");
-                ProductList();
             }
             else
             {
                 ApiManager.Instance.APIResponseFailPopup(statusCode, "Something Went Wrong", data.ToString(), false);
             }
+            ProductList();
             ApiManager.Instance.RaycastUnblock();
         }
 
