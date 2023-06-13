@@ -59,6 +59,12 @@ public class Login : MonoBehaviour
         }
     }
 
+    public void LoginGuest()
+    {
+        GameManager.Instance.OpenMarkerDetailsWindow();
+        WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel); // Redirect to Home Panel
+    }
+
     public void OnForgotPasswordTextHit()
     {
         forgotEmail.text = email.text;
