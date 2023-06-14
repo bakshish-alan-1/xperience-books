@@ -484,7 +484,9 @@ public class ApiManager : MonoBehaviour
             
             FileHandler.SaveUserData(userData);    // save updated user details on local file
             Profile.Instance.SetProfileData(GameManager.Instance.m_UserData);
-            errorWindow.SetErrorMessage("Congratulations", response.message, "OKAY", ErrorWindow.ResponseData.JustClose, true);
+            errorWindow.SetErrorMessage("Profile Updated", /*response.message*/
+                "Congratulations, you have successfully updated your profile"/*Temprorary message to be updated later from server*/, 
+                "OKAY", ErrorWindow.ResponseData.JustClose, true);
             WindowManager.Instance.BackToPreviousWindow();
         }
         else
