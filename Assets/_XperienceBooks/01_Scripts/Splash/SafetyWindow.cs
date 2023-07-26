@@ -74,5 +74,6 @@ public class SafetyWindow : MonoBehaviour
     public void CloseWindow()
     {
         currentWindowAnimator.Play(windowFadeOut);
+        HomeScreen.Instance.OnScanBtnHit();
     }
 }

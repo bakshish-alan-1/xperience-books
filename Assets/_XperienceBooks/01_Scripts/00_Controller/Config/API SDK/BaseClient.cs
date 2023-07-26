@@ -29,6 +29,9 @@ namespace Intellify.core
                 case DevEnvironment.Staging:
                     APIEnvironment = new APIEnvironment(properties.Staging);
                     break;
+                case DevEnvironment.Local:
+                    APIEnvironment = new APIEnvironment(properties.LocalBaseURL);
+                    break;
             }
         }
     }

@@ -96,6 +96,11 @@ public class WindowManager : MonoBehaviour
             OpenPanel("PrivacyPolicy");
     }
 
+    public void ShowLogin()
+    {
+        OpenPanel("Login");
+    }
+
     public string getCurrentWindowName()
     {
         return windows[currentWindowIndex].windowName;

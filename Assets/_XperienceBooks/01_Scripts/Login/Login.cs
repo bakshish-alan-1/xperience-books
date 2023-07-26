@@ -61,7 +61,8 @@ public class Login : MonoBehaviour
 
     public void LoginGuest()
     {
-        GameManager.Instance.OpenMarkerDetailsWindow();
+        //GameManager.Instance.OpenMarkerDetailsWindow();
+        GameManager.Instance.OpenSafetyWindow();
         WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel); // Redirect to Home Panel
     }
 

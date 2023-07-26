@@ -6,7 +6,8 @@ public enum DevEnvironment
 {
     Testing,
     Staging,
-    Production
+    Production,
+    Local
 }
 
 /// <summary>
@@ -29,6 +30,8 @@ public class Properties : ScriptableObject
 
     [Header("Client Server")]
     public string ProductionBaseURL = "https://admin.continuummultimedia.com/api/";
+    [Header("Local Server")]
+    public string LocalBaseURL = "http://127.0.0.1:8000/api/";
 
     [Space(15)]
     [Tooltip("Update version every time when published new build, it will used to handle force update popup.")]

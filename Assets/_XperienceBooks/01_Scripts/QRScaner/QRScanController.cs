@@ -53,8 +53,10 @@ public class QRScanController : MonoBehaviour
     {
         if (!isThemeSet || GameManager.Instance.isNewThemeDownload)
         {
+            Debug.Log("No theme selected");
             isThemeSet = true;
-            BG.sprite = (ThemeManager.Instance.scanBackground);
+            if(ThemeManager.Instance.scanBackground != null)
+                BG.sprite = (ThemeManager.Instance.scanBackground);
             BackIcon.sprite = (ThemeManager.Instance.backBtn);
             if (GameManager.Instance.TitleFont != null)
                 TitleTxt.font = GameManager.Instance.TitleFont;
@@ -200,6 +202,7 @@ public class QRScanController : MonoBehaviour
         Reset();
         if (this.e_qrController != null)
         {
+            Debug.Log("Check 1");
             this.e_qrController.StartWork();
         }
     }

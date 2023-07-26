@@ -289,6 +289,11 @@ public class GameManager : MonoBehaviour
         markerWindowAnimator.Play("Window Out");
         safetyWindow.OpenWindow();
     }
+
+    public void OpenSafetyWindow()
+    {
+        safetyWindow.OpenWindow();
+    }
     #endregion
 
     Sprite textureToSprite = null;
