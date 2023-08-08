@@ -16,7 +16,7 @@ MonoBehaviour:
   TestingBaseURL: https://arbooks-test.theintellify.net/api/
   Staging: https://arbooks-stage.theintellify.net/api/
   ProductionBaseURL: https://admin.continuummultimedia.com/api/
-  LocalBaseURL: http://127.0.0.1:8000/api/
+  LocalBaseURL: http://3.15.176.60/api/
   AppVersion: 1.1
   LoginAPI: login
   Register: register
