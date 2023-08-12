@@ -6,8 +6,9 @@ public class Welcome : MonoBehaviour
 {
     private void Start()
     {
-        //GameManager.Instance.OpenSafetyWindow();
-        //WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel);
+        GameManager.Instance.OpenSafetyWindow();
+        WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel);
+        //HomeScreen.Instance.OnScanBtnHit();
     }
 
     public void GUI_QR_CodeDownload()

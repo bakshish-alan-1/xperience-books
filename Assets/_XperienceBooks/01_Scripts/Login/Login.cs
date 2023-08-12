@@ -61,9 +61,9 @@ public class Login : MonoBehaviour
 
     public void LoginGuest()
     {
-        //GameManager.Instance.OpenMarkerDetailsWindow();
         GameManager.Instance.OpenSafetyWindow();
         WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel); // Redirect to Home Panel
+        //ApiManager.Instance.DownloadGenreAuto(35, 1, 1);
     }
 
     public void OnForgotPasswordTextHit()

@@ -46,9 +46,10 @@ public class HomeScreen : MonoBehaviour
         Debug.Log("IsThemeSaved: "+ PlayerPrefs.GetString("IsThemeSaved"));
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
-        
+        yield return new WaitForSeconds(0.5f);
+        OnScanBtnHit();
     }
 
     public void OnScanBtnHit()

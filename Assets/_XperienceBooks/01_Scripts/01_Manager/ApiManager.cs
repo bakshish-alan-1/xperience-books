@@ -832,6 +832,111 @@ public class ApiManager : MonoBehaviour
     }
     #endregion
 
+    #region Direct Book Theme Download
+    public void DownloadGenreAuto(int genre, int series, int book)
+    {
+        StartCoroutine(CheckInternetConnection(isConnected =>
+        {
+            if (isConnected)
+            {
+                APIClient.CallWebAPI(Method.GET.ToString(), properties.genreList, string.Empty, GameManager.Instance.m_UserData.token, (success, data, statusCode) =>
+                {
+                    if (success)
+                    {
+                        Debug.Log("OnGenreList: " + data.ToString());
+                        SeriesController.Instance.setGenreList(data.ToString());
+                        DownloadSeriesAuto(genre, series);
+                    }
+                });
+            }
+        }));
+    }
+
+    private void DownloadSeriesAuto(int genre, int seriesId)
+    {
+        StartCoroutine(CheckInternetConnection(isConnected =>
+        {
+            if (isConnected)
+            {
+                APIClient.CallWebAPI(Method.GET.ToString(), string.Format(properties.seriesList, genre), string.Empty, GameManager.Instance.m_UserData.token,
+                    (success, data, statusCode) =>
+                    {
+                        if (success)
+                        {
+                            Debug.Log("On Series: " + data.ToString());
+                            SeriesList response = JsonUtility.FromJson<SeriesList>(data.ToString());
+                            GameManager.Instance.m_Series = response.data;//Store List of series                            
+                            DownloadBooksAuto(seriesId);
+                            //WindowManager.Instance.OpenPanel("Series"); // Redirect to Series list panel
+                            //HomeScreen.Instance.OnSetSeriesData();  // set or download all series image and name 
+                        }
+                    });
+            }
+        }));
+    }
+
+    private void DownloadBooksAuto(int seriesId)
+    {
+        StartCoroutine(CheckInternetConnection(isConnected =>
+        {
+            if (isConnected)
+            {
+                APIClient.CallWebAPI(Method.GET.ToString(), properties.seriesDetails + "/" + seriesId.ToString() + "/books", string.Empty, GameManager.Instance.m_UserData.token,
+                    (success, data, code) =>
+                    {
+                        if (success)
+                        {
+                            Debug.Log("Series Books List again: " + data.ToString());
+                            GameManager.Instance.selectedSeries = GameManager.Instance.m_Series[0];
+
+                            GameManager.Instance.TitleFont = null;
+                            GameManager.Instance.DetailFont = null;
+
+                            string theme = GameManager.Instance.GetThemePath();
+                            // create directory, remove different time stamp theme save on same series
+                            if (!System.IO.Directory.Exists(theme))
+                            {
+                                if (System.IO.Directory.Exists(GameManager.Instance.LocalStoragePath + "Theme/" + GameManager.Instance.selectedSeries.theme.id))
+                                    System.IO.Directory.Delete(GameManager.Instance.LocalStoragePath + "Theme/" + GameManager.Instance.selectedSeries.theme.id + "/", true);
+                            }
+
+                            FileHandler.SaveSeriesData(GameManager.Instance.selectedSeries);
+                            SeriesDetailsList response = JsonUtility.FromJson<SeriesDetailsList>(data.ToString());
+                            GameManager.Instance.m_SeriesDetails = response.data;//store details of series
+                            //WindowManager.Instance.OpenPanel("Book"); // Redirect to book selection panel
+                            //HomeScreen.Instance.OnSetBooksData(); // set or download all book image and name 
+                            DownloadThemeAuto(0);
+                        }
+                    });
+            }
+        }));
+    }
+
+    private void DownloadThemeAuto(int seriesIndex)
+    {
+            //checkDownloadedThemeSeries();
+            GameManager.Instance.selectedBooks = GameManager.Instance.m_SeriesDetails[seriesIndex];
+
+            FileHandler.SaveBooksData(GameManager.Instance.selectedBooks);
+
+        Debug.Log(" ------ " + GameManager.Instance.GetThemePath());
+        //return;
+            // if theme is not available then save new theame and set
+            if (!System.IO.Directory.Exists(GameManager.Instance.GetThemePath()))
+            {
+                PlayerPrefs.SetString("IsThemeSaved", "false");
+                ThemeManager.Instance.SaveSeriesTheame();
+            }
+            else
+            {
+                Debug.Log("Call LoadSkinTheme from BookData");
+                ThemeManager.Instance.LoadSkinTheme(true);// already theme available then direct set to the home panel
+            }
+            //ThemeManager.Instance.SaveSeriesIcon(GameManager.Instance.selectedBooks.image, GameManager.Instance.LocalStoragePath + "Theme/" + StaticKeywords.SeriesImage);
+    }
+    #endregion
+
+
     #region GenreList
     public void getGenre()
     {

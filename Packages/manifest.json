@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.unity.2d.sprite": "1.0.0",
     "com.unity.device-simulator": "3.0.2-preview",
     "com.unity.mobile.notifications": "1.4.4",
     "com.unity.textmeshpro": "3.0.6",
