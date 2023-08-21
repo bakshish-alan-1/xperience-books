@@ -212,6 +212,7 @@ public class ThemeManager : MonoBehaviour
             seriesIcon = Resources.Load<Sprite>("NoImage");
             progressText.text = "100 %";
             GameManager.Instance.OpenPrepareThemWindow(false);
+            Debug.Log("===================================== All Download compete goto next scene");
             SceneLoader.LoadScene(1);
         }
         else
@@ -240,7 +241,17 @@ public class ThemeManager : MonoBehaviour
             progressText.text = "100 %";
             request.Dispose();
             GameManager.Instance.OpenPrepareThemWindow(false);
-            SceneLoader.LoadScene(1);
+            Debug.Log($"===================================== All Download compete goto next scene {GameManager.Instance.isGuestUser}");
+            if (!GameManager.Instance.isGuestUser)
+            {
+                SceneLoader.LoadScene(1);
+            }
+            else
+            {
+                GameManager.Instance.isNewThemeDownload = true;
+                ApiManager.Instance.RaycastUnblock();
+                GameManager.Instance.UpdateMappedModuleList();
+            }
         }
     }
 
@@ -269,8 +280,7 @@ public class ThemeManager : MonoBehaviour
     {
         t = new Texture2D(100, 100);
         byte[] b = File.ReadAllBytes(path + "/" + name);
-        t.LoadImage(b);
-
+        t.LoadImage(b);        
         textureToSprite = Sprite.Create(t, new Rect(0, 0, t.width, t.height), new Vector2(0.5f, 0.5f), 100.0f);
 
         return textureToSprite;
@@ -279,6 +289,7 @@ public class ThemeManager : MonoBehaviour
     // call after download theme
     IEnumerator LoadSkin()
     {
+        Debug.Log("Came here to load Skin");
         yield return new WaitForEndOfFrame();
         theme = GameManager.Instance.GetThemePath();
 
@@ -442,8 +453,16 @@ public class ThemeManager : MonoBehaviour
         urls.Clear();
         name.Clear();
         urls.TrimExcess();
-        name.TrimExcess(); 
-        SaveSeriesIcon(GameManager.Instance.selectedBooks.image, GameManager.Instance.LocalStoragePath + "Theme/" + StaticKeywords.SeriesImage);
+        name.TrimExcess();
+        if (!GameManager.Instance.isGuestUser)
+        {
+            SaveSeriesIcon(GameManager.Instance.selectedBooks.image, GameManager.Instance.LocalStoragePath + "Theme/" + StaticKeywords.SeriesImage);
+        }
+        else
+        {
+            ApiManager.Instance.RaycastUnblock();
+            GameManager.Instance.OpenPrepareThemWindow(false);
+        }
         //SceneLoader.LoadScene(1);
     }
 
@@ -597,6 +616,7 @@ public class ThemeManager : MonoBehaviour
         else
         {
             progressText.text = "100 %";
+            Debug.Log("===================================== All Download compete goto next scene");
             SceneLoader.LoadScene(1);
         }
     }

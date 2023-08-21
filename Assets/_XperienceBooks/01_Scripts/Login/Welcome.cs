@@ -7,7 +7,7 @@ public class Welcome : MonoBehaviour
     private void Start()
     {
         GameManager.Instance.OpenSafetyWindow();
-        WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel);
+        WindowManager.Instance.OpenPanel(StaticKeywords.LoginPanel);
         //HomeScreen.Instance.OnScanBtnHit();
     }
 

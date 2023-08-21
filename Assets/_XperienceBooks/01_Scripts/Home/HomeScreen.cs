@@ -50,6 +50,7 @@ public class HomeScreen : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         OnScanBtnHit();
+        //ApiManager.Instance.DownloadSkinAuto(35, 1, 1);
     }
 
     public void OnScanBtnHit()
@@ -148,7 +149,8 @@ public class HomeScreen : MonoBehaviour
         Title.text = "";
         OnSetHomeScreenSocialMediaObject();
         setHomeTheameOfSeries();// call to set home window images as per skin data received
-        GameManager.Instance.OpenMarkerDetailsWindow();// instruction window to provide details of marker images
+        //BAKSHISH: Commented marker details window as this is no longer needed
+        //GameManager.Instance.OpenMarkerDetailsWindow();// instruction window to provide details of marker images
 
         NotificationPanel.Instance.OnSetThem();// set downloaded theme for notification panel
         Profile.Instance.OnSetThem();// set theme for profile screen
@@ -176,11 +178,10 @@ public class HomeScreen : MonoBehaviour
         Color newCol;
         if (ColorUtility.TryParseHtmlString(GameManager.Instance.selectedSeries.theme.color_code, out newCol))
             ScanBtnTxt.color = newCol;
-
+        QRScanController.Instance.Play();
         GameManager.Instance.OpenPrepareThemWindow(false);
         isThemeSet = true;
         WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel);
-
         ApiManager.Instance.GetNotificationList();
     }
 

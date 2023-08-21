@@ -396,7 +396,7 @@ public class ApiManager : MonoBehaviour
             }
             else
             {
-                GameManager.Instance.OpenMarkerDetailsWindow();
+                //GameManager.Instance.OpenMarkerDetailsWindow();
                 WindowManager.Instance.OpenPanel(StaticKeywords.HomePanel); // Redirect to Home Panel
             }
             Debug.Log("Login success: " + PlayerPrefs.GetInt("firebaseTokenSaved"));
@@ -499,14 +499,18 @@ public class ApiManager : MonoBehaviour
     // Get Mapped Module List :- 3
     #region Mapped ModuleList
 
-    public void GetMappedModules(int bookID, int chapterID,int qrCodeID, float latitude, float longitude)
+    public void GetMappedModules(int bookID, int chapterID,int qrCodeID, float latitude, float longitude, Action<bool, object, long> callBack = null)
     {
         StartCoroutine(CheckInternetConnection(isConnected =>
         {
             if (isConnected)
             {
                 RayCastBlock();
-                APIClient.CallWebAPI(Method.GET.ToString(), string.Format(properties.GetMappModuleList, bookID, chapterID, qrCodeID, latitude, longitude, GameManager.Instance.selectedBooks.id) , string.Empty, GameManager.Instance.m_UserData.token, GetMappedModuleList);
+                APIClient.CallWebAPI(Method.GET.ToString(), string.Format(properties.GetMappModuleList, bookID, chapterID, qrCodeID, latitude, longitude, 
+                    GameManager.Instance.selectedBooks.id) , string.Empty, GameManager.Instance.m_UserData.token, (success, data, responseCode)=> {
+                        GetMappedModuleList(success, data, responseCode);
+                        callBack?.Invoke(success, data, responseCode);
+                    } );
             }
         }));
     }
@@ -723,9 +727,10 @@ public class ApiManager : MonoBehaviour
             GameManager.Instance.m_UserData = response.data;//Store User Data on Instance
             Profile.Instance.SetProfileData(GameManager.Instance.m_UserData); // Set Data in Profile view (" In Future need to remove this method and Merge with SetUserData")
             PlayerPrefs.SetInt(StaticKeywords.Login, 1);//User  Login sucess playerfab set
+            /** //BAKSHISH: Commented marker details window as this is no longer needed
             if (WindowManager.Instance.currentWindowIndex == 11)// show if current screen are change password screen
                 GameManager.Instance.OpenMarkerDetailsWindow();
-
+            **/
             GetSeriesList();
         }
         else
@@ -833,7 +838,7 @@ public class ApiManager : MonoBehaviour
     #endregion
 
     #region Direct Book Theme Download
-    public void DownloadGenreAuto(int genre, int series, int book)
+    public void DownloadSkinAuto(int genre, int series, int book)
     {
         StartCoroutine(CheckInternetConnection(isConnected =>
         {
@@ -844,7 +849,10 @@ public class ApiManager : MonoBehaviour
                     if (success)
                     {
                         Debug.Log("OnGenreList: " + data.ToString());
-                        SeriesController.Instance.setGenreList(data.ToString());
+                        GameManager.Instance.genreId = genre;
+                        PlayerPrefs.SetInt("GenreId", GameManager.Instance.genreId);
+                        SeriesController.Instance.genreData = null;
+                        SeriesController.Instance.genreData = JsonUtility.FromJson<GenreData>(data.ToString());
                         DownloadSeriesAuto(genre, series);
                     }
                 });
@@ -862,10 +870,27 @@ public class ApiManager : MonoBehaviour
                     (success, data, statusCode) =>
                     {
                         if (success)
-                        {
+                        {                            
                             Debug.Log("On Series: " + data.ToString());
                             SeriesList response = JsonUtility.FromJson<SeriesList>(data.ToString());
-                            GameManager.Instance.m_Series = response.data;//Store List of series                            
+                            GameManager.Instance.m_Series = response.data;//Store List of series    
+                            //=========================================//
+                            GameManager.Instance.selectedSeries = GameManager.Instance.m_Series.Find(series => series.id == seriesId);
+
+                            GameManager.Instance.TitleFont = null;
+                            GameManager.Instance.DetailFont = null;
+
+                            string theme = GameManager.Instance.GetThemePath();
+                            // create directory, remove different time stamp theme save on same series
+                            if (!System.IO.Directory.Exists(theme))
+                            {
+                                Debug.Log($"Directory does not exists {theme}");
+                                if (System.IO.Directory.Exists(GameManager.Instance.LocalStoragePath + "Theme/" + GameManager.Instance.selectedSeries.theme.id))
+                                    System.IO.Directory.Delete(GameManager.Instance.LocalStoragePath + "Theme/" + GameManager.Instance.selectedSeries.theme.id + "/", true);
+                            }
+
+                            FileHandler.SaveSeriesData(GameManager.Instance.selectedSeries);
+                            //=========================================//
                             DownloadBooksAuto(seriesId);
                             //WindowManager.Instance.OpenPanel("Series"); // Redirect to Series list panel
                             //HomeScreen.Instance.OnSetSeriesData();  // set or download all series image and name 
@@ -896,6 +921,7 @@ public class ApiManager : MonoBehaviour
                             // create directory, remove different time stamp theme save on same series
                             if (!System.IO.Directory.Exists(theme))
                             {
+                                Debug.Log($"Theme folder does not exists {theme}");
                                 if (System.IO.Directory.Exists(GameManager.Instance.LocalStoragePath + "Theme/" + GameManager.Instance.selectedSeries.theme.id))
                                     System.IO.Directory.Delete(GameManager.Instance.LocalStoragePath + "Theme/" + GameManager.Instance.selectedSeries.theme.id + "/", true);
                             }
@@ -919,7 +945,7 @@ public class ApiManager : MonoBehaviour
 
             FileHandler.SaveBooksData(GameManager.Instance.selectedBooks);
 
-        Debug.Log(" ------ " + GameManager.Instance.GetThemePath());
+            Debug.Log(" ------ " + GameManager.Instance.GetThemePath());
         //return;
             // if theme is not available then save new theame and set
             if (!System.IO.Directory.Exists(GameManager.Instance.GetThemePath()))

@@ -8,6 +8,7 @@ namespace EnhancedScrollerDemos.MainMenu
     {
         public void ReturnToMainMenuButton_OnClick()
         {
+            Debug.Log("===================================== All Download compete goto next scene");
             SceneManager.LoadScene("MainMenu");
         }
     }

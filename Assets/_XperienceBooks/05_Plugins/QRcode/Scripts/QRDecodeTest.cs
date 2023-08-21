@@ -113,6 +113,7 @@ public class QRDecodeTest : MonoBehaviour
 			this.e_qrController.StopWork();
 		}
 		//Application.LoadLevel(scenename);
+		Debug.Log("===================================== All Download compete goto next scene");
 		SceneManager.LoadScene(scenename);
 	}
 

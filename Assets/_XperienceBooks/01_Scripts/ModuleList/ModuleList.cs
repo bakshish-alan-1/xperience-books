@@ -40,6 +40,7 @@ public class ModuleList : MonoBehaviour
     {
         if (!isThemeSet || GameManager.Instance.isNewThemeDownload)
         {
+            Debug.Log("Should be setting theme here");
             isThemeSet = true;
             BG.sprite = (ThemeManager.Instance.background);
             BackIcon.sprite = (ThemeManager.Instance.backBtn);

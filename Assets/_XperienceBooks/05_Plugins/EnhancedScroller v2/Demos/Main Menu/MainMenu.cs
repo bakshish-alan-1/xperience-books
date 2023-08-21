@@ -8,6 +8,7 @@ namespace EnhancedScollerDemos.MainMenu
     {
         public void SceneButton_OnClick(string sceneName)
         {
+            Debug.Log("===================================== All Download compete goto next scene");
             SceneManager.LoadScene(sceneName);
         }
     }

@@ -153,7 +153,8 @@ public class QRScanController : MonoBehaviour
 
                 GameManager.Instance.FanArtEmailSubject = "Fan Art Submission for " + GameManager.Instance.selectedBooks.name + " (Chapter-" + chapterID + " - QR Code-" + qrCodeID + ")";
 
-                ApiManager.Instance.GetMappedModules(bookID, chapterID, qrCodeID, latitude, longitude);
+                ApiManager.Instance.GetMappedModules(bookID, chapterID, qrCodeID, latitude, longitude, OnScanSuccess);
+                //Download theme for this QR code
                 GlobalControl.Instance.scanComplete = true;
             }
         }
@@ -161,6 +162,15 @@ public class QRScanController : MonoBehaviour
 
             ApiManager.Instance.WrongQR();
 
+        }
+    }
+
+    private void OnScanSuccess(bool success, object data, long respCode)
+    {
+        if (success)
+        {
+            ARMappedModuleList response = JsonUtility.FromJson<ARMappedModuleList>(data.ToString());
+            ApiManager.Instance.DownloadSkinAuto(response.data.book_details.genre_id, response.data.book_details.series_id, response.data.book_details.book_id);
         }
     }
 
@@ -226,6 +236,7 @@ public class QRScanController : MonoBehaviour
         {
             this.e_qrController.StopWork();
         }
+        Debug.Log("===================================== All Download compete goto next scene");
         SceneManager.LoadScene(scenename);
     }
 

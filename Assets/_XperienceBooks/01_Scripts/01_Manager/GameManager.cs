@@ -17,6 +17,8 @@ public class Book
     public string book_name;
     public string chapter_name;
     public string series_name;
+    public int series_id;
+    public int genre_id;
     public List<int> b_MapModules = new List<int>();
 
     public string BasePath() {
@@ -83,6 +85,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] string m_LocalPath;
     public string WatermarkURL;
     public int genreId = -1;
+    public bool isGuestUser;
 
     /// <summary>
     /// Store warning window info
@@ -158,6 +161,10 @@ public class GameManager : MonoBehaviour
                 selectedSeries = FileHandler.GetSeries();
             if (File.Exists(LocalStoragePath + "Theme/BooksData.json"))
                 selectedBooks = FileHandler.GetSeriesBook();
+        }
+        else
+        {
+            isGuestUser = true;
         }
     }
 
